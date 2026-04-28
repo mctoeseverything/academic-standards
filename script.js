@@ -1,110 +1,14 @@
-const questions = [
-  {
-    text: "Which expression is equivalent to 3(2x - 5) + 4x?",
-    choices: ["10x - 15", "10x - 5", "6x - 15", "6x - 5"]
-  },
-  {
-    text: "Solve for x: 2x + 3 = 7",
-    choices: ["x = 2", "x = 3", "x = 1", "x = 5"]
-  },
-  {
-    text: "Which expression is equivalent to 5(x + 2) - 3x?",
-    choices: ["2x + 10", "8x + 2", "2x - 10", "5x - 6"]
-  },
-  {
-    text: "Solve for y: 4y - 8 = 20",
-    choices: ["y = 7", "y = 6", "y = 8", "y = 5"]
-  },
-  {
-    text: "What is the slope of the line passing through (1, 3) and (5, 11)?",
-    choices: ["1", "2", "3", "4"]
-  },
-  {
-    text: "Which value of x makes x/3 + 4 = 9 true?",
-    choices: ["9", "12", "15", "18"]
-  },
-  {
-    text: "Simplify: 7a - 2a + 9",
-    choices: ["5a + 9", "9a - 2", "5a - 9", "7a + 7"]
-  },
-  {
-    text: "What is the solution to 3x = 24?",
-    choices: ["6", "7", "8", "9"]
-  },
-  {
-    text: "Which point lies on the line y = 2x + 1?",
-    choices: ["(1, 1)", "(2, 5)", "(3, 5)", "(4, 7)"]
-  },
-  {
-    text: "Factor: x^2 + 7x + 12",
-    choices: ["(x + 3)(x + 4)", "(x + 2)(x + 6)", "(x - 3)(x - 4)", "(x + 1)(x + 12)"]
-  },
-  {
-    text: "Solve: 5x - 9 = 16",
-    choices: ["x = 5", "x = 6", "x = 7", "x = 8"]
-  },
-  {
-    text: "Which inequality represents numbers greater than or equal to 12?",
-    choices: ["x > 12", "x < 12", "x >= 12", "x <= 12"]
-  },
-  {
-    text: "What is the value of 2^4?",
-    choices: ["8", "12", "16", "24"]
-  },
-  {
-    text: "Simplify: 6m + 3 - 2m",
-    choices: ["4m + 3", "8m", "4m - 3", "6m + 1"]
-  },
-  {
-    text: "Solve for x: 9 + x = 14",
-    choices: ["3", "4", "5", "6"]
-  },
-  {
-    text: "Which graph has a y-intercept of -2?",
-    choices: ["y = x - 2", "y = x + 2", "y = 2x", "y = -2x + 2"]
-  },
-  {
-    text: "Evaluate 3n - 1 when n = 4.",
-    choices: ["9", "10", "11", "12"]
-  },
-  {
-    text: "What is the solution to x - 7 = 15?",
-    choices: ["18", "20", "21", "22"]
-  },
-  {
-    text: "Simplify: 4(p + 6)",
-    choices: ["4p + 6", "4p + 24", "p + 24", "8p + 6"]
-  },
-  {
-    text: "Which expression is equivalent to 12 - 3(2 - x)?",
-    choices: ["6 + 3x", "6 - 3x", "18 - 3x", "12 + 6x"]
-  },
-  {
-    text: "Solve: 7x + 5 = 26",
-    choices: ["x = 2", "x = 3", "x = 4", "x = 5"]
-  },
-  {
-    text: "What is the domain of the relation {(1,2), (3,4), (5,6)}?",
-    choices: ["{2,4,6}", "{1,3,5}", "{1,2,3}", "{4,5,6}"]
-  },
-  {
-    text: "Simplify: 10 - (3 + x)",
-    choices: ["7 + x", "13 - x", "7 - x", "10 - 3x"]
-  },
-  {
-    text: "Which equation has the solution x = -4?",
-    choices: ["x + 4 = 0", "x - 4 = 0", "4x = -1", "x/4 = 4"]
-  },
-  {
-    text: "Solve for z: 2z + 11 = 19",
-    choices: ["z = 3", "z = 4", "z = 5", "z = 6"]
-  }
-];
+const STORAGE_KEY = "standards-institute-algebra-1-state";
+const NOTES_KEY = "standards-institute-algebra-1-notes";
+const DEFAULT_TIME = 5400;
 
+let questions = [];
 let current = 0;
-const answers = {};
-const markedQuestions = new Set();
-let time = 5400;
+let answers = {};
+let markedQuestions = new Set();
+let time = DEFAULT_TIME;
+let timerId = null;
+let submitted = false;
 
 const questionText = document.getElementById("questionText");
 const choicesDiv = document.getElementById("choices");
@@ -112,16 +16,101 @@ const questionGrid = document.getElementById("questionGrid");
 const questionNumberBadge = document.getElementById("questionNumberBadge");
 const markToggle = document.getElementById("markToggle");
 const markToggleLabel = markToggle.querySelector("span:last-child");
+const answeredCount = document.getElementById("answeredCount");
+const totalQuestions = document.getElementById("totalQuestions");
+const markedCount = document.getElementById("markedCount");
+const prevButton = document.getElementById("prevButton");
+const nextButton = document.getElementById("nextButton");
+const submitButton = document.getElementById("submitButton");
 const examShell = document.querySelector(".exam-shell");
 const leftSidebar = document.getElementById("leftSidebar");
 const rightSidebar = document.getElementById("rightSidebar");
+const calculatorButton = document.getElementById("calculatorButton");
+const graphingButton = document.getElementById("graphingButton");
+const notesButton = document.getElementById("notesButton");
+const notesField = document.getElementById("notesField");
+const submitSummary = document.getElementById("submitSummary");
+const submitChecklist = document.getElementById("submitChecklist");
+const confirmSubmitButton = document.getElementById("confirmSubmitButton");
+const restartButton = document.getElementById("restartButton");
+const resultsScore = document.getElementById("resultsScore");
+const resultsBreakdown = document.getElementById("resultsBreakdown");
+const resultsAnswered = document.getElementById("resultsAnswered");
+const resultsCorrect = document.getElementById("resultsCorrect");
+const resultsMarked = document.getElementById("resultsMarked");
+const resultsTime = document.getElementById("resultsTime");
+const resultsReview = document.getElementById("resultsReview");
+
+function getAnsweredCount() {
+  return Object.keys(answers).length;
+}
+
+function formatTime(totalSeconds) {
+  const h = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+  const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+  const s = String(totalSeconds % 60).padStart(2, "0");
+  return `${h}:${m}:${s}`;
+}
+
+function saveState() {
+  const state = {
+    current,
+    answers,
+    markedQuestions: [...markedQuestions],
+    time,
+    submitted
+  };
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function restoreState() {
+  const rawState = localStorage.getItem(STORAGE_KEY);
+  if (!rawState) return;
+
+  try {
+    const state = JSON.parse(rawState);
+    current = Number.isInteger(state.current) ? state.current : 0;
+    answers = state.answers && typeof state.answers === "object" ? state.answers : {};
+    markedQuestions = new Set(Array.isArray(state.markedQuestions) ? state.markedQuestions : []);
+    time = typeof state.time === "number" ? state.time : DEFAULT_TIME;
+    submitted = Boolean(state.submitted);
+  } catch {
+    current = 0;
+    answers = {};
+    markedQuestions = new Set();
+    time = DEFAULT_TIME;
+    submitted = false;
+  }
+}
+
+function loadNotes() {
+  notesField.value = localStorage.getItem(NOTES_KEY) || "";
+}
+
+function saveNotes() {
+  localStorage.setItem(NOTES_KEY, notesField.value);
+}
+
+function updateHeaderStats() {
+  answeredCount.textContent = getAnsweredCount();
+  totalQuestions.textContent = questions.length;
+  markedCount.textContent = markedQuestions.size;
+}
+
+function updateNavigationState() {
+  prevButton.disabled = current === 0 || submitted;
+  nextButton.disabled = current === questions.length - 1 || submitted;
+  submitButton.disabled = submitted;
+  markToggle.disabled = submitted;
+}
 
 function renderQuestion() {
-  const q = questions[current];
+  if (!questions.length) return;
 
+  const q = questions[current];
   questionNumberBadge.textContent = current + 1;
   questionText.textContent = q.text;
-
   choicesDiv.innerHTML = "";
 
   q.choices.forEach((choice, index) => {
@@ -133,6 +122,15 @@ function renderQuestion() {
       button.classList.add("selected");
     }
 
+    if (submitted) {
+      button.disabled = true;
+      if (index === q.correct) {
+        button.classList.add("correct");
+      } else if (answers[current] === index) {
+        button.classList.add("incorrect");
+      }
+    }
+
     button.innerHTML = `
       <span class="choice-letter">${String.fromCharCode(65 + index)}</span>
       <span class="choice-text">${choice}</span>
@@ -140,6 +138,7 @@ function renderQuestion() {
 
     button.onclick = () => {
       answers[current] = index;
+      saveState();
       renderQuestion();
     };
 
@@ -150,6 +149,8 @@ function renderQuestion() {
   markToggleLabel.textContent = markedQuestions.has(current) ? "Marked for Review" : "Mark for Review";
 
   renderGrid();
+  updateHeaderStats();
+  updateNavigationState();
 }
 
 function getQuestionState(index) {
@@ -167,8 +168,10 @@ function renderGrid() {
     button.className = `q-box ${getQuestionState(index)}`;
     button.type = "button";
     button.textContent = index + 1;
+    button.disabled = submitted;
     button.onclick = () => {
       current = index;
+      saveState();
       renderQuestion();
     };
     questionGrid.appendChild(button);
@@ -178,6 +181,7 @@ function renderGrid() {
 function nextQuestion() {
   if (current < questions.length - 1) {
     current += 1;
+    saveState();
     renderQuestion();
   }
 }
@@ -185,17 +189,21 @@ function nextQuestion() {
 function prevQuestion() {
   if (current > 0) {
     current -= 1;
+    saveState();
     renderQuestion();
   }
 }
 
 function toggleMarked() {
+  if (submitted) return;
+
   if (markedQuestions.has(current)) {
     markedQuestions.delete(current);
   } else {
     markedQuestions.add(current);
   }
 
+  saveState();
   renderQuestion();
 }
 
@@ -222,18 +230,154 @@ function toggleSidebar(side) {
 }
 
 function updateTimer() {
+  if (submitted) return;
+
   if (time > 0) {
     time -= 1;
+    document.getElementById("time").textContent = formatTime(time);
+    saveState();
+    return;
   }
 
-  const h = String(Math.floor(time / 3600)).padStart(2, "0");
-  const m = String(Math.floor((time % 3600) / 60)).padStart(2, "0");
-  const s = String(time % 60).padStart(2, "0");
-
-  document.getElementById("time").textContent = `${h}:${m}:${s}`;
+  showSubmitModal(true);
 }
 
-markToggle.addEventListener("click", toggleMarked);
+function startTimer() {
+  if (timerId) clearInterval(timerId);
+  document.getElementById("time").textContent = formatTime(time);
+  timerId = setInterval(updateTimer, 1000);
+}
 
-setInterval(updateTimer, 1000);
-renderQuestion();
+function showSubmitModal(autoSubmit = false) {
+  if (timerId && autoSubmit) {
+    clearInterval(timerId);
+    timerId = null;
+  }
+
+  const unanswered = questions.length - getAnsweredCount();
+  submitSummary.textContent = autoSubmit
+    ? "Time has expired. Review your counts below and submit your mock exam."
+    : "You are about to finish this mock exam. Review your progress before submitting.";
+
+  submitChecklist.innerHTML = `
+    <div class="submit-line"><span>Answered questions</span><strong>${getAnsweredCount()} of ${questions.length}</strong></div>
+    <div class="submit-line"><span>Unanswered questions</span><strong>${unanswered}</strong></div>
+    <div class="submit-line"><span>Marked for review</span><strong>${markedQuestions.size}</strong></div>
+    <div class="submit-line"><span>Time remaining</span><strong>${formatTime(time)}</strong></div>
+  `;
+
+  openModal("submitModal");
+}
+
+function finalizeSubmission() {
+  submitted = true;
+  saveState();
+  closeModal("submitModal");
+  if (timerId) clearInterval(timerId);
+  renderQuestion();
+  renderResults();
+  openModal("resultsModal");
+}
+
+function renderResults() {
+  let correct = 0;
+  resultsReview.innerHTML = "";
+
+  questions.forEach((question, index) => {
+    if (answers[index] === question.correct) correct += 1;
+
+    const row = document.createElement("div");
+    row.className = "review-row";
+
+    const userAnswer = Object.hasOwn(answers, index) ? String.fromCharCode(65 + answers[index]) : "Unanswered";
+    const correctAnswer = String.fromCharCode(65 + question.correct);
+
+    row.innerHTML = `
+      <div class="review-row-top">
+        <strong>Question ${index + 1}</strong>
+        <span class="${answers[index] === question.correct ? "review-good" : "review-bad"}">
+          ${answers[index] === question.correct ? "Correct" : "Check"}
+        </span>
+      </div>
+      <p>${question.text}</p>
+      <div class="review-meta">
+        <span>Your answer: ${userAnswer}</span>
+        <span>Correct answer: ${correctAnswer}</span>
+      </div>
+    `;
+
+    resultsReview.appendChild(row);
+  });
+
+  const score = Math.round((correct / questions.length) * 100);
+  resultsScore.textContent = `${score}%`;
+  resultsBreakdown.textContent = `${correct} correct out of ${questions.length} questions`;
+  resultsAnswered.textContent = getAnsweredCount();
+  resultsCorrect.textContent = correct;
+  resultsMarked.textContent = markedQuestions.size;
+  resultsTime.textContent = formatTime(time);
+}
+
+function restartTest() {
+  current = 0;
+  answers = {};
+  markedQuestions = new Set();
+  time = DEFAULT_TIME;
+  submitted = false;
+  closeModal("resultsModal");
+  localStorage.removeItem(STORAGE_KEY);
+  startTimer();
+  renderQuestion();
+}
+
+async function loadQuestions() {
+  try {
+    const response = await fetch("./questions.json");
+    if (!response.ok) {
+      throw new Error("Unable to load questions.json");
+    }
+
+    questions = await response.json();
+  } catch {
+    const fallback = document.getElementById("questionsFallback");
+    questions = JSON.parse(fallback.textContent);
+  }
+}
+
+calculatorButton.addEventListener("click", () => openModal("calculatorModal"));
+graphingButton.addEventListener("click", () => openModal("graphingModal"));
+notesButton.addEventListener("click", () => openModal("notesModal"));
+notesField.addEventListener("input", saveNotes);
+markToggle.addEventListener("click", toggleMarked);
+submitButton.addEventListener("click", () => showSubmitModal(false));
+confirmSubmitButton.addEventListener("click", finalizeSubmission);
+restartButton.addEventListener("click", restartTest);
+
+window.nextQuestion = nextQuestion;
+window.prevQuestion = prevQuestion;
+window.toggleSidebar = toggleSidebar;
+window.openModal = openModal;
+window.closeModal = closeModal;
+
+async function init() {
+  loadNotes();
+  restoreState();
+  await loadQuestions();
+
+  if (current > questions.length - 1) {
+    current = 0;
+  }
+
+  startTimer();
+  renderQuestion();
+
+  if (submitted) {
+    if (timerId) clearInterval(timerId);
+    renderResults();
+    openModal("resultsModal");
+  }
+}
+
+init().catch(() => {
+  questionText.textContent = "There was a problem loading the Algebra I question set.";
+});
