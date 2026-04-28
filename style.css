@@ -583,6 +583,10 @@ svg {
   box-shadow: var(--shadow);
 }
 
+.formula-modal .modal-content {
+  width: min(760px, 100%);
+}
+
 .modal-content h3 {
   margin-top: 0;
   font-family: "Source Serif 4", Georgia, serif;
@@ -657,6 +661,7 @@ svg {
   font-family: "Source Serif 4", Georgia, serif;
   font-size: 1.02rem;
   color: var(--navy-deep);
+  line-height: 1.4;
 }
 
 .formula-expression em {
@@ -708,6 +713,42 @@ svg {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+}
+
+.formula-modal .sheet-section {
+  padding: 18px 24px 20px;
+}
+
+.formula-modal .formula-list {
+  gap: 14px;
+}
+
+.formula-modal .formula-row {
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 18px;
+  min-height: 72px;
+  padding: 14px 16px;
+}
+
+.formula-modal .formula-label {
+  align-self: center;
+  font-size: 0.92rem;
+}
+
+.formula-modal .formula-expression {
+  font-size: 1.1rem;
+}
+
+.formula-modal .formula-row .formula-expression {
+  white-space: nowrap;
+}
+
+.formula-modal .featured-formula {
+  min-height: 120px;
+}
+
+.formula-modal .featured-formula .formula-expression {
+  font-size: 1.45rem;
 }
 
 @media (max-width: 1280px) {
@@ -779,5 +820,21 @@ svg {
   .nav-button,
   .pause-button {
     width: 100%;
+  }
+}
+
+@media (max-width: 720px) {
+  .formula-modal .formula-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    min-height: 0;
+  }
+
+  .formula-modal .formula-row .formula-expression {
+    white-space: normal;
+  }
+
+  .formula-modal .featured-formula .formula-expression {
+    font-size: 1.2rem;
   }
 }

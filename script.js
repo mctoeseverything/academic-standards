@@ -112,9 +112,6 @@ const questionGrid = document.getElementById("questionGrid");
 const questionNumberBadge = document.getElementById("questionNumberBadge");
 const markToggle = document.getElementById("markToggle");
 const markToggleLabel = markToggle.querySelector("span:last-child");
-const markedCount = document.getElementById("markedCount");
-const reviewMarkedButton = document.getElementById("reviewMarkedButton");
-const reviewNextButton = document.getElementById("reviewNextButton");
 const examShell = document.querySelector(".exam-shell");
 const leftSidebar = document.getElementById("leftSidebar");
 const rightSidebar = document.getElementById("rightSidebar");
@@ -153,7 +150,6 @@ function renderQuestion() {
   markToggleLabel.textContent = markedQuestions.has(current) ? "Marked for Review" : "Mark for Review";
 
   renderGrid();
-  updateMarkedCount();
 }
 
 function getQuestionState(index) {
@@ -179,10 +175,6 @@ function renderGrid() {
   });
 }
 
-function updateMarkedCount() {
-  markedCount.textContent = markedQuestions.size;
-}
-
 function nextQuestion() {
   if (current < questions.length - 1) {
     current += 1;
@@ -205,24 +197,6 @@ function toggleMarked() {
   }
 
   renderQuestion();
-}
-
-function goToNextMarkedOrUnanswered() {
-  const upcomingMarked = questions.findIndex((_, index) => index > current && markedQuestions.has(index));
-  if (upcomingMarked !== -1) {
-    current = upcomingMarked;
-    renderQuestion();
-    return;
-  }
-
-  const upcomingUnanswered = questions.findIndex((_, index) => index > current && !Object.hasOwn(answers, index));
-  if (upcomingUnanswered !== -1) {
-    current = upcomingUnanswered;
-    renderQuestion();
-    return;
-  }
-
-  nextQuestion();
 }
 
 function openModal(id) {
@@ -260,14 +234,6 @@ function updateTimer() {
 }
 
 markToggle.addEventListener("click", toggleMarked);
-reviewMarkedButton.addEventListener("click", () => {
-  const firstMarked = [...markedQuestions].sort((a, b) => a - b)[0];
-  if (firstMarked !== undefined) {
-    current = firstMarked;
-    renderQuestion();
-  }
-});
-reviewNextButton.addEventListener("click", goToNextMarkedOrUnanswered);
 
 setInterval(updateTimer, 1000);
 renderQuestion();

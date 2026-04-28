@@ -125,9 +125,6 @@
           <div class="legend-item"><span class="legend-swatch marked"></span>Marked for Review</div>
         </div>
 
-        <button class="secondary-button review-button" type="button" id="reviewMarkedButton">
-          Review Marked (<span id="markedCount">0</span>)
-        </button>
       </aside>
 
       <section class="panel center-panel">
@@ -164,7 +161,6 @@
         <div class="action-bar">
           <button class="secondary-button nav-button" type="button" onclick="prevQuestion()"><svg class="inline-icon tiny-icon"><use href="#icon-chevron-left"></use></svg>Previous</button>
           <div class="action-group">
-            <button class="secondary-button nav-button" type="button" id="reviewNextButton">Review &amp; Next</button>
             <button class="primary-button nav-button" type="button" onclick="nextQuestion()">Next<svg class="inline-icon tiny-icon"><use href="#icon-chevron-right"></use></svg></button>
           </div>
         </div>
@@ -251,7 +247,7 @@
     </div>
   </div>
 
-  <div class="modal" id="formulaModal" aria-hidden="true">
+  <div class="modal formula-modal" id="formulaModal" aria-hidden="true">
     <div class="modal-content">
       <div class="modal-sheet">
         <div class="sheet-header">
