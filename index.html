@@ -69,7 +69,10 @@
         <div class="question-body">
           <div class="question-meta">
             <div class="question-pill" id="questionNumberBadge">1</div>
-            <button class="mark-toggle" id="markToggle" type="button">Mark for Review</button>
+            <button class="mark-toggle" id="markToggle" type="button">
+              <span class="icon bookmark-icon" aria-hidden="true"></span>
+              <span>Mark for Review</span>
+            </button>
           </div>
 
           <h1 id="questionText"></h1>
@@ -80,11 +83,26 @@
       <aside class="panel tools-panel">
         <h2>Tools</h2>
         <div class="tools-list">
-          <button class="tool-link" type="button">Calculator</button>
-          <button class="tool-link" type="button" onclick="openModal('referenceModal')">Reference Sheet</button>
-          <button class="tool-link" type="button" onclick="openModal('formulaModal')">Formula Sheet</button>
-          <button class="tool-link" type="button">Graphing Tool</button>
-          <button class="tool-link" type="button">Notes</button>
+          <button class="tool-link" type="button">
+            <span class="icon tool-icon calculator-icon" aria-hidden="true"></span>
+            <span>Calculator</span>
+          </button>
+          <button class="tool-link" type="button" onclick="openModal('referenceModal')">
+            <span class="icon tool-icon document-icon" aria-hidden="true"></span>
+            <span>Reference Sheet</span>
+          </button>
+          <button class="tool-link" type="button" onclick="openModal('formulaModal')">
+            <span class="icon tool-icon formula-icon" aria-hidden="true"></span>
+            <span>Formula Sheet</span>
+          </button>
+          <button class="tool-link" type="button">
+            <span class="icon tool-icon graph-icon" aria-hidden="true"></span>
+            <span>Graphing Tool</span>
+          </button>
+          <button class="tool-link" type="button">
+            <span class="icon tool-icon notes-icon" aria-hidden="true"></span>
+            <span>Notes</span>
+          </button>
         </div>
       </aside>
     </section>

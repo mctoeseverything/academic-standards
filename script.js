@@ -111,6 +111,7 @@ const choicesDiv = document.getElementById("choices");
 const questionGrid = document.getElementById("questionGrid");
 const questionNumberBadge = document.getElementById("questionNumberBadge");
 const markToggle = document.getElementById("markToggle");
+const markToggleLabel = markToggle.querySelector("span:last-child");
 const markedCount = document.getElementById("markedCount");
 const reviewMarkedButton = document.getElementById("reviewMarkedButton");
 const reviewNextButton = document.getElementById("reviewNextButton");
@@ -146,7 +147,7 @@ function renderQuestion() {
   });
 
   markToggle.classList.toggle("active", markedQuestions.has(current));
-  markToggle.textContent = markedQuestions.has(current) ? "Marked for Review" : "Mark for Review";
+  markToggleLabel.textContent = markedQuestions.has(current) ? "Marked for Review" : "Mark for Review";
 
   renderGrid();
   updateMarkedCount();

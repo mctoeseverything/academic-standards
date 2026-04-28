@@ -20,7 +20,7 @@
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: "Segoe UI", "Aptos", "Helvetica Neue", Arial, sans-serif;
+  font-family: "Aptos", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   color: var(--text);
   background:
     radial-gradient(circle at top center, rgba(20, 61, 121, 0.06), transparent 32%),
@@ -37,7 +37,7 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding: 28px 32px;
+  padding: 22px 28px;
   background: rgba(255, 255, 255, 0.92);
   border-bottom: 1px solid rgba(196, 206, 222, 0.75);
   backdrop-filter: blur(12px);
@@ -84,7 +84,7 @@ a {
 
 .brand-name {
   font-family: Cambria, Georgia, "Times New Roman", serif;
-  font-size: 1.95rem;
+  font-size: 1.8rem;
   font-weight: 600;
   line-height: 1;
   color: var(--navy-strong);
@@ -92,7 +92,7 @@ a {
 
 .brand-tag {
   margin-top: 3px;
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   color: var(--navy);
   opacity: 0.82;
 }
@@ -106,6 +106,7 @@ a {
 .main-nav a {
   color: var(--muted);
   text-decoration: none;
+  font-size: 0.98rem;
   font-weight: 500;
 }
 
@@ -120,13 +121,14 @@ a {
   gap: 12px;
   padding-left: 18px;
   border-left: 1px solid var(--border);
+  font-size: 0.98rem;
 }
 
 .avatar {
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 999px;
   color: var(--muted);
   background: linear-gradient(180deg, #f3f4f7 0%, #ebeef5 100%);
@@ -135,13 +137,13 @@ a {
 }
 
 .page-shell {
-  padding: 28px 24px 32px;
+  padding: 22px 20px 24px;
 }
 
 .exam-shell {
   display: grid;
-  grid-template-columns: 310px minmax(0, 1fr) 230px;
-  min-height: calc(100vh - 206px);
+  grid-template-columns: 282px minmax(0, 1fr) 212px;
+  min-height: calc(100vh - 180px);
   background: rgba(255, 255, 255, 0.84);
   border: 1px solid var(--border);
   border-radius: 30px;
@@ -155,7 +157,7 @@ a {
 
 .questions-panel,
 .tools-panel {
-  padding: 30px 28px 26px;
+  padding: 24px 22px 22px;
 }
 
 .center-panel {
@@ -165,22 +167,23 @@ a {
 
 .questions-panel h2,
 .tools-panel h2 {
-  margin: 0 0 28px;
-  font-size: 1.2rem;
+  margin: 0 0 22px;
+  font-size: 1.08rem;
 }
 
 .question-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
+  gap: 10px;
 }
 
 .q-box {
-  height: 42px;
+  height: 38px;
   border: 1px solid var(--border-strong);
-  border-radius: 10px;
+  border-radius: 9px;
   background: #fff;
   color: var(--text);
+  font-size: 0.96rem;
   font-weight: 600;
   cursor: pointer;
   transition: 0.18s ease;
@@ -209,8 +212,8 @@ a {
 
 .legend {
   display: grid;
-  gap: 14px;
-  margin-top: 54px;
+  gap: 12px;
+  margin-top: 40px;
 }
 
 .legend-item {
@@ -218,11 +221,12 @@ a {
   align-items: center;
   gap: 12px;
   color: #4d5a75;
+  font-size: 0.96rem;
 }
 
 .legend-swatch {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 5px;
   border: 1px solid var(--border-strong);
   background: #fff;
@@ -259,13 +263,13 @@ a {
   grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 28px;
-  padding: 20px 32px;
+  padding: 18px 26px;
   border-bottom: 1px solid var(--border);
 }
 
 .eyebrow {
   margin: 0 0 8px;
-  font-size: 2rem;
+  font-size: 1.72rem;
   font-weight: 700;
 }
 
@@ -274,6 +278,7 @@ a {
   background: transparent;
   padding: 0;
   color: var(--navy);
+  font-size: 0.96rem;
   font-weight: 500;
   cursor: pointer;
 }
@@ -293,31 +298,31 @@ a {
 }
 
 .timer-label {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: var(--navy);
 }
 
 .timer-value {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 500;
   letter-spacing: 0.04em;
 }
 
 .question-body {
-  padding: 34px 32px 40px;
+  padding: 28px 26px 32px;
 }
 
 .question-meta {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
 }
 
 .question-pill {
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
   background: var(--navy);
   color: #fff;
@@ -325,9 +330,14 @@ a {
 }
 
 .mark-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   border: none;
   background: transparent;
   color: #2d3b59;
+  padding: 0;
+  font-size: 0.98rem;
   font-weight: 500;
   cursor: pointer;
 }
@@ -337,16 +347,16 @@ a {
 }
 
 #questionText {
-  margin: 28px 0 34px;
-  font-size: 1.55rem;
+  margin: 24px 0 28px;
+  font-size: 1.34rem;
   line-height: 1.5;
   font-weight: 500;
 }
 
 .choices {
   display: grid;
-  gap: 16px;
-  max-width: 780px;
+  gap: 14px;
+  max-width: 720px;
 }
 
 .choice {
@@ -354,9 +364,9 @@ a {
   align-items: center;
   gap: 16px;
   width: 100%;
-  padding: 18px 20px;
+  padding: 15px 18px;
   border: 1px solid var(--border-strong);
-  border-radius: 16px;
+  border-radius: 14px;
   background: #fff;
   cursor: pointer;
   transition: 0.18s ease;
@@ -376,22 +386,23 @@ a {
 .choice-letter {
   display: grid;
   place-items: center;
-  flex: 0 0 30px;
-  width: 30px;
-  height: 30px;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
   border: 2px solid #2b3956;
   border-radius: 999px;
   font-weight: 700;
+  font-size: 0.94rem;
 }
 
 .choice-text {
-  font-family: Cambria, Georgia, "Times New Roman", serif;
-  font-size: 1.1rem;
+  font-size: 1rem;
+  line-height: 1.45;
 }
 
 .tools-list {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .tool-link {
@@ -400,19 +411,145 @@ a {
   gap: 12px;
   border: none;
   background: transparent;
-  padding: 10px 0;
+  padding: 8px 0;
   color: #24314d;
   cursor: pointer;
   text-align: left;
+  font-size: 0.98rem;
 }
 
-.tool-link::before {
+.icon {
+  position: relative;
+  display: inline-block;
+  flex: 0 0 auto;
+}
+
+.bookmark-icon {
+  width: 12px;
+  height: 16px;
+  border: 1.8px solid currentColor;
+  border-radius: 2px 2px 0 0;
+  border-bottom: none;
+}
+
+.bookmark-icon::after {
   content: "";
-  width: 18px;
-  height: 18px;
-  border: 2px solid var(--text);
+  position: absolute;
+  left: -1.8px;
+  right: -1.8px;
+  bottom: -1px;
+  margin: auto;
+  width: 0;
+  height: 0;
+  border-left: 7.8px solid transparent;
+  border-right: 7.8px solid transparent;
+  border-top: 7px solid currentColor;
+}
+
+.bookmark-icon::before {
+  content: "";
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  bottom: -0.5px;
+  margin: auto;
+  width: 0;
+  height: 0;
+  border-left: 5.2px solid transparent;
+  border-right: 5.2px solid transparent;
+  border-top: 5px solid #fff;
+}
+
+.tool-icon {
+  width: 20px;
+  height: 20px;
+  color: #24314d;
+}
+
+.calculator-icon {
+  border: 1.8px solid currentColor;
   border-radius: 4px;
-  opacity: 0.9;
+}
+
+.calculator-icon::before,
+.calculator-icon::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  border-top: 1.8px solid currentColor;
+}
+
+.calculator-icon::before {
+  top: 6px;
+}
+
+.calculator-icon::after {
+  top: 11px;
+}
+
+.document-icon {
+  border: 1.8px solid currentColor;
+  border-radius: 3px;
+}
+
+.document-icon::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 7px;
+  height: 7px;
+  border-top: 1.8px solid currentColor;
+  border-right: 1.8px solid currentColor;
+  background: #fff;
+  transform: skew(-12deg);
+}
+
+.formula-icon::before {
+  content: "fx";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.95rem;
+  font-style: italic;
+  font-weight: 700;
+}
+
+.graph-icon {
+  border-bottom: 1.8px solid currentColor;
+  border-left: 1.8px solid currentColor;
+  border-radius: 0 0 0 3px;
+}
+
+.graph-icon::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  bottom: 4px;
+  width: 11px;
+  height: 7px;
+  border-left: 1.8px solid currentColor;
+  border-bottom: 1.8px solid currentColor;
+  transform: skew(-35deg);
+}
+
+.notes-icon {
+  border: 1.8px solid currentColor;
+  border-radius: 3px;
+  transform: rotate(-2deg);
+}
+
+.notes-icon::before {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 1.8px;
+  background: currentColor;
+  top: 5px;
+  left: 4px;
+  box-shadow: 0 4px 0 currentColor;
 }
 
 .action-bar {
@@ -420,8 +557,8 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  margin-top: 20px;
-  padding: 22px 4px 0;
+  margin-top: 16px;
+  padding: 18px 4px 0;
 }
 
 .action-group {
@@ -434,9 +571,10 @@ a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 54px;
-  padding: 0 24px;
-  border-radius: 14px;
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: 12px;
+  font-size: 0.98rem;
   font-weight: 700;
   cursor: pointer;
   transition: 0.18s ease;
@@ -460,11 +598,11 @@ a {
 }
 
 .nav-button {
-  min-width: 142px;
+  min-width: 132px;
 }
 
 .pause-button {
-  min-width: 96px;
+  min-width: 88px;
 }
 
 .modal {
