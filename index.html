@@ -109,8 +109,13 @@
 
   <main class="page-shell">
     <section class="exam-shell">
-      <aside class="panel questions-panel">
-        <h2>Questions</h2>
+      <aside class="panel questions-panel" id="leftSidebar">
+        <div class="panel-head">
+          <h2>Questions</h2>
+          <button class="collapse-button" type="button" onclick="toggleSidebar('left')" aria-label="Collapse questions panel">
+            <svg class="inline-icon tiny-icon"><use href="#icon-chevron-left"></use></svg>
+          </button>
+        </div>
         <div class="question-grid" id="questionGrid"></div>
 
         <div class="legend">
@@ -155,10 +160,23 @@
           <h1 id="questionText"></h1>
           <div id="choices" class="choices"></div>
         </div>
+
+        <div class="action-bar">
+          <button class="secondary-button nav-button" type="button" onclick="prevQuestion()"><svg class="inline-icon tiny-icon"><use href="#icon-chevron-left"></use></svg>Previous</button>
+          <div class="action-group">
+            <button class="secondary-button nav-button" type="button" id="reviewNextButton">Review &amp; Next</button>
+            <button class="primary-button nav-button" type="button" onclick="nextQuestion()">Next<svg class="inline-icon tiny-icon"><use href="#icon-chevron-right"></use></svg></button>
+          </div>
+        </div>
       </section>
 
-      <aside class="panel tools-panel">
-        <h2>Tools</h2>
+      <aside class="panel tools-panel" id="rightSidebar">
+        <div class="panel-head">
+          <h2>Tools</h2>
+          <button class="collapse-button" type="button" onclick="toggleSidebar('right')" aria-label="Collapse tools panel">
+            <svg class="inline-icon tiny-icon"><use href="#icon-chevron-right"></use></svg>
+          </button>
+        </div>
         <div class="tools-list">
           <button class="tool-link" type="button">
             <svg class="tool-svg"><use href="#icon-calculator"></use></svg>
@@ -183,14 +201,6 @@
         </div>
       </aside>
     </section>
-
-    <div class="action-bar">
-      <button class="secondary-button nav-button" type="button" onclick="prevQuestion()"><svg class="inline-icon tiny-icon"><use href="#icon-chevron-left"></use></svg>Previous</button>
-      <div class="action-group">
-        <button class="secondary-button nav-button" type="button" id="reviewNextButton">Review &amp; Next</button>
-        <button class="primary-button nav-button" type="button" onclick="nextQuestion()">Next<svg class="inline-icon tiny-icon"><use href="#icon-chevron-right"></use></svg></button>
-      </div>
-    </div>
   </main>
 
   <div class="modal" id="referenceModal" aria-hidden="true">

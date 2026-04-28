@@ -115,6 +115,9 @@ const markToggleLabel = markToggle.querySelector("span:last-child");
 const markedCount = document.getElementById("markedCount");
 const reviewMarkedButton = document.getElementById("reviewMarkedButton");
 const reviewNextButton = document.getElementById("reviewNextButton");
+const examShell = document.querySelector(".exam-shell");
+const leftSidebar = document.getElementById("leftSidebar");
+const rightSidebar = document.getElementById("rightSidebar");
 
 function renderQuestion() {
   const q = questions[current];
@@ -228,6 +231,20 @@ function openModal(id) {
 
 function closeModal(id) {
   document.getElementById(id).style.display = "none";
+}
+
+function toggleSidebar(side) {
+  const isLeft = side === "left";
+  const sidebar = isLeft ? leftSidebar : rightSidebar;
+  const variableName = isLeft ? "--left-sidebar-width" : "--right-sidebar-width";
+  const expandedWidth = isLeft ? "320px" : "234px";
+  const collapsedWidth = "64px";
+
+  sidebar.classList.toggle("collapsed");
+  examShell.style.setProperty(
+    variableName,
+    sidebar.classList.contains("collapsed") ? collapsedWidth : expandedWidth
+  );
 }
 
 function updateTimer() {

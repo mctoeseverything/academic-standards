@@ -150,7 +150,7 @@ svg {
 
 .exam-shell {
   display: grid;
-  grid-template-columns: 320px minmax(0, 1fr) 234px;
+  grid-template-columns: var(--left-sidebar-width, 320px) minmax(0, 1fr) var(--right-sidebar-width, 234px);
   flex: 1 1 auto;
   min-height: 0;
   border: 1px solid var(--border);
@@ -183,10 +183,31 @@ svg {
 
 .questions-panel h2,
 .tools-panel h2 {
-  margin: 0 0 24px;
+  margin: 0;
   font-size: 1.12rem;
   font-weight: 700;
   color: var(--navy-deep);
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.collapse-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--navy);
+  cursor: pointer;
 }
 
 .question-grid {
@@ -465,8 +486,10 @@ svg {
   justify-content: space-between;
   gap: 18px;
   flex: 0 0 auto;
-  min-height: 68px;
-  padding: 0 8px;
+  min-height: 74px;
+  padding: 14px 30px 18px;
+  border-top: 1px solid var(--border);
+  background: linear-gradient(180deg, #f9fbff 0%, #f4f7fc 100%);
 }
 
 .action-group {
@@ -511,6 +534,35 @@ svg {
   width: 100%;
   margin-top: 34px;
   flex-shrink: 0;
+}
+
+.questions-panel.collapsed,
+.tools-panel.collapsed {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.questions-panel.collapsed .panel-head,
+.tools-panel.collapsed .panel-head {
+  justify-content: center;
+  margin-bottom: 0;
+}
+
+.questions-panel.collapsed h2,
+.tools-panel.collapsed h2,
+.questions-panel.collapsed .question-grid,
+.questions-panel.collapsed .legend,
+.questions-panel.collapsed .review-button,
+.tools-panel.collapsed .tools-list {
+  display: none;
+}
+
+.questions-panel.collapsed .collapse-button svg {
+  transform: rotate(180deg);
+}
+
+.tools-panel.collapsed .collapse-button svg {
+  transform: rotate(180deg);
 }
 
 .modal {
