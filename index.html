@@ -2,74 +2,121 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Standards Institute - Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Standards Institute - Assessment</title>
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-
-<header class="topbar">
-  <div class="logo">Standards Institute</div>
-  <div class="timer">Time Remaining: <span id="time">01:30:00</span></div>
-</header>
-
-<div class="layout">
-
-  <!-- LEFT SIDEBAR -->
-  <aside class="sidebar left" id="leftSidebar">
-    <div class="sidebar-header">
-      Questions
-      <button onclick="toggleSidebar('left')">⟨⟨</button>
+  <header class="site-header">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div>
+        <div class="brand-name">Standards Institute</div>
+        <div class="brand-tag">Academic assessments. Trusted practice.</div>
+      </div>
     </div>
-    <div class="question-grid" id="questionGrid"></div>
-  </aside>
 
-  <!-- MAIN -->
-  <main class="main">
-    <h2 id="questionTitle">Question 1</h2>
-    <p id="questionText"></p>
+    <nav class="main-nav" aria-label="Primary">
+      <a href="#">Dashboard</a>
+      <a href="#" class="active">Assessments</a>
+      <a href="#">My Results</a>
+      <a href="#">Help</a>
+    </nav>
 
-    <div id="choices"></div>
+    <div class="user-chip">
+      <div class="avatar">JS</div>
+      <span>John Smith</span>
+    </div>
+  </header>
 
-    <div class="nav-buttons">
-      <button onclick="prevQuestion()">Previous</button>
-      <button onclick="nextQuestion()">Next</button>
+  <main class="page-shell">
+    <section class="exam-shell">
+      <aside class="panel questions-panel">
+        <h2>Questions</h2>
+        <div class="question-grid" id="questionGrid"></div>
+
+        <div class="legend">
+          <div class="legend-item"><span class="legend-swatch current"></span>Current</div>
+          <div class="legend-item"><span class="legend-swatch unanswered"></span>Not Answered</div>
+          <div class="legend-item"><span class="legend-swatch answered"></span>Answered</div>
+          <div class="legend-item"><span class="legend-swatch marked"></span>Marked for Review</div>
+        </div>
+
+        <button class="secondary-button review-button" type="button" id="reviewMarkedButton">
+          Review Marked (<span id="markedCount">0</span>)
+        </button>
+      </aside>
+
+      <section class="panel center-panel">
+        <div class="exam-header">
+          <div>
+            <p class="eyebrow">Algebra I - Test Form</p>
+            <button class="text-button" type="button">Directions</button>
+          </div>
+
+          <div class="timer-block">
+            <div class="timer-label">Time Remaining</div>
+            <div class="timer-value" id="time">01:30:00</div>
+          </div>
+
+          <button class="secondary-button pause-button" type="button">Pause</button>
+        </div>
+
+        <div class="question-body">
+          <div class="question-meta">
+            <div class="question-pill" id="questionNumberBadge">1</div>
+            <button class="mark-toggle" id="markToggle" type="button">Mark for Review</button>
+          </div>
+
+          <h1 id="questionText"></h1>
+          <div id="choices" class="choices"></div>
+        </div>
+      </section>
+
+      <aside class="panel tools-panel">
+        <h2>Tools</h2>
+        <div class="tools-list">
+          <button class="tool-link" type="button">Calculator</button>
+          <button class="tool-link" type="button" onclick="openModal('referenceModal')">Reference Sheet</button>
+          <button class="tool-link" type="button" onclick="openModal('formulaModal')">Formula Sheet</button>
+          <button class="tool-link" type="button">Graphing Tool</button>
+          <button class="tool-link" type="button">Notes</button>
+        </div>
+      </aside>
+    </section>
+
+    <div class="action-bar">
+      <button class="secondary-button nav-button" type="button" onclick="prevQuestion()">Previous</button>
+      <div class="action-group">
+        <button class="secondary-button nav-button" type="button" id="reviewNextButton">Review &amp; Next</button>
+        <button class="primary-button nav-button" type="button" onclick="nextQuestion()">Next</button>
+      </div>
     </div>
   </main>
 
-  <!-- RIGHT SIDEBAR -->
-  <aside class="sidebar right" id="rightSidebar">
-    <div class="sidebar-header">
-      Tools
-      <button onclick="toggleSidebar('right')">⟩⟩</button>
+  <div class="modal" id="referenceModal" aria-hidden="true">
+    <div class="modal-content">
+      <h3>Reference Sheet</h3>
+      <p><strong>Properties</strong></p>
+      <p>a + b = b + a</p>
+      <p>a(b + c) = ab + ac</p>
+      <button class="primary-button" type="button" onclick="closeModal('referenceModal')">Close</button>
     </div>
-
-    <button onclick="openModal('referenceModal')">Reference Sheet</button>
-    <button onclick="openModal('formulaModal')">Formula Sheet</button>
-  </aside>
-
-</div>
-
-<!-- REFERENCE MODAL -->
-<div class="modal" id="referenceModal">
-  <div class="modal-content">
-    <h3>Reference Sheet</h3>
-    <p><b>Properties:</b></p>
-    <p>a + b = b + a</p>
-    <p>a(b + c) = ab + ac</p>
-    <button onclick="closeModal('referenceModal')">Close</button>
   </div>
-</div>
 
-<!-- FORMULA MODAL -->
-<div class="modal" id="formulaModal">
-  <div class="modal-content">
-    <h3>Formula Sheet</h3>
-    <p><b>Quadratic Formula:</b></p>
-    <p>x = (-b ± √(b² - 4ac)) / 2a</p>
-    <button onclick="closeModal('formulaModal')">Close</button>
+  <div class="modal" id="formulaModal" aria-hidden="true">
+    <div class="modal-content">
+      <h3>Formula Sheet</h3>
+      <p><strong>Quadratic Formula</strong></p>
+      <p>x = (-b +/- sqrt(b^2 - 4ac)) / 2a</p>
+      <button class="primary-button" type="button" onclick="closeModal('formulaModal')">Close</button>
+    </div>
   </div>
-</div>
 
-<script src="./script.js"></script>
+  <script src="./script.js"></script>
 </body>
 </html>
