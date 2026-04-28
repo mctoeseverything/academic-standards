@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Standards Institute - Test</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo">Standards Institute</div>
+  <div class="timer">Time Remaining: <span id="time">01:30:00</span></div>
+</header>
+
+<div class="layout">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar left" id="leftSidebar">
+    <div class="sidebar-header">
+      Questions
+      <button onclick="toggleSidebar('left')">⟨⟨</button>
+    </div>
+    <div class="question-grid" id="questionGrid"></div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <h2 id="questionTitle">Question 1</h2>
+    <p id="questionText"></p>
+
+    <div id="choices"></div>
+
+    <div class="nav-buttons">
+      <button onclick="prevQuestion()">Previous</button>
+      <button onclick="nextQuestion()">Next</button>
+    </div>
+  </main>
+
+  <!-- RIGHT SIDEBAR -->
+  <aside class="sidebar right" id="rightSidebar">
+    <div class="sidebar-header">
+      Tools
+      <button onclick="toggleSidebar('right')">⟩⟩</button>
+    </div>
+
+    <button onclick="openModal('referenceModal')">Reference Sheet</button>
+    <button onclick="openModal('formulaModal')">Formula Sheet</button>
+  </aside>
+
+</div>
+
+<!-- REFERENCE MODAL -->
+<div class="modal" id="referenceModal">
+  <div class="modal-content">
+    <h3>Reference Sheet</h3>
+    <p><b>Properties:</b></p>
+    <p>a + b = b + a</p>
+    <p>a(b + c) = ab + ac</p>
+    <button onclick="closeModal('referenceModal')">Close</button>
+  </div>
+</div>
+
+<!-- FORMULA MODAL -->
+<div class="modal" id="formulaModal">
+  <div class="modal-content">
+    <h3>Formula Sheet</h3>
+    <p><b>Quadratic Formula:</b></p>
+    <p>x = (-b ± √(b² - 4ac)) / 2a</p>
+    <button onclick="closeModal('formulaModal')">Close</button>
+  </div>
+</div>
+
+<script src="./script.js"></script>
+</body>
+</html>
