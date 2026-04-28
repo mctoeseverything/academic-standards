@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Standards Institute</title>
+  <title>Standards Institute - Assessment</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet" />
@@ -11,245 +11,207 @@
 </head>
 <body>
   <svg class="icon-sprite" aria-hidden="true" focusable="false">
-    <symbol id="icon-document" viewBox="0 0 24 24">
+    <symbol id="icon-home" viewBox="0 0 24 24">
+      <path d="M3 10.5 12 3l9 7.5"></path>
+      <path d="M5 9.5V21h5v-6h4v6h5V9.5"></path>
+    </symbol>
+    <symbol id="icon-book-open" viewBox="0 0 24 24">
+      <path d="M12 7v14"></path>
+      <path d="M3 18a3 3 0 0 1 3-3h6"></path>
+      <path d="M21 18a3 3 0 0 0-3-3h-6"></path>
+      <path d="M6 4h6v11H6a3 3 0 0 0-3 3V7a3 3 0 0 1 3-3Z"></path>
+      <path d="M18 4h-6v11h6a3 3 0 0 1 3 3V7a3 3 0 0 0-3-3Z"></path>
+    </symbol>
+    <symbol id="icon-chart" viewBox="0 0 24 24">
+      <path d="M4 20V10"></path>
+      <path d="M10 20V4"></path>
+      <path d="M16 20v-7"></path>
+      <path d="M22 20v-4"></path>
+    </symbol>
+    <symbol id="icon-circle-help" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M9.1 9a3 3 0 1 1 5.8 1c0 2-3 2-3 4"></path>
+      <path d="M12 17h.01"></path>
+    </symbol>
+    <symbol id="icon-chevron-down" viewBox="0 0 24 24">
+      <path d="m6 9 6 6 6-6"></path>
+    </symbol>
+    <symbol id="icon-clock-3" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M12 7v5l3 3"></path>
+    </symbol>
+    <symbol id="icon-bookmark" viewBox="0 0 24 24">
+      <path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+    </symbol>
+    <symbol id="icon-calculator" viewBox="0 0 24 24">
+      <rect x="5" y="2.5" width="14" height="19" rx="2"></rect>
+      <path d="M8 6.5h8"></path>
+      <path d="M8 11h2"></path>
+      <path d="M14 11h2"></path>
+      <path d="M8 15h2"></path>
+      <path d="M14 15h2"></path>
+      <path d="M8 19h2"></path>
+      <path d="M14 19h2"></path>
+    </symbol>
+    <symbol id="icon-file-text" viewBox="0 0 24 24">
       <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path>
       <path d="M14 2v5h5"></path>
       <path d="M9 13h6"></path>
       <path d="M9 17h6"></path>
       <path d="M9 9h1"></path>
     </symbol>
-    <symbol id="icon-target" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="8"></circle>
-      <circle cx="12" cy="12" r="4"></circle>
-      <path d="M16.5 7.5 21 3"></path>
-      <path d="m14.5 5.5 4 4"></path>
+    <symbol id="icon-function-square" viewBox="0 0 24 24">
+      <path d="M20 20h-3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3"></path>
+      <path d="M4 20h3a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H4"></path>
+      <path d="m9 12 3-3 3 3"></path>
+      <path d="m15 15-3-3-3 3"></path>
     </symbol>
-    <symbol id="icon-bars" viewBox="0 0 24 24">
-      <path d="M5 19V9"></path>
-      <path d="M12 19V5"></path>
-      <path d="M19 19v-8"></path>
+    <symbol id="icon-chart-no-axes" viewBox="0 0 24 24">
+      <path d="M5 5v14h14"></path>
+      <path d="m8 15 3-3 2 2 4-6"></path>
     </symbol>
-    <symbol id="icon-shield" viewBox="0 0 24 24">
-      <path d="M12 3 5 6v6c0 5 3.5 8 7 9 3.5-1 7-4 7-9V6z"></path>
-      <path d="m9.5 12 2 2 3-4"></path>
+    <symbol id="icon-square-pen" viewBox="0 0 24 24">
+      <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+      <path d="M16 3h5v5"></path>
+      <path d="m21 3-9 9"></path>
     </symbol>
-    <symbol id="icon-monitor" viewBox="0 0 24 24">
-      <rect x="3" y="4" width="18" height="13" rx="2"></rect>
-      <path d="M8 20h8"></path>
-      <path d="M12 17v3"></path>
-      <path d="m7.5 10 1.8 1.8 3.2-3.7"></path>
-      <path d="M12.8 9h3.7"></path>
-      <path d="M12.8 12h3.7"></path>
-    </symbol>
-    <symbol id="icon-cap" viewBox="0 0 24 24">
-      <path d="m2 9.5 10-5 10 5-10 5z"></path>
-      <path d="M6 11.5v4.2c0 1.3 2.7 3.3 6 3.3s6-2 6-3.3v-4.2"></path>
-      <path d="M22 10v6"></path>
-    </symbol>
-    <symbol id="icon-arrow-up-right" viewBox="0 0 24 24">
-      <path d="M7 17 17 7"></path>
-      <path d="M9 7h8v8"></path>
+    <symbol id="icon-chevron-left" viewBox="0 0 24 24">
+      <path d="m15 18-6-6 6-6"></path>
     </symbol>
     <symbol id="icon-chevron-right" viewBox="0 0 24 24">
       <path d="m9 18 6-6-6-6"></path>
     </symbol>
-    <symbol id="icon-facebook" viewBox="0 0 24 24">
-      <path d="M14 8h3V4h-3c-2.2 0-4 1.8-4 4v3H7v4h3v5h4v-5h3l1-4h-4V8c0-.6.4-1 1-1Z"></path>
-    </symbol>
-    <symbol id="icon-twitter" viewBox="0 0 24 24">
-      <path d="M22 5.8c-.7.3-1.5.5-2.3.6.8-.5 1.5-1.2 1.8-2.2-.8.5-1.7.8-2.6 1-1.5-1.6-4-1.7-5.7-.2-1 .9-1.4 2.3-1.1 3.6-3.1-.2-5.9-1.7-7.8-4-.9 1.6-.4 3.6 1.1 4.6-.6 0-1.2-.2-1.7-.5 0 1.9 1.3 3.5 3.2 3.9-.6.2-1.3.2-1.9.1.5 1.7 2.1 2.9 3.9 2.9A8.2 8.2 0 0 1 3 18.4a11.5 11.5 0 0 0 6.3 1.9c7.5 0 11.7-6.4 11.4-12.1.8-.6 1.5-1.4 2.1-2.4Z"></path>
-    </symbol>
-    <symbol id="icon-youtube" viewBox="0 0 24 24">
-      <path d="M21 8.5a2.6 2.6 0 0 0-1.8-1.8C17.6 6.2 12 6.2 12 6.2s-5.6 0-7.2.5A2.6 2.6 0 0 0 3 8.5 27 27 0 0 0 2.5 12a27 27 0 0 0 .5 3.5 2.6 2.6 0 0 0 1.8 1.8c1.6.5 7.2.5 7.2.5s5.6 0 7.2-.5a2.6 2.6 0 0 0 1.8-1.8 27 27 0 0 0 .5-3.5 27 27 0 0 0-.5-3.5Z"></path>
-      <path d="m10 15.2 5-3.2-5-3.2z"></path>
-    </symbol>
-    <symbol id="icon-linkedin" viewBox="0 0 24 24">
-      <path d="M6.8 8.3a1.8 1.8 0 1 1 0-3.6 1.8 1.8 0 0 1 0 3.6Z"></path>
-      <path d="M5.2 10h3.2v9H5.2z"></path>
-      <path d="M11 10h3v1.3h.1c.4-.8 1.5-1.6 3.1-1.6 3.3 0 3.9 2.1 3.9 4.9V19H18v-3.9c0-.9 0-2.2-1.4-2.2s-1.6 1-1.6 2.1V19H11z"></path>
+    <symbol id="icon-pause" viewBox="0 0 24 24">
+      <path d="M9 5h2v14H9z"></path>
+      <path d="M13 5h2v14h-2z"></path>
     </symbol>
   </svg>
 
-  <div class="site-frame">
-    <header class="site-header">
-      <div class="brand-block">
-        <h1 class="brand-name">Standards Institute</h1>
-        <p class="brand-tag">Setting the standard for academic excellence</p>
-      </div>
+  <header class="site-header">
+    <div class="brand-block">
+      <div class="brand-name">Standards Institute</div>
+      <div class="brand-tag">Setting the standard for academic excellence</div>
+    </div>
 
-      <nav class="main-nav" aria-label="Primary">
-        <a href="#">Assessments</a>
-        <a href="#">About</a>
-        <a href="#">Resources</a>
-        <a href="#">News</a>
-        <a href="#">Help</a>
-      </nav>
+    <nav class="main-nav" aria-label="Primary">
+      <a href="#"><svg class="nav-icon"><use href="#icon-home"></use></svg><span>Dashboard</span></a>
+      <a href="#" class="active"><svg class="nav-icon"><use href="#icon-book-open"></use></svg><span>Assessments</span></a>
+      <a href="#"><svg class="nav-icon"><use href="#icon-chart"></use></svg><span>My Results</span></a>
+      <a href="#"><svg class="nav-icon"><use href="#icon-circle-help"></use></svg><span>Help</span></a>
+    </nav>
 
-      <div class="header-actions">
-        <button class="button button-secondary" type="button">Sign In</button>
-        <button class="button button-primary" type="button">Create Account</button>
-      </div>
-    </header>
+    <div class="user-chip">
+      <div class="avatar">JS</div>
+      <span>John Smith</span>
+      <svg class="caret-icon"><use href="#icon-chevron-down"></use></svg>
+    </div>
+  </header>
 
-    <main>
-      <section class="hero">
-        <div class="hero-copy">
-          <h2>Confidently measure.<br />Clearly improve.</h2>
-          <p>Standards Institute provides high-quality practice assessments aligned to rigorous academic standards.</p>
-          <div class="hero-actions">
-            <button class="button button-primary button-large" type="button">Start an Assessment</button>
-            <button class="button button-secondary button-large" type="button">View Sample Test</button>
-          </div>
+  <main class="page-shell">
+    <section class="exam-shell">
+      <aside class="panel questions-panel">
+        <h2>Questions</h2>
+        <div class="question-grid" id="questionGrid"></div>
+
+        <div class="legend">
+          <div class="legend-item"><span class="legend-swatch current"></span>Current</div>
+          <div class="legend-item"><span class="legend-swatch unanswered"></span>Not Answered</div>
+          <div class="legend-item"><span class="legend-swatch answered"></span>Answered</div>
+          <div class="legend-item"><span class="legend-swatch marked"></span>Marked for Review</div>
         </div>
 
-        <div class="hero-art" aria-hidden="true">
-          <div class="hero-blob"></div>
-          <div class="monitor-card">
-            <svg class="hero-monitor"><use href="#icon-monitor"></use></svg>
-          </div>
-          <div class="chart-badge">
-            <svg><use href="#icon-bars"></use></svg>
-          </div>
-        </div>
-      </section>
+        <button class="secondary-button review-button" type="button" id="reviewMarkedButton">
+          Review Marked (<span id="markedCount">0</span>)
+        </button>
+      </aside>
 
-      <section class="features" aria-label="Highlights">
-        <article class="feature">
-          <div class="feature-icon"><svg><use href="#icon-document"></use></svg></div>
-          <h3>Rigorous Standards</h3>
-          <p>Assessments built to reflect college and career readiness.</p>
-        </article>
-        <article class="feature">
-          <div class="feature-icon"><svg><use href="#icon-target"></use></svg></div>
-          <h3>Accurate Results</h3>
-          <p>Instant scoring and detailed performance insights.</p>
-        </article>
-        <article class="feature">
-          <div class="feature-icon"><svg><use href="#icon-bars"></use></svg></div>
-          <h3>Track Progress</h3>
-          <p>Monitor growth over time and focus on what matters.</p>
-        </article>
-        <article class="feature">
-          <div class="feature-icon"><svg><use href="#icon-shield"></use></svg></div>
-          <h3>Trusted Practice</h3>
-          <p>Used by students, educators, and families nationwide.</p>
-        </article>
-      </section>
-
-      <section class="assessments-card">
-        <div class="section-head">
+      <section class="panel center-panel">
+        <div class="exam-header">
           <div>
-            <h2>Available Assessments</h2>
-            <p>Practice tests, answer keys, and resources by subject.</p>
+            <p class="eyebrow">Algebra I - Test Form</p>
+            <button class="text-button" type="button">Directions <svg class="inline-icon tiny-icon"><use href="#icon-chevron-down"></use></svg></button>
           </div>
-          <button class="button button-secondary all-button" type="button">
-            View All Assessments
-            <svg class="button-icon"><use href="#icon-chevron-right"></use></svg>
+
+          <div class="timer-block">
+            <svg class="inline-icon clock-icon"><use href="#icon-clock-3"></use></svg>
+            <div>
+              <div class="timer-label">Time Remaining</div>
+              <div class="timer-value" id="time">01:30:00</div>
+            </div>
+          </div>
+
+          <button class="secondary-button pause-button" type="button"><svg class="inline-icon pause-icon"><use href="#icon-pause"></use></svg>Pause</button>
+        </div>
+
+        <div class="question-body">
+          <div class="question-meta">
+            <div class="question-pill" id="questionNumberBadge">1</div>
+            <button class="mark-toggle" id="markToggle" type="button">
+              <svg class="inline-icon"><use href="#icon-bookmark"></use></svg>
+              <span>Mark for Review</span>
+            </button>
+          </div>
+
+          <h1 id="questionText"></h1>
+          <div id="choices" class="choices"></div>
+        </div>
+      </section>
+
+      <aside class="panel tools-panel">
+        <h2>Tools</h2>
+        <div class="tools-list">
+          <button class="tool-link" type="button">
+            <svg class="tool-svg"><use href="#icon-calculator"></use></svg>
+            <span>Calculator</span>
+          </button>
+          <button class="tool-link" type="button" onclick="openModal('referenceModal')">
+            <svg class="tool-svg"><use href="#icon-file-text"></use></svg>
+            <span>Reference Sheet</span>
+          </button>
+          <button class="tool-link" type="button" onclick="openModal('formulaModal')">
+            <svg class="tool-svg"><use href="#icon-function-square"></use></svg>
+            <span>Formula Sheet</span>
+          </button>
+          <button class="tool-link" type="button">
+            <svg class="tool-svg"><use href="#icon-chart-no-axes"></use></svg>
+            <span>Graphing Tool</span>
+          </button>
+          <button class="tool-link" type="button">
+            <svg class="tool-svg"><use href="#icon-square-pen"></use></svg>
+            <span>Notes</span>
           </button>
         </div>
+      </aside>
+    </section>
 
-        <div class="assessments-grid">
-          <section class="subject">
-            <h3>Algebra I</h3>
-            <ul>
-              <li><a href="#">Algebra I Test Form <svg class="link-icon"><use href="#icon-arrow-up-right"></use></svg></a></li>
-              <li><a href="#">Algebra I Answer Key</a></li>
-              <li><a href="#">Algebra I Item Rationale</a></li>
-              <li><a href="#">Algebra I Student Expectations Tested</a></li>
-            </ul>
-          </section>
-
-          <section class="subject">
-            <h3>Biology</h3>
-            <ul>
-              <li><a href="#">Biology Test Form <svg class="link-icon"><use href="#icon-arrow-up-right"></use></svg></a></li>
-              <li><a href="#">Biology Answer Key</a></li>
-              <li><a href="#">Biology Item Rationale</a></li>
-              <li><a href="#">Biology Student Expectations Tested</a></li>
-            </ul>
-          </section>
-
-          <section class="subject">
-            <h3>English I</h3>
-            <ul>
-              <li><a href="#">English I Test Form <svg class="link-icon"><use href="#icon-arrow-up-right"></use></svg></a></li>
-              <li><a href="#">English I Answer Key</a></li>
-              <li><a href="#">English I Item Rationale</a></li>
-              <li><a href="#">English I Student Expectations Tested</a></li>
-            </ul>
-          </section>
-
-          <section class="subject">
-            <h3>U.S. History</h3>
-            <ul>
-              <li><a href="#">U.S. History Test Form <svg class="link-icon"><use href="#icon-arrow-up-right"></use></svg></a></li>
-              <li><a href="#">U.S. History Answer Key</a></li>
-              <li><a href="#">U.S. History Item Rationale</a></li>
-              <li><a href="#">U.S. History Student Expectations Tested</a></li>
-            </ul>
-          </section>
-
-          <section class="subject">
-            <h3>English II</h3>
-            <ul>
-              <li><a href="#">English II Test Form <svg class="link-icon"><use href="#icon-arrow-up-right"></use></svg></a></li>
-              <li><a href="#">English II Answer Key</a></li>
-              <li><a href="#">English II Item Rationale</a></li>
-              <li><a href="#">English II Student Expectations Tested</a></li>
-            </ul>
-          </section>
-        </div>
-      </section>
-
-      <section class="cta-strip">
-        <div class="cta-badge">
-          <svg><use href="#icon-cap"></use></svg>
-        </div>
-        <div class="cta-copy">
-          <h2>Preparing today for success tomorrow.</h2>
-          <p>High-quality practice leads to real results. Standards Institute is here to support every step of your academic journey.</p>
-        </div>
-        <button class="button button-secondary button-large" type="button">Learn More About Us</button>
-      </section>
-    </main>
-
-    <footer class="site-footer">
-      <div class="footer-brand">
-        <h2>Standards Institute</h2>
-        <p>&copy; 2024 Standards Institute.<br />All rights reserved.</p>
+    <div class="action-bar">
+      <button class="secondary-button nav-button" type="button" onclick="prevQuestion()"><svg class="inline-icon tiny-icon"><use href="#icon-chevron-left"></use></svg>Previous</button>
+      <div class="action-group">
+        <button class="secondary-button nav-button" type="button" id="reviewNextButton">Review &amp; Next</button>
+        <button class="primary-button nav-button" type="button" onclick="nextQuestion()">Next<svg class="inline-icon tiny-icon"><use href="#icon-chevron-right"></use></svg></button>
       </div>
+    </div>
+  </main>
 
-      <div class="footer-links">
-        <div>
-          <h3>About</h3>
-          <a href="#">Our Mission</a>
-          <a href="#">Leadership</a>
-          <a href="#">Careers</a>
-        </div>
-        <div>
-          <h3>Resources</h3>
-          <a href="#">Test Security</a>
-          <a href="#">Accessibility</a>
-          <a href="#">Research</a>
-        </div>
-        <div>
-          <h3>Help</h3>
-          <a href="#">FAQs</a>
-          <a href="#">Contact Us</a>
-          <a href="#">Support</a>
-        </div>
-      </div>
-
-      <div class="footer-social">
-        <h3>Stay Connected</h3>
-        <div class="social-row">
-          <a href="#" aria-label="Facebook"><svg><use href="#icon-facebook"></use></svg></a>
-          <a href="#" aria-label="Twitter"><svg><use href="#icon-twitter"></use></svg></a>
-          <a href="#" aria-label="YouTube"><svg><use href="#icon-youtube"></use></svg></a>
-          <a href="#" aria-label="LinkedIn"><svg><use href="#icon-linkedin"></use></svg></a>
-        </div>
-      </div>
-    </footer>
+  <div class="modal" id="referenceModal" aria-hidden="true">
+    <div class="modal-content">
+      <h3>Reference Sheet</h3>
+      <p><strong>Properties</strong></p>
+      <p>a + b = b + a</p>
+      <p>a(b + c) = ab + ac</p>
+      <button class="primary-button" type="button" onclick="closeModal('referenceModal')">Close</button>
+    </div>
   </div>
+
+  <div class="modal" id="formulaModal" aria-hidden="true">
+    <div class="modal-content">
+      <h3>Formula Sheet</h3>
+      <p><strong>Quadratic Formula</strong></p>
+      <p>x = (-b +/- sqrt(b^2 - 4ac)) / 2a</p>
+      <button class="primary-button" type="button" onclick="closeModal('formulaModal')">Close</button>
+    </div>
+  </div>
+
+  <script src="./script.js"></script>
 </body>
 </html>
