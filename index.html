@@ -205,19 +205,123 @@
 
   <div class="modal" id="referenceModal" aria-hidden="true">
     <div class="modal-content">
-      <h3>Reference Sheet</h3>
-      <p><strong>Properties</strong></p>
-      <p>a + b = b + a</p>
-      <p>a(b + c) = ab + ac</p>
+      <div class="modal-sheet">
+        <div class="sheet-header">
+          <h3>Reference Sheet</h3>
+          <p>Algebra I testing support</p>
+        </div>
+
+        <div class="sheet-section">
+          <h4>Properties of Operations</h4>
+          <div class="formula-list">
+            <div class="formula-row">
+              <span class="formula-label">Commutative Property</span>
+              <span class="formula-expression"><em>a</em> + <em>b</em> = <em>b</em> + <em>a</em></span>
+            </div>
+            <div class="formula-row">
+              <span class="formula-label">Associative Property</span>
+              <span class="formula-expression">(<em>a</em> + <em>b</em>) + <em>c</em> = <em>a</em> + (<em>b</em> + <em>c</em>)</span>
+            </div>
+            <div class="formula-row">
+              <span class="formula-label">Distributive Property</span>
+              <span class="formula-expression"><em>a</em>(<em>b</em> + <em>c</em>) = <em>ab</em> + <em>ac</em></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sheet-section">
+          <h4>Exponent Rules</h4>
+          <div class="formula-list">
+            <div class="formula-row">
+              <span class="formula-label">Product of Powers</span>
+              <span class="formula-expression"><em>x</em><sup>m</sup> · <em>x</em><sup>n</sup> = <em>x</em><sup>m+n</sup></span>
+            </div>
+            <div class="formula-row">
+              <span class="formula-label">Power of a Power</span>
+              <span class="formula-expression">(<em>x</em><sup>m</sup>)<sup>n</sup> = <em>x</em><sup>mn</sup></span>
+            </div>
+            <div class="formula-row">
+              <span class="formula-label">Zero Exponent</span>
+              <span class="formula-expression"><em>x</em><sup>0</sup> = 1, for <em>x</em> ≠ 0</span>
+            </div>
+          </div>
+        </div>
+      </div>
       <button class="primary-button" type="button" onclick="closeModal('referenceModal')">Close</button>
     </div>
   </div>
 
   <div class="modal" id="formulaModal" aria-hidden="true">
     <div class="modal-content">
-      <h3>Formula Sheet</h3>
-      <p><strong>Quadratic Formula</strong></p>
-      <p>x = (-b +/- sqrt(b^2 - 4ac)) / 2a</p>
+      <div class="modal-sheet">
+        <div class="sheet-header">
+          <h3>Formula Sheet</h3>
+          <p>Algebra I testing support</p>
+        </div>
+
+        <div class="sheet-section">
+          <h4>Linear and Slope Formulas</h4>
+          <div class="formula-list">
+            <div class="formula-row">
+              <span class="formula-label">Slope Formula</span>
+              <span class="formula-expression formula-fraction">
+                <span class="fraction">
+                  <span class="top"><em>y</em><sub>2</sub> - <em>y</em><sub>1</sub></span>
+                  <span class="bottom"><em>x</em><sub>2</sub> - <em>x</em><sub>1</sub></span>
+                </span>
+              </span>
+            </div>
+            <div class="formula-row">
+              <span class="formula-label">Slope-Intercept Form</span>
+              <span class="formula-expression"><em>y</em> = <em>mx</em> + <em>b</em></span>
+            </div>
+            <div class="formula-row">
+              <span class="formula-label">Point-Slope Form</span>
+              <span class="formula-expression"><em>y</em> - <em>y</em><sub>1</sub> = <em>m</em>(<em>x</em> - <em>x</em><sub>1</sub>)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sheet-section">
+          <h4>Quadratic Formula</h4>
+          <div class="featured-formula">
+            <span class="formula-expression">
+              <em>x</em> =
+              <span class="fraction">
+                <span class="top">-<em>b</em> &plusmn; &radic;(<em>b</em><sup>2</sup> - 4<em>ac</em>)</span>
+                <span class="bottom">2<em>a</em></span>
+              </span>
+            </span>
+          </div>
+        </div>
+
+        <div class="sheet-section">
+          <h4>Distance and Midpoint</h4>
+          <div class="formula-list">
+            <div class="formula-row">
+              <span class="formula-label">Distance Formula</span>
+              <span class="formula-expression">
+                <em>d</em> = &radic;((<em>x</em><sub>2</sub> - <em>x</em><sub>1</sub>)<sup>2</sup> + (<em>y</em><sub>2</sub> - <em>y</em><sub>1</sub>)<sup>2</sup>)
+              </span>
+            </div>
+            <div class="formula-row">
+              <span class="formula-label">Midpoint Formula</span>
+              <span class="formula-expression">
+                <span class="midpoint-group">(
+                  <span class="fraction compact-fraction">
+                    <span class="top"><em>x</em><sub>1</sub> + <em>x</em><sub>2</sub></span>
+                    <span class="bottom">2</span>
+                  </span>,
+                  <span class="fraction compact-fraction">
+                    <span class="top"><em>y</em><sub>1</sub> + <em>y</em><sub>2</sub></span>
+                    <span class="bottom">2</span>
+                  </span>
+                )</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
       <button class="primary-button" type="button" onclick="closeModal('formulaModal')">Close</button>
     </div>
   </div>
