@@ -29,6 +29,7 @@ const calculatorButton = document.getElementById("calculatorButton");
 const graphingButton = document.getElementById("graphingButton");
 const notesButton = document.getElementById("notesButton");
 const notesField = document.getElementById("notesField");
+const graphingContainer = document.getElementById("desmosGraphingCalculator");
 const submitSummary = document.getElementById("submitSummary");
 const submitChecklist = document.getElementById("submitChecklist");
 const confirmSubmitButton = document.getElementById("confirmSubmitButton");
@@ -40,6 +41,7 @@ const resultsCorrect = document.getElementById("resultsCorrect");
 const resultsMarked = document.getElementById("resultsMarked");
 const resultsTime = document.getElementById("resultsTime");
 const resultsReview = document.getElementById("resultsReview");
+let graphingCalculator = null;
 
 function getAnsweredCount() {
   return Object.keys(answers).length;
@@ -103,6 +105,7 @@ function updateNavigationState() {
   nextButton.disabled = current === questions.length - 1 || submitted;
   submitButton.disabled = submitted;
   markToggle.disabled = submitted;
+  submitButton.hidden = current !== questions.length - 1;
 }
 
 function renderQuestion() {
@@ -208,11 +211,81 @@ function toggleMarked() {
 }
 
 function openModal(id) {
-  document.getElementById(id).style.display = "flex";
+  const modal = document.getElementById(id);
+  const windowEl = modal.querySelector(".draggable-window");
+  if (windowEl) {
+    windowEl.style.left = "";
+    windowEl.style.top = "";
+    windowEl.style.transform = "";
+  }
+  modal.style.display = "flex";
 }
 
 function closeModal(id) {
   document.getElementById(id).style.display = "none";
+}
+
+function initGraphingCalculator() {
+  if (graphingCalculator || !window.Desmos || !graphingContainer) return;
+
+  graphingCalculator = Desmos.GraphingCalculator(graphingContainer, {
+    expressions: true,
+    expressionsTopbar: false,
+    settingsMenu: true,
+    zoomButtons: true,
+    keypad: true,
+    border: false,
+    expressionsCollapsed: false,
+    lockViewport: false,
+    projectorMode: false,
+    pasteGraphLink: false,
+    links: false
+  });
+
+  graphingCalculator.setExpression({ id: "starter1", latex: "y=x^2" });
+  graphingCalculator.setExpression({ id: "starter2", latex: "y=2x+1" });
+}
+
+function setupDraggableWindows() {
+  document.querySelectorAll(".draggable-window").forEach((windowEl) => {
+    const handle = windowEl.querySelector(".drag-handle");
+    if (!handle) return;
+
+    let dragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    handle.addEventListener("pointerdown", (event) => {
+      if (event.target.closest("button")) return;
+
+      dragging = true;
+      const rect = windowEl.getBoundingClientRect();
+      offsetX = event.clientX - rect.left;
+      offsetY = event.clientY - rect.top;
+
+      windowEl.style.left = `${rect.left}px`;
+      windowEl.style.top = `${rect.top}px`;
+      windowEl.style.transform = "none";
+      handle.setPointerCapture(event.pointerId);
+    });
+
+    handle.addEventListener("pointermove", (event) => {
+      if (!dragging) return;
+      windowEl.style.left = `${event.clientX - offsetX}px`;
+      windowEl.style.top = `${event.clientY - offsetY}px`;
+    });
+
+    const endDrag = (event) => {
+      if (!dragging) return;
+      dragging = false;
+      if (handle.hasPointerCapture(event.pointerId)) {
+        handle.releasePointerCapture(event.pointerId);
+      }
+    };
+
+    handle.addEventListener("pointerup", endDrag);
+    handle.addEventListener("pointercancel", endDrag);
+  });
 }
 
 function toggleSidebar(side) {
@@ -345,7 +418,10 @@ async function loadQuestions() {
 }
 
 calculatorButton.addEventListener("click", () => openModal("calculatorModal"));
-graphingButton.addEventListener("click", () => openModal("graphingModal"));
+graphingButton.addEventListener("click", () => {
+  initGraphingCalculator();
+  openModal("graphingModal");
+});
 notesButton.addEventListener("click", () => openModal("notesModal"));
 notesField.addEventListener("input", saveNotes);
 markToggle.addEventListener("click", toggleMarked);
@@ -363,6 +439,7 @@ async function init() {
   loadNotes();
   restoreState();
   await loadQuestions();
+  setupDraggableWindows();
 
   if (current > questions.length - 1) {
     current = 0;

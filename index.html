@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./style.css" />
+  <script src="https://www.desmos.com/api/v1.3/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
 </head>
 <body>
   <svg class="icon-sprite" aria-hidden="true" focusable="false">
@@ -328,8 +329,8 @@
   </div>
 
   <div class="modal tool-modal" id="calculatorModal" aria-hidden="true">
-    <div class="modal-content modal-content-wide">
-      <div class="tool-modal-header">
+    <div class="modal-content modal-content-wide draggable-window">
+      <div class="tool-modal-header drag-handle">
         <div>
           <h3>Calculator</h3>
           <p>Powered by Desmos scientific calculator.</p>
@@ -348,28 +349,23 @@
   </div>
 
   <div class="modal tool-modal" id="graphingModal" aria-hidden="true">
-    <div class="modal-content modal-content-wide">
-      <div class="tool-modal-header">
+    <div class="modal-content modal-content-wide draggable-window">
+      <div class="tool-modal-header drag-handle">
         <div>
           <h3>Graphing Tool</h3>
-          <p>Powered by Desmos graphing calculator.</p>
+          <p>Powered by embedded Desmos graphing calculator.</p>
         </div>
         <button class="secondary-button" type="button" onclick="closeModal('graphingModal')">Close</button>
       </div>
       <div class="tool-frame-wrap">
-        <iframe
-          class="tool-frame"
-          src="https://www.desmos.com/calculator"
-          title="Desmos Graphing Calculator"
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <div id="desmosGraphingCalculator" class="tool-frame desmos-embed" aria-label="Embedded Desmos graphing calculator"></div>
       </div>
     </div>
   </div>
 
   <div class="modal" id="notesModal" aria-hidden="true">
-    <div class="modal-content notes-modal-content">
-      <div class="tool-modal-header">
+    <div class="modal-content notes-modal-content draggable-window">
+      <div class="tool-modal-header drag-handle">
         <div>
           <h3>Scratch Notes</h3>
           <p>Your notes auto-save in this browser.</p>
