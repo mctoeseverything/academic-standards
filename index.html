@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Standards Institute – Algebra I Assessment</title>
+  <title>Academic Standards Board – Algebra I Assessment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="./style.css" />
   <script src="https://www.desmos.com/api/v1.3/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
 </head>
@@ -28,15 +30,12 @@
 
   <header class="site-header">
     <div class="brand-block">
-      <div class="brand-name">Standards Institute &mdash; Algebra I Assessment</div>
+      <div class="brand-name">Academic Standards Board</div>
     </div>
 
     <div class="timer-block">
       <svg class="clock-icon"><use href="#icon-clock-3"></use></svg>
-      <div>
-        <div class="timer-label">Time Remaining</div>
-        <div class="timer-value" id="time">01:30:00</div>
-      </div>
+      <div class="timer-value" id="time">01:30:00</div>
     </div>
 
     <button class="secondary-button pause-button" type="button">
@@ -50,7 +49,7 @@
       <!-- Left: Question Navigator -->
       <aside class="panel questions-panel" id="leftSidebar">
         <div class="panel-head">
-          <h2>Question Navigator</h2>
+          <h2>Questions</h2>
           <button class="collapse-button" type="button" onclick="toggleSidebar('left')" aria-label="Collapse question navigator">
             <svg class="inline-icon tiny-icon"><use href="#icon-chevron-left"></use></svg>
           </button>
@@ -58,26 +57,23 @@
         <div class="question-grid" id="questionGrid"></div>
 
         <div class="legend">
-          <div class="legend-item"><span class="legend-swatch current"></span>Current Item</div>
+          <div class="legend-item"><span class="legend-swatch current"></span>Current</div>
           <div class="legend-item"><span class="legend-swatch unanswered"></span>Not Answered</div>
           <div class="legend-item"><span class="legend-swatch answered"></span>Answered</div>
-          <div class="legend-item"><span class="legend-swatch marked"></span>Flagged for Review</div>
+          <div class="legend-item"><span class="legend-swatch marked"></span>Marked for Review</div>
         </div>
       </aside>
 
       <!-- Center: Question Content -->
       <section class="panel center-panel">
         <div class="exam-header">
-          <div>
-            <p class="eyebrow">Algebra I &ndash; Form A</p>
-            <button class="text-button" type="button">Test Directions <svg class="inline-icon tiny-icon"><use href="#icon-chevron-down"></use></svg></button>
-            <div class="exam-status">
+          <div class="exam-header-left">
+            <p class="eyebrow">Algebra I &ndash; Test Form</p>
+            <div class="exam-header-stats">
               <span class="status-chip">Items Answered: <strong id="answeredCount">0</strong>&nbsp;of&nbsp;<span id="totalQuestions">0</span></span>
-              <span class="status-chip">Flagged for Review: <strong id="markedCount">0</strong></span>
+              <span class="status-chip">Marked for Review: <strong id="markedCount">0</strong></span>
             </div>
           </div>
-
-          <div style="display:none" class="timer-block-inline"><!-- timer moved to header --></div>
 
           <button class="secondary-button submit-button" id="submitButton" type="button">Submit Test</button>
         </div>
@@ -87,13 +83,13 @@
             <div class="question-pill" id="questionNumberBadge">1</div>
             <button class="mark-toggle" id="markToggle" type="button">
               <svg class="inline-icon"><use href="#icon-bookmark"></use></svg>
-              <span>Flag for Review</span>
+              <span>Mark for Review</span>
             </button>
-          </div>
 
-          <div class="question-tools">
-            <button class="secondary-button utility-button" id="eliminateModeButton" type="button">Answer Eliminator</button>
-            <button class="secondary-button utility-button" id="highlightModeButton" type="button">Highlight Text</button>
+            <div class="question-tools">
+              <button class="secondary-button utility-button" id="eliminateModeButton" type="button">Strikethrough</button>
+              <button class="secondary-button utility-button" id="highlightModeButton" type="button">Highlight</button>
+            </div>
           </div>
 
           <div id="questionText" class="question-stem"></div>
@@ -102,11 +98,11 @@
 
         <div class="action-bar">
           <button class="secondary-button nav-button" id="prevButton" type="button" onclick="prevQuestion()">
-            <svg class="inline-icon tiny-icon"><use href="#icon-chevron-left"></use></svg>Previous Item
+            <svg class="inline-icon tiny-icon"><use href="#icon-chevron-left"></use></svg>Previous
           </button>
           <div class="action-group">
             <button class="primary-button nav-button" id="nextButton" type="button" onclick="nextQuestion()">
-              Next Item<svg class="inline-icon tiny-icon"><use href="#icon-chevron-right"></use></svg>
+              Next<svg class="inline-icon tiny-icon"><use href="#icon-chevron-right"></use></svg>
             </button>
           </div>
         </div>
@@ -115,32 +111,17 @@
       <!-- Right: Testing Tools -->
       <aside class="panel tools-panel" id="rightSidebar">
         <div class="panel-head">
-          <h2>Testing Tools</h2>
+          <h2>Tools</h2>
           <button class="collapse-button" type="button" onclick="toggleSidebar('right')" aria-label="Collapse tools panel">
             <svg class="inline-icon tiny-icon"><use href="#icon-chevron-right"></use></svg>
           </button>
         </div>
         <div class="tools-list">
-          <button class="tool-link" id="calculatorButton" type="button">
-            <svg class="tool-svg"><use href="#icon-calculator"></use></svg>
-            <span>Calculator</span>
-          </button>
-          <button class="tool-link" type="button" onclick="openModal('referenceModal')">
-            <svg class="tool-svg"><use href="#icon-file-text"></use></svg>
-            <span>Reference Sheet</span>
-          </button>
-          <button class="tool-link" type="button" onclick="openModal('formulaModal')">
-            <svg class="tool-svg"><use href="#icon-function-square"></use></svg>
-            <span>Formula Sheet</span>
-          </button>
-          <button class="tool-link" id="graphingButton" type="button">
-            <svg class="tool-svg"><use href="#icon-chart-no-axes"></use></svg>
-            <span>Graphing Tool</span>
-          </button>
-          <button class="tool-link" id="notesButton" type="button">
-            <svg class="tool-svg"><use href="#icon-square-pen"></use></svg>
-            <span>Scratch Notes</span>
-          </button>
+          <button class="tool-link" id="calculatorButton" type="button">Calculator</button>
+          <button class="tool-link" type="button" onclick="openModal('referenceModal')">Reference Sheet</button>
+          <button class="tool-link" type="button" onclick="openModal('formulaModal')">Formula Sheet</button>
+          <button class="tool-link" id="graphingButton" type="button">Graphing Tool</button>
+          <button class="tool-link" id="notesButton" type="button">Notes</button>
         </div>
       </aside>
 
@@ -309,7 +290,7 @@
     <div class="modal-content notes-modal-content draggable-window">
       <div class="tool-modal-header drag-handle">
         <div>
-          <h3>Scratch Notes</h3>
+          <h3>Notes</h3>
           <p>Notes are saved locally in this browser session only.</p>
         </div>
         <button class="secondary-button" type="button" onclick="closeModal('notesModal')">Close</button>
@@ -322,7 +303,7 @@
   <div class="modal" id="submitModal" aria-hidden="true">
     <div class="modal-content">
       <h3>Submit Test?</h3>
-      <p id="submitSummary"></p>
+      <p id="submitSummary" style="font-size:0.84rem;color:var(--muted);margin-top:6px;"></p>
       <div class="submit-summary-list" id="submitChecklist"></div>
       <div class="modal-actions">
         <button class="secondary-button" type="button" onclick="closeModal('submitModal')">Return to Test</button>

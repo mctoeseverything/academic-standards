@@ -228,29 +228,23 @@ function renderChoiceButton(question, choice, index) {
 
   const isMulti = question.type === "select_multiple";
   const eliminated = getEliminatedChoices(current).includes(index);
+  const letter = String.fromCharCode(65 + index);
 
-  if (isMulti) {
-    button.classList.add("choice-multi");
-  }
+  if (isMulti) button.classList.add("choice-multi");
+  if (eliminated) button.classList.add("eliminated");
 
-  if (eliminated) {
-    button.classList.add("eliminated");
-  }
+  const isSelected = isMulti
+    ? Array.isArray(answers[current]) && answers[current].includes(index)
+    : answers[current] === index;
 
-  if (question.type === "select_multiple") {
-    const selected = Array.isArray(answers[current]) && answers[current].includes(index);
-    if (selected) button.classList.add("selected");
-  } else if (answers[current] === index) {
-    button.classList.add("selected");
-  }
+  if (isSelected) button.classList.add("selected");
 
   if (submitted) {
     button.disabled = true;
-    if (question.type === "select_multiple") {
-      const selected = Array.isArray(answers[current]) && answers[current].includes(index);
+    if (isMulti) {
       const correct = question.correct.includes(index);
       if (correct) button.classList.add("correct");
-      if (selected && !correct) button.classList.add("incorrect");
+      if (isSelected && !correct) button.classList.add("incorrect");
     } else if (index === question.correct) {
       button.classList.add("correct");
     } else if (answers[current] === index) {
@@ -258,10 +252,28 @@ function renderChoiceButton(question, choice, index) {
     }
   }
 
-  button.innerHTML = `
-    <span class="choice-letter">${isMulti ? "&#10003;" : String.fromCharCode(65 + index)}</span>
-    <span class="choice-text">${choice}</span>
-  `;
+  // Radio / checkbox indicator
+  const radioEl = document.createElement("span");
+  radioEl.className = "choice-letter";
+
+  // Letter label
+  const alphaEl = document.createElement("span");
+  alphaEl.className = "choice-alpha";
+  alphaEl.textContent = letter;
+
+  // Choice text
+  const textEl = document.createElement("span");
+  textEl.className = "choice-text";
+  textEl.textContent = choice;
+
+  // Wrapper for alpha + text
+  const textWrapper = document.createElement("span");
+  textWrapper.className = "choice-text-wrapper";
+  textWrapper.appendChild(alphaEl);
+  textWrapper.appendChild(textEl);
+
+  button.appendChild(radioEl);
+  button.appendChild(textWrapper);
 
   button.onclick = () => {
     if (submitted) return;
@@ -273,7 +285,7 @@ function renderChoiceButton(question, choice, index) {
       return;
     }
 
-    if (question.type === "select_multiple") {
+    if (isMulti) {
       const selected = new Set(Array.isArray(answers[current]) ? answers[current] : []);
       if (selected.has(index)) {
         selected.delete(index);
@@ -528,8 +540,8 @@ function toggleSidebar(side) {
   const isLeft = side === "left";
   const sidebar = isLeft ? leftSidebar : rightSidebar;
   const variableName = isLeft ? "--left-sidebar-width" : "--right-sidebar-width";
-  const expandedWidth = isLeft ? "320px" : "234px";
-  const collapsedWidth = "64px";
+  const expandedWidth = isLeft ? "230px" : "200px";
+  const collapsedWidth = "56px";
 
   sidebar.classList.toggle("collapsed");
   examShell.style.setProperty(
