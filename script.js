@@ -595,43 +595,135 @@ function restartTest() {
   renderQuestion();
 }
 
+// ==============================
+// DESMOS SAFETY LAYER (NEW)
+// ==============================
+
+function isImplicitEquation(expr) {
+  // catches: 3x+2=11, x+1=y, etc.
+  return /^[^=]+=[^=]+$/.test(expr) && !/^y=|^x=/.test(expr.trim());
+}
+
+function isRegression(expr) {
+  return /~/.test(expr);
+}
+
+function isActionOrTicker(expr) {
+  return /->|\bslider\b|\bticker\b|\baction\b/i.test(expr);
+}
+
+function desmosSafeSetExpression(expr) {
+  if (!graphingCalculator) return;
+
+  const raw = String(expr).trim();
+
+  // Block implicit equations
+  if (isImplicitEquation(raw)) {
+    graphingCalculator.setExpression({
+      id: "error",
+      latex: "y=\\text{''}",
+      color: "#ff0000"
+    });
+
+    graphingCalculator.setExpression({
+      id: "errorMsg",
+      latex: "y=\\text{Implicit equations are disabled}"
+    });
+
+    return;
+  }
+
+  // Block regressions
+  if (isRegression(raw)) {
+    graphingCalculator.setExpression({
+      id: "errorMsg2",
+      latex: "y=\\text{Regression is disabled}"
+    });
+    return;
+  }
+
+  // Block actions/tickers
+  if (isActionOrTicker(raw)) {
+    graphingCalculator.setExpression({
+      id: "errorMsg3",
+      latex: "y=\\text{Actions are disabled}"
+    });
+    return;
+  }
+
+  // Otherwise allow normal Desmos behavior
+  graphingCalculator.setExpression({ latex: raw });
+}
+
+// ==============================
+// FIX: "=" INPUT BUG (NEW)
+// ==============================
+
+function preventBadCalculatorInput() {
+  document.addEventListener("keydown", (e) => {
+    // Prevent accidental form submit / input reset behavior
+    if (e.key === "=") {
+      e.preventDefault();
+      const active = document.activeElement;
+
+      // If typing inside Desmos or input fields, just insert "=" safely
+      if (active && active.tagName === "INPUT") {
+        const start = active.selectionStart;
+        const end = active.selectionEnd;
+        const val = active.value;
+
+        active.value = val.slice(0, start) + "=" + val.slice(end);
+        active.selectionStart = active.selectionEnd = start + 1;
+
+        active.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+    }
+  });
+}
+
+// ==============================
+// PATCH DESMOS INIT
+// ==============================
+
 function initGraphingCalculator() {
   if (graphingCalculator || !window.Desmos || !graphingContainer) return;
 
   graphingCalculator = Desmos.GraphingCalculator(graphingContainer, {
     expressions: true,
-    keypad: true,
+    expressionsTopbar: false,
     settingsMenu: true,
     zoomButtons: true,
+    keypad: true,
     border: false,
-    expressionsTopbar: false,
     expressionsCollapsed: false,
     lockViewport: false,
     pasteGraphLink: false,
-    links: false,
-    restrictedFunctions: {
-      regressions: true
+    links: false
+  });
+
+  // Override expression setter with safety layer
+  const originalSetExpression = graphingCalculator.setExpression.bind(graphingCalculator);
+
+  graphingCalculator.setExpression = function (obj) {
+    if (obj && obj.latex) {
+      desmosSafeSetExpression(obj.latex);
+    } else {
+      originalSetExpression(obj);
     }
-  });
-
-  // Enforce equation format rules (custom layer)
-  graphingCalculator.observeEvent('change', () => {
-    const expressions = graphingCalculator.getExpressions();
-
-    expressions.forEach(expr => {
-      if (!expr.latex) return;
-
-      const invalid =
-        expr.latex.includes('=') &&
-        !expr.latex.startsWith('y=') &&
-        !expr.latex.startsWith('x=');
-
-      if (invalid) {
-        graphingCalculator.setExpression({ id: expr.id, latex: '' });
-      }
-    });
-  });
+  };
 }
+
+// ==============================
+// CALL INPUT FIX ON LOAD
+// ==============================
+
+window.addEventListener("load", () => {
+  preventBadCalculatorInput();
+
+  if (calculatorFrame) {
+    calculatorFrame.src = "https://www.desmos.com/scientific";
+  }
+});
 
 function setupDraggableWindows() {
   document.querySelectorAll(".draggable-window").forEach((windowEl) => {
