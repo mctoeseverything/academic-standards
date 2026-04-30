@@ -3,63 +3,329 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Assessment</title>
-
+  <title>Standards Institute - Assessment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
+  <svg class="icon-sprite" aria-hidden="true" focusable="false">
+    <symbol id="icon-home" viewBox="0 0 24 24">
+      <path d="M3 10.5 12 3l9 7.5"></path>
+      <path d="M5 9.5V21h5v-6h4v6h5V9.5"></path>
+    </symbol>
+    <symbol id="icon-book-open" viewBox="0 0 24 24">
+      <path d="M12 7v14"></path>
+      <path d="M3 18a3 3 0 0 1 3-3h6"></path>
+      <path d="M21 18a3 3 0 0 0-3-3h-6"></path>
+      <path d="M6 4h6v11H6a3 3 0 0 0-3 3V7a3 3 0 0 1 3-3Z"></path>
+      <path d="M18 4h-6v11h6a3 3 0 0 1 3 3V7a3 3 0 0 0-3-3Z"></path>
+    </symbol>
+    <symbol id="icon-chart" viewBox="0 0 24 24">
+      <path d="M4 20V10"></path>
+      <path d="M10 20V4"></path>
+      <path d="M16 20v-7"></path>
+      <path d="M22 20v-4"></path>
+    </symbol>
+    <symbol id="icon-circle-help" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M9.1 9a3 3 0 1 1 5.8 1c0 2-3 2-3 4"></path>
+      <path d="M12 17h.01"></path>
+    </symbol>
+    <symbol id="icon-chevron-down" viewBox="0 0 24 24">
+      <path d="m6 9 6 6 6-6"></path>
+    </symbol>
+    <symbol id="icon-clock-3" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M12 7v5l3 3"></path>
+    </symbol>
+    <symbol id="icon-bookmark" viewBox="0 0 24 24">
+      <path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+    </symbol>
+    <symbol id="icon-calculator" viewBox="0 0 24 24">
+      <rect x="5" y="2.5" width="14" height="19" rx="2"></rect>
+      <path d="M8 6.5h8"></path>
+      <path d="M8 11h2"></path>
+      <path d="M14 11h2"></path>
+      <path d="M8 15h2"></path>
+      <path d="M14 15h2"></path>
+      <path d="M8 19h2"></path>
+      <path d="M14 19h2"></path>
+    </symbol>
+    <symbol id="icon-file-text" viewBox="0 0 24 24">
+      <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path>
+      <path d="M14 2v5h5"></path>
+      <path d="M9 13h6"></path>
+      <path d="M9 17h6"></path>
+      <path d="M9 9h1"></path>
+    </symbol>
+    <symbol id="icon-function-square" viewBox="0 0 24 24">
+      <path d="M20 20h-3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3"></path>
+      <path d="M4 20h3a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H4"></path>
+      <path d="m9 12 3-3 3 3"></path>
+      <path d="m15 15-3-3-3 3"></path>
+    </symbol>
+    <symbol id="icon-chart-no-axes" viewBox="0 0 24 24">
+      <path d="M5 5v14h14"></path>
+      <path d="m8 15 3-3 2 2 4-6"></path>
+    </symbol>
+    <symbol id="icon-square-pen" viewBox="0 0 24 24">
+      <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+      <path d="M16 3h5v5"></path>
+      <path d="m21 3-9 9"></path>
+    </symbol>
+    <symbol id="icon-chevron-left" viewBox="0 0 24 24">
+      <path d="m15 18-6-6 6-6"></path>
+    </symbol>
+    <symbol id="icon-chevron-right" viewBox="0 0 24 24">
+      <path d="m9 18 6-6-6-6"></path>
+    </symbol>
+    <symbol id="icon-pause" viewBox="0 0 24 24">
+      <path d="M9 5h2v14H9z"></path>
+      <path d="M13 5h2v14h-2z"></path>
+    </symbol>
+  </svg>
 
-<header class="exam-header-bar">
-  <div class="exam-title">Algebra I Assessment</div>
+  <header class="site-header">
+    <div class="brand-block">
+      <div class="brand-name">Standards Institute</div>
+      <div class="brand-tag">Setting the standard for academic excellence</div>
+    </div>
 
-  <div class="exam-meta">
-    <span>Time Remaining: <strong id="time">01:30:00</strong></span>
-    <button class="text-control">Pause</button>
+    <nav class="main-nav" aria-label="Primary">
+      <a href="#"><svg class="nav-icon"><use href="#icon-home"></use></svg><span>Dashboard</span></a>
+      <a href="#" class="active"><svg class="nav-icon"><use href="#icon-book-open"></use></svg><span>Assessments</span></a>
+      <a href="#"><svg class="nav-icon"><use href="#icon-chart"></use></svg><span>My Results</span></a>
+      <a href="#"><svg class="nav-icon"><use href="#icon-circle-help"></use></svg><span>Help</span></a>
+    </nav>
+
+    <div class="user-chip">
+      <div class="avatar">JS</div>
+      <span>John Smith</span>
+      <svg class="caret-icon"><use href="#icon-chevron-down"></use></svg>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    <section class="exam-shell">
+      <aside class="panel questions-panel" id="leftSidebar">
+        <div class="panel-head">
+          <h2>Questions</h2>
+          <button class="collapse-button" type="button" onclick="toggleSidebar('left')" aria-label="Collapse questions panel">
+            <svg class="inline-icon tiny-icon"><use href="#icon-chevron-left"></use></svg>
+          </button>
+        </div>
+        <div class="question-grid" id="questionGrid"></div>
+
+        <div class="legend">
+          <div class="legend-item"><span class="legend-swatch current"></span>Current</div>
+          <div class="legend-item"><span class="legend-swatch unanswered"></span>Not Answered</div>
+          <div class="legend-item"><span class="legend-swatch answered"></span>Answered</div>
+          <div class="legend-item"><span class="legend-swatch marked"></span>Marked for Review</div>
+        </div>
+
+        <button class="secondary-button review-button" type="button" id="reviewMarkedButton">
+          Review Marked (<span id="markedCount">0</span>)
+        </button>
+      </aside>
+
+      <section class="panel center-panel">
+        <div class="exam-header">
+          <div>
+            <p class="eyebrow">Algebra I - Mock Exam Form</p>
+            <button class="text-button" type="button">Directions <svg class="inline-icon tiny-icon"><use href="#icon-chevron-down"></use></svg></button>
+          </div>
+
+          <div class="timer-block">
+            <svg class="inline-icon clock-icon"><use href="#icon-clock-3"></use></svg>
+            <div>
+              <div class="timer-label">Time Remaining</div>
+              <div class="timer-value" id="time">01:30:00</div>
+            </div>
+          </div>
+
+          <button class="secondary-button pause-button" type="button"><svg class="inline-icon pause-icon"><use href="#icon-pause"></use></svg>Pause</button>
+        </div>
+
+        <div class="question-body">
+          <div class="question-meta">
+            <div class="question-pill" id="questionNumberBadge">1</div>
+            <button class="mark-toggle" id="markToggle" type="button">
+              <svg class="inline-icon"><use href="#icon-bookmark"></use></svg>
+              <span>Mark for Review</span>
+            </button>
+          </div>
+
+          <h1 id="questionText"></h1>
+          <div id="choices" class="choices"></div>
+        </div>
+
+        <div class="action-bar">
+          <button class="secondary-button nav-button" type="button" onclick="prevQuestion()"><svg class="inline-icon tiny-icon"><use href="#icon-chevron-left"></use></svg>Previous</button>
+          <div class="action-group">
+            <button class="secondary-button nav-button" type="button" id="reviewNextButton">Review &amp; Next</button>
+            <button class="primary-button nav-button" type="button" onclick="nextQuestion()">Next<svg class="inline-icon tiny-icon"><use href="#icon-chevron-right"></use></svg></button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel tools-panel" id="rightSidebar">
+        <div class="panel-head">
+          <h2>Tools</h2>
+          <button class="collapse-button" type="button" onclick="toggleSidebar('right')" aria-label="Collapse tools panel">
+            <svg class="inline-icon tiny-icon"><use href="#icon-chevron-right"></use></svg>
+          </button>
+        </div>
+        <div class="tools-list">
+          <button class="tool-link" type="button">
+            <svg class="tool-svg"><use href="#icon-calculator"></use></svg>
+            <span>Calculator</span>
+          </button>
+          <button class="tool-link" type="button" onclick="openModal('referenceModal')">
+            <svg class="tool-svg"><use href="#icon-file-text"></use></svg>
+            <span>Reference Sheet</span>
+          </button>
+          <button class="tool-link" type="button" onclick="openModal('formulaModal')">
+            <svg class="tool-svg"><use href="#icon-function-square"></use></svg>
+            <span>Formula Sheet</span>
+          </button>
+          <button class="tool-link" type="button">
+            <svg class="tool-svg"><use href="#icon-chart-no-axes"></use></svg>
+            <span>Graphing Tool</span>
+          </button>
+          <button class="tool-link" type="button">
+            <svg class="tool-svg"><use href="#icon-square-pen"></use></svg>
+            <span>Notes</span>
+          </button>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <div class="modal" id="referenceModal" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-sheet">
+        <div class="sheet-header">
+          <h3>Reference Sheet</h3>
+          <p>Algebra I testing support</p>
+        </div>
+
+        <div class="sheet-section">
+          <h4>Properties of Operations</h4>
+          <div class="formula-list">
+            <div class="formula-row">
+              <span class="formula-label">Commutative Property</span>
+              <span class="formula-expression"><em>a</em> + <em>b</em> = <em>b</em> + <em>a</em></span>
+            </div>
+            <div class="formula-row">
+              <span class="formula-label">Associative Property</span>
+              <span class="formula-expression">(<em>a</em> + <em>b</em>) + <em>c</em> = <em>a</em> + (<em>b</em> + <em>c</em>)</span>
+            </div>
+            <div class="formula-row">
+              <span class="formula-label">Distributive Property</span>
+              <span class="formula-expression"><em>a</em>(<em>b</em> + <em>c</em>) = <em>ab</em> + <em>ac</em></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sheet-section">
+          <h4>Exponent Rules</h4>
+          <div class="formula-list">
+            <div class="formula-row">
+              <span class="formula-label">Product of Powers</span>
+              <span class="formula-expression"><em>x</em><sup>m</sup> · <em>x</em><sup>n</sup> = <em>x</em><sup>m+n</sup></span>
+            </div>
+            <div class="formula-row">
+              <span class="formula-label">Power of a Power</span>
+              <span class="formula-expression">(<em>x</em><sup>m</sup>)<sup>n</sup> = <em>x</em><sup>mn</sup></span>
+            </div>
+            <div class="formula-row">
+              <span class="formula-label">Zero Exponent</span>
+              <span class="formula-expression"><em>x</em><sup>0</sup> = 1, for <em>x</em> ≠ 0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="primary-button" type="button" onclick="closeModal('referenceModal')">Close</button>
+    </div>
   </div>
-</header>
 
-<main class="exam-shell">
+  <div class="modal" id="formulaModal" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-sheet">
+        <div class="sheet-header">
+          <h3>Formula Sheet</h3>
+          <p>Algebra I testing support</p>
+        </div>
 
-  <!-- LEFT: Question navigation -->
-  <aside class="sidebar" id="leftSidebar">
-    <div class="sidebar-title">Questions</div>
-    <div class="question-grid" id="questionGrid"></div>
-  </aside>
+        <div class="sheet-section">
+          <h4>Linear and Slope Formulas</h4>
+          <div class="formula-list">
+            <div class="formula-row">
+              <span class="formula-label">Slope Formula</span>
+              <span class="formula-expression formula-fraction">
+                <span class="fraction">
+                  <span class="top"><em>y</em><sub>2</sub> - <em>y</em><sub>1</sub></span>
+                  <span class="bottom"><em>x</em><sub>2</sub> - <em>x</em><sub>1</sub></span>
+                </span>
+              </span>
+            </div>
+            <div class="formula-row">
+              <span class="formula-label">Slope-Intercept Form</span>
+              <span class="formula-expression"><em>y</em> = <em>mx</em> + <em>b</em></span>
+            </div>
+            <div class="formula-row">
+              <span class="formula-label">Point-Slope Form</span>
+              <span class="formula-expression"><em>y</em> - <em>y</em><sub>1</sub> = <em>m</em>(<em>x</em> - <em>x</em><sub>1</sub>)</span>
+            </div>
+          </div>
+        </div>
 
-  <!-- CENTER: Question -->
-  <section class="main-panel">
+        <div class="sheet-section">
+          <h4>Quadratic Formula</h4>
+          <div class="featured-formula">
+            <span class="formula-expression">
+              <em>x</em> =
+              <span class="fraction">
+                <span class="top">-<em>b</em> &plusmn; &radic;(<em>b</em><sup>2</sup> - 4<em>ac</em>)</span>
+                <span class="bottom">2<em>a</em></span>
+              </span>
+            </span>
+          </div>
+        </div>
 
-    <div class="question-header">
-      <span>Question <span id="questionNumberBadge">1</span></span>
-      <button class="text-control" id="markToggle">Mark for Review</button>
+        <div class="sheet-section">
+          <h4>Distance and Midpoint</h4>
+          <div class="formula-list">
+            <div class="formula-row">
+              <span class="formula-label">Distance Formula</span>
+              <span class="formula-expression">
+                <em>d</em> = &radic;((<em>x</em><sub>2</sub> - <em>x</em><sub>1</sub>)<sup>2</sup> + (<em>y</em><sub>2</sub> - <em>y</em><sub>1</sub>)<sup>2</sup>)
+              </span>
+            </div>
+            <div class="formula-row">
+              <span class="formula-label">Midpoint Formula</span>
+              <span class="formula-expression">
+                <span class="midpoint-group">(
+                  <span class="fraction compact-fraction">
+                    <span class="top"><em>x</em><sub>1</sub> + <em>x</em><sub>2</sub></span>
+                    <span class="bottom">2</span>
+                  </span>,
+                  <span class="fraction compact-fraction">
+                    <span class="top"><em>y</em><sub>1</sub> + <em>y</em><sub>2</sub></span>
+                    <span class="bottom">2</span>
+                  </span>
+                )</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="primary-button" type="button" onclick="closeModal('formulaModal')">Close</button>
     </div>
+  </div>
 
-    <div class="question-body">
-      <h1 id="questionText"></h1>
-      <div id="choices"></div>
-    </div>
-
-    <div class="nav-bar">
-      <button class="text-control" onclick="prevQuestion()">Previous</button>
-      <button class="text-control" onclick="nextQuestion()">Next</button>
-    </div>
-
-  </section>
-
-  <!-- RIGHT: Tools -->
-  <aside class="sidebar">
-    <div class="sidebar-title">Tools</div>
-    <div class="tools-list">
-      <button class="text-control">Calculator</button>
-      <button class="text-control">Reference Sheet</button>
-      <button class="text-control">Formula Sheet</button>
-      <button class="text-control">Graphing Tool</button>
-      <button class="text-control">Notes</button>
-    </div>
-  </aside>
-
-</main>
-
-<script src="./script.js"></script>
+  <script src="./script.js"></script>
 </body>
 </html>
