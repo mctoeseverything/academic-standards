@@ -597,17 +597,39 @@ function restartTest() {
 
 function initGraphingCalculator() {
   if (graphingCalculator || !window.Desmos || !graphingContainer) return;
+
   graphingCalculator = Desmos.GraphingCalculator(graphingContainer, {
     expressions: true,
-    expressionsTopbar: false,
+    keypad: true,
     settingsMenu: true,
     zoomButtons: true,
-    keypad: true,
     border: false,
+    expressionsTopbar: false,
     expressionsCollapsed: false,
     lockViewport: false,
     pasteGraphLink: false,
-    links: false
+    links: false,
+    restrictedFunctions: {
+      regressions: true
+    }
+  });
+
+  // Enforce equation format rules (custom layer)
+  graphingCalculator.observeEvent('change', () => {
+    const expressions = graphingCalculator.getExpressions();
+
+    expressions.forEach(expr => {
+      if (!expr.latex) return;
+
+      const invalid =
+        expr.latex.includes('=') &&
+        !expr.latex.startsWith('y=') &&
+        !expr.latex.startsWith('x=');
+
+      if (invalid) {
+        graphingCalculator.setExpression({ id: expr.id, latex: '' });
+      }
+    });
   });
 }
 
