@@ -62,7 +62,8 @@ function escapeHtml(text) {
 }
 
 function getQuestionPromptMarkup(index) {
-  return stemMarkup[index] || escapeHtml(questions[index].prompt);
+  // stemMarkup stores highlighted HTML; otherwise use the raw prompt so LaTeX isn't escaped
+  return stemMarkup[index] || questions[index].prompt;
 }
 
 function normalizeText(value) {
@@ -223,7 +224,7 @@ function renderChoiceButton(question, choice, index) {
 
   const textEl = document.createElement("span");
   textEl.className = "choice-text";
-  textEl.textContent = choice;
+  textEl.innerHTML = choice;
 
   textWrapper.appendChild(alphaEl);
   textWrapper.appendChild(textEl);
