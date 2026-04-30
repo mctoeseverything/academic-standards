@@ -37,6 +37,7 @@ const graphingButton = document.getElementById("graphingButton");
 const notesButton = document.getElementById("notesButton");
 const notesField = document.getElementById("notesField");
 const graphingContainer = document.getElementById("desmosGraphingCalculator");
+const calculatorFrame = document.getElementById("calculatorFrame");
 const submitSummary = document.getElementById("submitSummary");
 const submitChecklist = document.getElementById("submitChecklist");
 const confirmSubmitButton = document.getElementById("confirmSubmitButton");
@@ -69,7 +70,6 @@ function normalizeText(value) {
 function normalizeNumeric(value) {
   const trimmed = String(value).trim();
   if (!trimmed) return "";
-
   if (trimmed.includes("/")) {
     const [numerator, denominator] = trimmed.split("/");
     const top = Number(numerator);
@@ -78,7 +78,6 @@ function normalizeNumeric(value) {
       return String(top / bottom);
     }
   }
-
   const numeric = Number(trimmed);
   return Number.isNaN(numeric) ? normalizeText(trimmed) : String(numeric);
 }
@@ -90,19 +89,9 @@ function getAnsweredCount() {
 function hasAnswer(index) {
   const question = questions[index];
   const answer = answers[index];
-
-  if (question.type === "select_multiple") {
-    return Array.isArray(answer) && answer.length > 0;
-  }
-
-  if (question.type === "numeric" || question.type === "short_response") {
-    return typeof answer === "string" && answer.trim().length > 0;
-  }
-
-  if (question.type === "graph_point") {
-    return typeof answer === "string" && answer.length > 0;
-  }
-
+  if (question.type === "select_multiple") return Array.isArray(answer) && answer.length > 0;
+  if (question.type === "numeric" || question.type === "short_response") return typeof answer === "string" && answer.trim().length > 0;
+  if (question.type === "graph_point") return typeof answer === "string" && answer.length > 0;
   return Number.isInteger(answer);
 }
 
@@ -114,23 +103,13 @@ function formatTime(totalSeconds) {
 }
 
 function saveState() {
-  const state = {
-    current,
-    answers,
-    markedQuestions: [...markedQuestions],
-    eliminatedChoices,
-    stemMarkup,
-    time,
-    submitted
-  };
-
+  const state = { current, answers, markedQuestions: [...markedQuestions], eliminatedChoices, stemMarkup, time, submitted };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
 function restoreState() {
   const rawState = localStorage.getItem(STORAGE_KEY);
   if (!rawState) return;
-
   try {
     const state = JSON.parse(rawState);
     current = Number.isInteger(state.current) ? state.current : 0;
@@ -141,23 +120,13 @@ function restoreState() {
     time = typeof state.time === "number" ? state.time : DEFAULT_TIME;
     submitted = Boolean(state.submitted);
   } catch {
-    current = 0;
-    answers = {};
-    markedQuestions = new Set();
-    eliminatedChoices = {};
-    stemMarkup = {};
-    time = DEFAULT_TIME;
-    submitted = false;
+    current = 0; answers = {}; markedQuestions = new Set();
+    eliminatedChoices = {}; stemMarkup = {}; time = DEFAULT_TIME; submitted = false;
   }
 }
 
-function loadNotes() {
-  notesField.value = localStorage.getItem(NOTES_KEY) || "";
-}
-
-function saveNotes() {
-  localStorage.setItem(NOTES_KEY, notesField.value);
-}
+function loadNotes() { notesField.value = localStorage.getItem(NOTES_KEY) || ""; }
+function saveNotes() { localStorage.setItem(NOTES_KEY, notesField.value); }
 
 function updateHeaderStats() {
   answeredCount.textContent = getAnsweredCount();
@@ -167,10 +136,7 @@ function updateHeaderStats() {
 
 function updateNavigationState() {
   const supportsElimination = ["multiple_choice", "select_multiple"].includes(questions[current]?.type);
-  if (!supportsElimination) {
-    eliminateMode = false;
-  }
-
+  if (!supportsElimination) eliminateMode = false;
   prevButton.disabled = current === 0 || submitted;
   nextButton.disabled = current === questions.length - 1 || submitted;
   submitButton.disabled = submitted;
@@ -191,18 +157,13 @@ function getQuestionState(index) {
 
 function renderGrid() {
   questionGrid.innerHTML = "";
-
   questions.forEach((_, index) => {
     const button = document.createElement("button");
     button.className = `q-box ${getQuestionState(index)}`;
     button.type = "button";
     button.textContent = index + 1;
     button.disabled = submitted;
-    button.onclick = () => {
-      current = index;
-      saveState();
-      renderQuestion();
-    };
+    button.onclick = () => { current = index; saveState(); renderQuestion(); };
     questionGrid.appendChild(button);
   });
 }
@@ -213,11 +174,7 @@ function getEliminatedChoices(index) {
 
 function toggleEliminatedChoice(questionIndex, choiceIndex) {
   const list = new Set(getEliminatedChoices(questionIndex));
-  if (list.has(choiceIndex)) {
-    list.delete(choiceIndex);
-  } else {
-    list.add(choiceIndex);
-  }
+  if (list.has(choiceIndex)) { list.delete(choiceIndex); } else { list.add(choiceIndex); }
   eliminatedChoices[questionIndex] = [...list];
 }
 
@@ -252,23 +209,22 @@ function renderChoiceButton(question, choice, index) {
     }
   }
 
-  // Radio / checkbox indicator
+  // Radio/checkbox indicator
   const radioEl = document.createElement("span");
   radioEl.className = "choice-letter";
 
-  // Letter label
+  // Text wrapper: letter + text
+  const textWrapper = document.createElement("span");
+  textWrapper.className = "choice-text-wrapper";
+
   const alphaEl = document.createElement("span");
   alphaEl.className = "choice-alpha";
   alphaEl.textContent = letter;
 
-  // Choice text
   const textEl = document.createElement("span");
   textEl.className = "choice-text";
   textEl.textContent = choice;
 
-  // Wrapper for alpha + text
-  const textWrapper = document.createElement("span");
-  textWrapper.className = "choice-text-wrapper";
   textWrapper.appendChild(alphaEl);
   textWrapper.appendChild(textEl);
 
@@ -277,28 +233,18 @@ function renderChoiceButton(question, choice, index) {
 
   button.onclick = () => {
     if (submitted) return;
-
     if (eliminateMode) {
       toggleEliminatedChoice(current, index);
-      saveState();
-      renderQuestion();
-      return;
+      saveState(); renderQuestion(); return;
     }
-
     if (isMulti) {
       const selected = new Set(Array.isArray(answers[current]) ? answers[current] : []);
-      if (selected.has(index)) {
-        selected.delete(index);
-      } else {
-        selected.add(index);
-      }
+      if (selected.has(index)) { selected.delete(index); } else { selected.add(index); }
       answers[current] = [...selected].sort((a, b) => a - b);
     } else {
       answers[current] = index;
     }
-
-    saveState();
-    renderQuestion();
+    saveState(); renderQuestion();
   };
 
   return button;
@@ -306,9 +252,7 @@ function renderChoiceButton(question, choice, index) {
 
 function renderMultipleChoice(question) {
   choicesDiv.className = "choices";
-  question.choices.forEach((choice, index) => {
-    choicesDiv.appendChild(renderChoiceButton(question, choice, index));
-  });
+  question.choices.forEach((choice, index) => choicesDiv.appendChild(renderChoiceButton(question, choice, index)));
 }
 
 function renderTextResponse(question) {
@@ -316,30 +260,23 @@ function renderTextResponse(question) {
   const value = typeof answers[current] === "string" ? answers[current] : "";
   const wrapper = document.createElement("div");
   wrapper.className = "response-card";
-
   const input = document.createElement("input");
   input.className = "response-input";
   input.type = "text";
   input.placeholder = question.placeholder || "Enter your response";
   input.value = value;
   input.disabled = submitted;
-
   input.addEventListener("input", (event) => {
     answers[current] = event.target.value;
-    saveState();
-    updateHeaderStats();
-    renderGrid();
+    saveState(); updateHeaderStats(); renderGrid();
   });
-
   wrapper.appendChild(input);
-
   if (submitted) {
     const feedback = document.createElement("div");
     feedback.className = isCorrect(current) ? "response-feedback review-good" : "response-feedback review-bad";
     feedback.textContent = isCorrect(current) ? "Accepted response" : "Check response";
     wrapper.appendChild(feedback);
   }
-
   choicesDiv.appendChild(wrapper);
 }
 
@@ -347,35 +284,26 @@ function renderGraphQuestion(question) {
   choicesDiv.className = "graph-question-panel";
   const wrapper = document.createElement("div");
   wrapper.className = "graph-card";
-
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", "0 0 360 260");
   svg.setAttribute("class", "graph-plane");
 
   const { xMin, xMax, yMin, yMax, points } = question.graph;
-  const width = 360;
-  const height = 260;
-  const padding = 28;
-
+  const width = 360, height = 260, padding = 28;
   const toSvgX = (x) => padding + ((x - xMin) / (xMax - xMin)) * (width - padding * 2);
   const toSvgY = (y) => height - padding - ((y - yMin) / (yMax - yMin)) * (height - padding * 2);
 
-  for (let x = xMin; x <= xMax; x += 1) {
+  for (let x = xMin; x <= xMax; x++) {
     const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    line.setAttribute("x1", toSvgX(x));
-    line.setAttribute("x2", toSvgX(x));
-    line.setAttribute("y1", padding);
-    line.setAttribute("y2", height - padding);
+    line.setAttribute("x1", toSvgX(x)); line.setAttribute("x2", toSvgX(x));
+    line.setAttribute("y1", padding); line.setAttribute("y2", height - padding);
     line.setAttribute("class", x === 0 ? "axis-line" : "grid-line");
     svg.appendChild(line);
   }
-
-  for (let y = yMin; y <= yMax; y += 1) {
+  for (let y = yMin; y <= yMax; y++) {
     const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    line.setAttribute("x1", padding);
-    line.setAttribute("x2", width - padding);
-    line.setAttribute("y1", toSvgY(y));
-    line.setAttribute("y2", toSvgY(y));
+    line.setAttribute("x1", padding); line.setAttribute("x2", width - padding);
+    line.setAttribute("y1", toSvgY(y)); line.setAttribute("y2", toSvgY(y));
     line.setAttribute("class", y === 0 ? "axis-line" : "grid-line");
     svg.appendChild(line);
   }
@@ -383,35 +311,21 @@ function renderGraphQuestion(question) {
   points.forEach((point) => {
     const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
     group.setAttribute("class", "graph-point-group");
-
     const isSelected = answers[current] === point.id;
     const isCorrectPoint = submitted && point.id === question.correct;
     const isIncorrectPoint = submitted && isSelected && point.id !== question.correct;
-
     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    circle.setAttribute("cx", toSvgX(point.x));
-    circle.setAttribute("cy", toSvgY(point.y));
-    circle.setAttribute("r", 9);
+    circle.setAttribute("cx", toSvgX(point.x)); circle.setAttribute("cy", toSvgY(point.y)); circle.setAttribute("r", 9);
     circle.setAttribute("class", `graph-point${isSelected ? " selected" : ""}${isCorrectPoint ? " correct" : ""}${isIncorrectPoint ? " incorrect" : ""}`);
-
     const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    text.setAttribute("x", toSvgX(point.x) + 12);
-    text.setAttribute("y", toSvgY(point.y) - 10);
+    text.setAttribute("x", toSvgX(point.x) + 12); text.setAttribute("y", toSvgY(point.y) - 10);
     text.setAttribute("class", "graph-point-label");
     text.textContent = `${point.label} (${point.x}, ${point.y})`;
-
-    group.appendChild(circle);
-    group.appendChild(text);
-
+    group.appendChild(circle); group.appendChild(text);
     if (!submitted) {
       group.style.cursor = "pointer";
-      group.addEventListener("click", () => {
-        answers[current] = point.id;
-        saveState();
-        renderQuestion();
-      });
+      group.addEventListener("click", () => { answers[current] = point.id; saveState(); renderQuestion(); });
     }
-
     svg.appendChild(group);
   });
 
@@ -421,66 +335,34 @@ function renderGraphQuestion(question) {
 
 function renderQuestionInput(question) {
   choicesDiv.innerHTML = "";
-
-  if (question.type === "multiple_choice" || question.type === "select_multiple") {
-    renderMultipleChoice(question);
-    return;
-  }
-
-  if (question.type === "numeric" || question.type === "short_response") {
-    renderTextResponse(question);
-    return;
-  }
-
-  if (question.type === "graph_point") {
-    renderGraphQuestion(question);
-  }
+  if (question.type === "multiple_choice" || question.type === "select_multiple") { renderMultipleChoice(question); return; }
+  if (question.type === "numeric" || question.type === "short_response") { renderTextResponse(question); return; }
+  if (question.type === "graph_point") { renderGraphQuestion(question); }
 }
 
 function renderQuestion() {
   if (!questions.length) return;
-
   const question = questions[current];
   questionNumberBadge.textContent = current + 1;
   questionText.innerHTML = getQuestionPromptMarkup(current);
-
   renderQuestionInput(question);
-
   markToggle.classList.toggle("active", markedQuestions.has(current));
   markToggleLabel.textContent = markedQuestions.has(current) ? "Marked for Review" : "Mark for Review";
-
-  renderGrid();
-  updateHeaderStats();
-  updateNavigationState();
+  renderGrid(); updateHeaderStats(); updateNavigationState();
 }
 
 function nextQuestion() {
-  if (current < questions.length - 1) {
-    current += 1;
-    saveState();
-    renderQuestion();
-  }
+  if (current < questions.length - 1) { current++; saveState(); renderQuestion(); }
 }
 
 function prevQuestion() {
-  if (current > 0) {
-    current -= 1;
-    saveState();
-    renderQuestion();
-  }
+  if (current > 0) { current--; saveState(); renderQuestion(); }
 }
 
 function toggleMarked() {
   if (submitted) return;
-
-  if (markedQuestions.has(current)) {
-    markedQuestions.delete(current);
-  } else {
-    markedQuestions.add(current);
-  }
-
-  saveState();
-  renderQuestion();
+  if (markedQuestions.has(current)) { markedQuestions.delete(current); } else { markedQuestions.add(current); }
+  saveState(); renderQuestion();
 }
 
 function toggleEliminateMode() {
@@ -499,16 +381,12 @@ function toggleHighlightMode() {
 
 function applyHighlightFromSelection() {
   if (!highlightMode || submitted) return;
-
   const selection = window.getSelection();
   if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return;
-
   const range = selection.getRangeAt(0);
   if (!questionText.contains(range.commonAncestorContainer)) return;
-
   const highlight = document.createElement("span");
   highlight.className = "highlighted-text";
-
   try {
     const fragment = range.extractContents();
     highlight.appendChild(fragment);
@@ -516,19 +394,13 @@ function applyHighlightFromSelection() {
     selection.removeAllRanges();
     stemMarkup[current] = questionText.innerHTML;
     saveState();
-  } catch {
-    selection.removeAllRanges();
-  }
+  } catch { selection.removeAllRanges(); }
 }
 
 function openModal(id) {
   const modal = document.getElementById(id);
   const windowEl = modal.querySelector(".draggable-window");
-  if (windowEl) {
-    windowEl.style.left = "";
-    windowEl.style.top = "";
-    windowEl.style.transform = "";
-  }
+  if (windowEl) { windowEl.style.left = ""; windowEl.style.top = ""; windowEl.style.transform = ""; }
   modal.style.display = "flex";
 }
 
@@ -540,26 +412,15 @@ function toggleSidebar(side) {
   const isLeft = side === "left";
   const sidebar = isLeft ? leftSidebar : rightSidebar;
   const variableName = isLeft ? "--left-sidebar-width" : "--right-sidebar-width";
-  const expandedWidth = isLeft ? "230px" : "200px";
+  const expandedWidth = isLeft ? "248px" : "210px";
   const collapsedWidth = "56px";
-
   sidebar.classList.toggle("collapsed");
-  examShell.style.setProperty(
-    variableName,
-    sidebar.classList.contains("collapsed") ? collapsedWidth : expandedWidth
-  );
+  examShell.style.setProperty(variableName, sidebar.classList.contains("collapsed") ? collapsedWidth : expandedWidth);
 }
 
 function updateTimer() {
   if (submitted) return;
-
-  if (time > 0) {
-    time -= 1;
-    document.getElementById("time").textContent = formatTime(time);
-    saveState();
-    return;
-  }
-
+  if (time > 0) { time--; document.getElementById("time").textContent = formatTime(time); saveState(); return; }
   showSubmitModal(true);
 }
 
@@ -570,100 +431,81 @@ function startTimer() {
 }
 
 function showSubmitModal(autoSubmit = false) {
-  if (timerId && autoSubmit) {
-    clearInterval(timerId);
-    timerId = null;
-  }
-
+  if (timerId && autoSubmit) { clearInterval(timerId); timerId = null; }
   const unanswered = questions.length - getAnsweredCount();
   submitSummary.textContent = autoSubmit
     ? "Time has expired. Review your counts below and submit your mock exam."
     : "You are about to finish this mock exam. Review your progress before submitting.";
-
   submitChecklist.innerHTML = `
     <div class="submit-line"><span>Answered questions</span><strong>${getAnsweredCount()} of ${questions.length}</strong></div>
     <div class="submit-line"><span>Unanswered questions</span><strong>${unanswered}</strong></div>
     <div class="submit-line"><span>Marked for review</span><strong>${markedQuestions.size}</strong></div>
     <div class="submit-line"><span>Time remaining</span><strong>${formatTime(time)}</strong></div>
   `;
-
   openModal("submitModal");
 }
 
 function isCorrect(index) {
   const question = questions[index];
   const answer = answers[index];
-
   if (!hasAnswer(index)) return false;
-
-  if (question.type === "multiple_choice") {
-    return answer === question.correct;
-  }
-
+  if (question.type === "multiple_choice") return answer === question.correct;
   if (question.type === "select_multiple") {
     const actual = Array.isArray(answer) ? [...answer].sort((a, b) => a - b) : [];
     const expected = [...question.correct].sort((a, b) => a - b);
     return JSON.stringify(actual) === JSON.stringify(expected);
   }
-
   if (question.type === "numeric") {
     const normalizedAnswer = normalizeNumeric(answer);
     return question.acceptedAnswers.some((accepted) => normalizeNumeric(accepted) === normalizedAnswer);
   }
-
   if (question.type === "short_response") {
     const normalizedAnswer = normalizeText(answer);
     return question.acceptedAnswers.some((accepted) => normalizeText(accepted) === normalizedAnswer);
   }
-
-  if (question.type === "graph_point") {
-    return answer === question.correct;
-  }
-
+  if (question.type === "graph_point") return answer === question.correct;
   return false;
 }
 
 function describeAnswer(index) {
   const question = questions[index];
   const answer = answers[index];
-
   if (!hasAnswer(index)) return "Unanswered";
-
-  if (question.type === "multiple_choice") {
-    return `${String.fromCharCode(65 + answer)}. ${question.choices[answer]}`;
-  }
-
-  if (question.type === "select_multiple") {
-    return answer
-      .map((choiceIndex) => `${String.fromCharCode(65 + choiceIndex)}. ${question.choices[choiceIndex]}`)
-      .join(", ");
-  }
-
-  if (question.type === "graph_point") {
-    return `Point ${answer}`;
-  }
-
+  if (question.type === "multiple_choice") return `${String.fromCharCode(65 + answer)}. ${question.choices[answer]}`;
+  if (question.type === "select_multiple") return answer.map((i) => `${String.fromCharCode(65 + i)}. ${question.choices[i]}`).join(", ");
+  if (question.type === "graph_point") return `Point ${answer}`;
   return String(answer);
 }
 
 function describeCorrectAnswer(index) {
   const question = questions[index];
-
-  if (question.type === "multiple_choice") {
-    return `${String.fromCharCode(65 + question.correct)}. ${question.choices[question.correct]}`;
-  }
-
-  if (question.type === "select_multiple") {
-    return question.correct
-      .map((choiceIndex) => `${String.fromCharCode(65 + choiceIndex)}. ${question.choices[choiceIndex]}`)
-      .join(", ");
-  }
-
-  if (question.type === "graph_point") {
-    return `Point ${question.correct}`;
-  }
-
+  if (question.type === "multiple_choice") return `${String.fromCharCode(65 + question.correct)}. ${question.choices[question.correct]}`;
+  if (question.type === "select_multiple") return question.correct.map((i) => `${String.fromCharCode(65 + i)}. ${question.choices[i]}`).join(", ");
+  if (question.type === "graph_point") return `Point ${question.correct}`;
   return question.acceptedAnswers.join(" or ");
+}
+
+// ── DESMOS RESET HELPERS ──────────────────────────────────
+
+function resetCalculator() {
+  // Reset the scientific calculator iframe to a fresh load
+  if (calculatorFrame) {
+    calculatorFrame.src = "about:blank";
+    // Small delay then reload so it's fresh on next open
+    setTimeout(() => { calculatorFrame.src = "https://www.desmos.com/scientific"; }, 50);
+  }
+}
+
+function resetGraphingCalculator() {
+  // Destroy and nullify the graphing calculator instance
+  if (graphingCalculator) {
+    try { graphingCalculator.destroy(); } catch (e) { /* ignore */ }
+    graphingCalculator = null;
+  }
+  // Clear the container so it's blank
+  if (graphingContainer) {
+    graphingContainer.innerHTML = "";
+  }
 }
 
 function finalizeSubmission() {
@@ -671,6 +513,9 @@ function finalizeSubmission() {
   saveState();
   closeModal("submitModal");
   if (timerId) clearInterval(timerId);
+  // Reset both calculators on submit
+  resetCalculator();
+  resetGraphingCalculator();
   renderQuestion();
   renderResults();
   openModal("resultsModal");
@@ -679,18 +524,14 @@ function finalizeSubmission() {
 function renderResults() {
   let correct = 0;
   resultsReview.innerHTML = "";
-
   questions.forEach((question, index) => {
-    if (isCorrect(index)) correct += 1;
-
+    if (isCorrect(index)) correct++;
     const row = document.createElement("div");
     row.className = "review-row";
     row.innerHTML = `
       <div class="review-row-top">
         <strong>Question ${index + 1}</strong>
-        <span class="${isCorrect(index) ? "review-good" : "review-bad"}">
-          ${isCorrect(index) ? "Correct" : "Check"}
-        </span>
+        <span class="${isCorrect(index) ? "review-good" : "review-bad"}">${isCorrect(index) ? "Correct" : "Check"}</span>
       </div>
       <p>${escapeHtml(question.prompt)}</p>
       <div class="review-meta">
@@ -698,10 +539,8 @@ function renderResults() {
         <span>Correct answer: ${escapeHtml(describeCorrectAnswer(index))}</span>
       </div>
     `;
-
     resultsReview.appendChild(row);
   });
-
   const score = Math.round((correct / questions.length) * 100);
   resultsScore.textContent = `${score}%`;
   resultsBreakdown.textContent = `${correct} correct out of ${questions.length} questions`;
@@ -712,24 +551,21 @@ function renderResults() {
 }
 
 function restartTest() {
-  current = 0;
-  answers = {};
-  markedQuestions = new Set();
-  eliminatedChoices = {};
-  stemMarkup = {};
-  time = DEFAULT_TIME;
-  submitted = false;
-  eliminateMode = false;
-  highlightMode = false;
+  current = 0; answers = {}; markedQuestions = new Set();
+  eliminatedChoices = {}; stemMarkup = {}; time = DEFAULT_TIME;
+  submitted = false; eliminateMode = false; highlightMode = false;
   closeModal("resultsModal");
   localStorage.removeItem(STORAGE_KEY);
+  // Reset both calculators on restart too
+  resetCalculator();
+  resetGraphingCalculator();
   startTimer();
   renderQuestion();
 }
 
 function initGraphingCalculator() {
+  // If already initialized, do nothing
   if (graphingCalculator || !window.Desmos || !graphingContainer) return;
-
   graphingCalculator = Desmos.GraphingCalculator(graphingContainer, {
     expressions: true,
     expressionsTopbar: false,
@@ -742,48 +578,33 @@ function initGraphingCalculator() {
     pasteGraphLink: false,
     links: false
   });
-
-  graphingCalculator.setExpression({ id: "starter1", latex: "y=x^2" });
-  graphingCalculator.setExpression({ id: "starter2", latex: "y=2x+1" });
+  // Start blank — no starter expressions so state is clean
 }
 
 function setupDraggableWindows() {
   document.querySelectorAll(".draggable-window").forEach((windowEl) => {
     const handle = windowEl.querySelector(".drag-handle");
     if (!handle) return;
-
-    let dragging = false;
-    let offsetX = 0;
-    let offsetY = 0;
-
+    let dragging = false, offsetX = 0, offsetY = 0;
     handle.addEventListener("pointerdown", (event) => {
       if (event.target.closest("button")) return;
-
       dragging = true;
       const rect = windowEl.getBoundingClientRect();
-      offsetX = event.clientX - rect.left;
-      offsetY = event.clientY - rect.top;
-
-      windowEl.style.left = `${rect.left}px`;
-      windowEl.style.top = `${rect.top}px`;
+      offsetX = event.clientX - rect.left; offsetY = event.clientY - rect.top;
+      windowEl.style.left = `${rect.left}px`; windowEl.style.top = `${rect.top}px`;
       windowEl.style.transform = "none";
       handle.setPointerCapture(event.pointerId);
     });
-
     handle.addEventListener("pointermove", (event) => {
       if (!dragging) return;
       windowEl.style.left = `${event.clientX - offsetX}px`;
       windowEl.style.top = `${event.clientY - offsetY}px`;
     });
-
     const endDrag = (event) => {
       if (!dragging) return;
       dragging = false;
-      if (handle.hasPointerCapture(event.pointerId)) {
-        handle.releasePointerCapture(event.pointerId);
-      }
+      if (handle.hasPointerCapture(event.pointerId)) handle.releasePointerCapture(event.pointerId);
     };
-
     handle.addEventListener("pointerup", endDrag);
     handle.addEventListener("pointercancel", endDrag);
   });
@@ -792,16 +613,21 @@ function setupDraggableWindows() {
 async function loadQuestions() {
   try {
     const response = await fetch("./questions.json");
-    if (!response.ok) {
-      throw new Error("Unable to load questions.json");
-    }
-
+    if (!response.ok) throw new Error("Unable to load questions.json");
     questions = await response.json();
   } catch {
     const fallback = document.getElementById("questionsFallback");
     questions = JSON.parse(fallback.textContent);
   }
 }
+
+// Load calculator iframe on page load (not on first open) so it's ready
+// but don't load graphing until opened to save memory
+window.addEventListener("load", () => {
+  if (calculatorFrame) {
+    calculatorFrame.src = "https://www.desmos.com/scientific";
+  }
+});
 
 calculatorButton.addEventListener("click", () => openModal("calculatorModal"));
 graphingButton.addEventListener("click", () => {
@@ -829,14 +655,9 @@ async function init() {
   restoreState();
   await loadQuestions();
   setupDraggableWindows();
-
-  if (current > questions.length - 1) {
-    current = 0;
-  }
-
+  if (current > questions.length - 1) current = 0;
   startTimer();
   renderQuestion();
-
   if (submitted) {
     if (timerId) clearInterval(timerId);
     renderResults();
