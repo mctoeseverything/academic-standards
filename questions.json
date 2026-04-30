@@ -7,182 +7,245 @@
   },
   {
     "type": "multiple_choice",
-    "prompt": "A gym charges $3$ dollars plus $2$ dollars per visit. If a customer pays $11$ dollars total, how many visits did they make?",
-    "choices": ["$4$", "$5$", "$3$", "$6$"],
+    "prompt": "A gym charges a $30$ registration fee plus $15$ per month. Which equation represents the total cost, $c$, after $m$ months?",
+    "choices": ["$c = 15m + 30$", "$c = 30m + 15$", "$c = 45m$", "$c = 15(m + 30)$"],
     "correct": 0
   },
   {
     "type": "multiple_choice",
-    "prompt": "A line passes through $(2,3)$ and $(4,7)$. A student calculates the slope as $\\frac{1}{2}$. What mistake did they most likely make?",
+    "prompt": "A student calculates the slope between $(2, 3)$ and $(4, 7)$ as $\\frac{4 - 2}{7 - 3}$. What mistake did they make?",
     "choices": [
-      "$\\text{They divided }\\Delta x \\text{ by } \\Delta y$",
-      "$\\text{They added instead of subtracting}$",
-      "$\\text{They multiplied coordinates}$",
-      "$\\text{They used incorrect points}$"
+      "They used $\\frac{\\Delta x}{\\Delta y}$ instead of $\\frac{\\Delta y}{\\Delta x}$",
+      "They added the coordinates instead of subtracting",
+      "They used the reciprocal of the slope",
+      "They confused the x and y intercepts"
     ],
     "correct": 0
   },
   {
     "type": "multiple_choice",
-    "prompt": "A rectangle has area $x^2 - 9$. Which expression could represent its side lengths?",
-    "choices": ["$(x-3)(x+3)$", "$(x-9)(x+1)$", "$(x-3)^2$", "$(x+9)(x-1)$"],
+    "prompt": "The area of a rectangular floor is represented by $w^2 - 7w$. If the width is $w$, which expression represents the length?",
+    "choices": ["$w - 7$", "$w + 7$", "$7 - w$", "$w^2$"],
     "correct": 0
   },
   {
     "type": "multiple_choice",
-    "prompt": "A student simplifies $\\frac{10x^2}{2x}$ as $5x^2$. Which step did they miss?",
-    "choices": [
-      "$\\text{Canceling a factor of }x$",
-      "$\\text{Adding exponents}$",
-      "$\\text{Multiplying coefficients}$",
-      "$\\text{Factoring the denominator}$"
-    ],
+    "prompt": "What is the zero of the linear function $f(x) = \\frac{2}{5}x - 10$?",
+    "choices": ["$25$", "$10$", "$-10$", "$-25$"],
     "correct": 0
   },
   {
     "type": "multiple_choice",
-    "prompt": "Solve: A number decreased by $4$ is at most $6$.",
-    "choices": ["$x \\leq 10$", "$x \\geq 2$", "$x \\leq 2$", "$x \\geq 10$"],
+    "prompt": "Which inequality represents 'a number decreased by $4$ is at most $6$'?",
+    "choices": ["$x - 4 \\leq 6$", "$x - 4 < 6$", "$x - 4 \\geq 6$", "$4 - x \\leq 6$"],
     "correct": 0
   },
   {
     "type": "multiple_choice",
-    "prompt": "The expression $2x^2$ models an area. What is the value when $x=3$?",
-    "choices": ["$18$", "$12$", "$9$", "$6$"],
+    "prompt": "A population of bacteria doubles every hour. If there are $100$ bacteria initially, which function models the population after $t$ hours?",
+    "choices": ["$f(t) = 100(2)^t$", "$f(t) = 2(100)^t$", "$f(t) = 100 + 2t$", "$f(t) = 2t + 100$"],
     "correct": 0
   },
   {
     "type": "multiple_choice",
-    "prompt": "A line has slope $3$ and y-intercept $2$. Which point lies on the line?",
-    "choices": ["$(0,2)$", "$(2,0)$", "$(3,2)$", "$(0,3)$"],
+    "prompt": "The equation $d = rt$ is used to find distance. Which equation shows the formula solved for $r$?",
+    "choices": ["$r = \\frac{d}{t}$", "$r = dt$", "$r = d - t$", "$r = \\frac{t}{d}$"],
     "correct": 0
   },
   {
     "type": "multiple_choice",
-    "prompt": "Solve the system $y=x+1$ and $y=2x-1$.",
-    "choices": ["$(2,3)$", "$(1,2)$", "$(0,1)$", "$(3,4)$"],
+    "prompt": "Solve the system: $y = x + 1$ and $y = 2x - 1$.",
+    "choices": ["$(2, 3)$", "$(1, 2)$", "$(0, 1)$", "$(3, 4)$"],
     "correct": 0
   },
   {
     "type": "multiple_choice",
-    "prompt": "A student writes $\\sqrt{16x^2}=4x$. Why is this incorrect?",
-    "choices": [
-      "$\\text{The result should be }4|x|$",
-      "$\\text{The square root cannot be simplified}$",
-      "$\\text{The coefficient is incorrect}$",
-      "$\\text{The exponent should remain}$"
-    ],
+    "prompt": "What is the value of $f(-3)$ for the function $f(x) = 2x^2 - 5$?",
+    "choices": ["$13$", "$-23$", "$7$", "$-11$"],
     "correct": 0
   },
   {
     "type": "multiple_choice",
-    "prompt": "For the function $f(x)=\\frac{1}{x-2}$, which value is not in the domain?",
-    "choices": ["$2$", "$-2$", "$0$", "$1$"],
-    "correct": 0
-  },
-  {
-    "type": "multiple_choice",
-    "prompt": "A student multiplies $(x^3)(x^2)$ and gets $x^6$. Which rule was misunderstood?",
-    "choices": [
-      "$\\text{Product of powers rule}$",
-      "$\\text{Power of a power rule}$",
-      "$\\text{Zero exponent rule}$",
-      "$\\text{Quotient rule}$"
-    ],
-    "correct": 0
-  },
-  {
-    "type": "select_multiple",
-    "prompt": "Which expressions are equivalent to $2(x+3)$?",
-    "choices": ["$2x+6$", "$x+6$", "$2x+3$", "$6+2x$"],
-    "correct": [0,3]
-  },
-  {
-    "type": "select_multiple",
-    "prompt": "Which values satisfy $x^2=9$?",
-    "choices": ["$3$", "$-3$", "$9$", "$-9$"],
-    "correct": [0,1]
-  },
-  {
-    "type": "select_multiple",
-    "prompt": "Which are solutions to $(x+2)(x-3)=0$?",
-    "choices": ["$3$", "$-2$", "$2$", "$-3$"],
-    "correct": [0,1]
-  },
-  {
-    "type": "select_multiple",
-    "prompt": "Which inequalities are equivalent to $-2x > 6$?",
+    "prompt": "Which inequality is equivalent to $-2x > 6$?",
     "choices": ["$x < -3$", "$x > -3$", "$x < 3$", "$x > 3$"],
-    "correct": [0]
+    "correct": 0
+  },
+  {
+    "type": "multiple_choice",
+    "prompt": "A student simplified $(x^3)^2$ as $x^5$. Which exponent rule did they apply incorrectly?",
+    "choices": [
+      "They added exponents instead of multiplying",
+      "They multiplied exponents instead of adding",
+      "They divided exponents",
+      "They used the negative exponent rule"
+    ],
+    "correct": 0
+  },
+  {
+    "type": "multiple_choice",
+    "prompt": "Which value of $x$ is a solution to $x^2 - 12x + 36 = 0$?",
+    "choices": ["$6$", "$-6$", "$0$", "$12$"],
+    "correct": 0
+  },
+  {
+    "type": "multiple_choice",
+    "prompt": "What is the slope of the line represented by $5x + 2y = 10$?",
+    "choices": ["$-2.5$", "$2.5$", "$-5$", "$5$"],
+    "correct": 0
+  },
+  {
+    "type": "multiple_choice",
+    "prompt": "Given $g(x) = x^2 - 4$, what is the range if the domain is $\\{-2, 0, 2\\}$?",
+    "choices": ["$\\{-4, 0\\}$", "$\\{0, 4\\}$", "$\\{-4, -2, 0, 2\\}$", "$\\{-4, 0, 4\\}$"],
+    "correct": 0
+  },
+  {
+    "type": "multiple_choice",
+    "prompt": "The graph of $f(x) = x^2$ is shifted $3$ units down. What is the new equation?",
+    "choices": ["$g(x) = x^2 - 3$", "$g(x) = (x - 3)^2$", "$g(x) = x^2 + 3$", "$g(x) = (x + 3)^2$"],
+    "correct": 0
+  },
+  {
+    "type": "multiple_choice",
+    "prompt": "Which correlation coefficient ($r$) indicates the strongest linear relationship?",
+    "choices": ["$-0.94$", "$0.88$", "$0.01$", "$0.50$"],
+    "correct": 0
+  },
+  {
+    "type": "multiple_choice",
+    "prompt": "What is the $y$-intercept of the function $f(x) = 3(2)^x$?",
+    "choices": ["$3$", "$2$", "$0$", "$6$"],
+    "correct": 0
+  },
+  {
+    "type": "multiple_choice",
+    "prompt": "Which expression is equivalent to $(2x^2 + 3x - 5) - (x^2 - 4x + 2)$?",
+    "choices": ["$x^2 + 7x - 7$", "$x^2 - x - 3$", "$3x^2 + 7x - 7$", "$x^2 + 7x - 3$"],
+    "correct": 0
+  },
+  {
+    "type": "multiple_choice",
+    "prompt": "The first four terms of a sequence are $16, 8, 4, 2$. What is the common ratio?",
+    "choices": ["$0.5$", "$-8$", "$2$", "$-0.5$"],
+    "correct": 0
+  },
+  {
+    "type": "select_multiple",
+    "prompt": "Which of the following are factors of $x^2 - 5x - 6$?",
+    "choices": ["$(x - 6)$", "$(x + 1)$", "$(x - 1)$", "$(x + 6)$"],
+    "correct": [0, 1]
+  },
+  {
+    "type": "select_multiple",
+    "prompt": "Which points are solutions to the inequality $y < 2x + 1$?",
+    "choices": ["$(2, 1)$", "$(0, 0)$", "$(1, 5)$", "$(5, 20)$"],
+    "correct": [0, 1]
+  },
+  {
+    "type": "select_multiple",
+    "prompt": "Which expressions are equivalent to $\\sqrt{72}$?",
+    "choices": ["$6\\sqrt{2}$", "$2\\sqrt{18}$", "$3\\sqrt{8}$", "$36\\sqrt{2}$"],
+    "correct": [0, 1, 2]
+  },
+  {
+    "type": "select_multiple",
+    "prompt": "Identify the systems of equations with no solution.",
+    "choices": [
+      "$y = 2x + 5$ and $y = 2x - 3$",
+      "$y = 3x + 1$ and $y = -3x + 1$",
+      "$x + y = 4$ and $2x + 2y = 8$",
+      "$x + y = 4$ and $x + y = 10$"
+    ],
+    "correct": [0, 3]
   },
   {
     "type": "numeric",
-    "prompt": "A taxi charges $5$ dollars plus $2$ dollars per mile. If the total is $21$, how many miles were traveled?",
-    "placeholder": "Enter a number",
+    "prompt": "A taxi charges $5$ dollars plus $2.50$ per mile. If the total fare is $25$ dollars, how many miles were traveled?",
+    "placeholder": "Enter miles",
     "acceptedAnswers": ["8"]
   },
   {
     "type": "numeric",
-    "prompt": "Evaluate $\\frac{1}{2}x$ when $x=8$",
-    "placeholder": "Enter a number",
-    "acceptedAnswers": ["4"]
+    "prompt": "What is the slope of the line $3x - y = 7$?",
+    "placeholder": "Enter slope",
+    "acceptedAnswers": ["3"]
   },
   {
     "type": "numeric",
-    "prompt": "A square has area $16$. What is the side length (positive solution)?",
-    "placeholder": "Enter a number",
-    "acceptedAnswers": ["4"]
+    "prompt": "Evaluate $3 + 2(4 - 1)^2$.",
+    "placeholder": "Enter value",
+    "acceptedAnswers": ["21"]
   },
   {
     "type": "numeric",
-    "prompt": "Find the slope of the line through $(1,2)$ and $(3,6)$",
-    "placeholder": "Enter a number",
+    "prompt": "Find the $x$-coordinate of the vertex for $y = x^2 - 4x + 5$.",
+    "placeholder": "Enter x",
     "acceptedAnswers": ["2"]
   },
   {
-    "type": "short_response",
-    "prompt": "Write the equation of a line with slope $2$ and y-intercept $-1$",
-    "placeholder": "Example: y=2x+3",
-    "acceptedAnswers": ["y=2x-1","y = 2x - 1"]
+    "type": "numeric",
+    "prompt": "If $f(x) = 5x - 2$, what is the value of $x$ when $f(x) = 13$?",
+    "placeholder": "Enter x",
+    "acceptedAnswers": ["3"]
   },
   {
     "type": "short_response",
-    "prompt": "Solve for $y$: $3x + y = 7$",
-    "placeholder": "Example: y=2x+3",
-    "acceptedAnswers": ["y=7-3x","y = 7 - 3x"]
-  },
-  {
-    "type": "short_response",
-    "prompt": "Factor $x^2 + 5x + 6$",
+    "prompt": "Factor the quadratic $x^2 + 5x + 6$",
     "placeholder": "Example: (x+2)(x+3)",
-    "acceptedAnswers": ["(x+2)(x+3)","(x + 2)(x + 3)"]
+    "acceptedAnswers": ["(x+2)(x+3)", "(x+3)(x+2)", "(x + 2)(x + 3)"]
+  },
+  {
+    "type": "short_response",
+    "prompt": "Write the equation of a vertical line passing through $(4, -7)$.",
+    "placeholder": "Example: x=0",
+    "acceptedAnswers": ["x=4", "x = 4"]
+  },
+  {
+    "type": "short_response",
+    "prompt": "Simplify the expression: $4x + 2(x - 3)$.",
+    "placeholder": "Example: 6x-6",
+    "acceptedAnswers": ["6x-6", "6x - 6"]
   },
   {
     "type": "graph_point",
-    "prompt": "Which point satisfies $y = x + 1$?",
+    "prompt": "Identify the y-intercept of the line $y = 2x - 3$.",
     "graph": {
-      "xMin": -4, "xMax": 4, "yMin": -4, "yMax": 4,
+      "xMin": -5, "xMax": 5, "yMin": -5, "yMax": 5,
       "points": [
-        { "id": "A", "x": 1, "y": 2, "label": "A" },
-        { "id": "B", "x": 0, "y": 0, "label": "B" },
-        { "id": "C", "x": 2, "y": 0, "label": "C" },
-        { "id": "D", "x": -1, "y": 1, "label": "D" }
+        { "id": "A", "x": 0, "y": -3, "label": "A" },
+        { "id": "B", "x": 1.5, "y": 0, "label": "B" },
+        { "id": "C", "x": 0, "y": 2, "label": "C" },
+        { "id": "D", "x": -3, "y": 0, "label": "D" }
       ]
     },
     "correct": "A"
   },
   {
     "type": "graph_point",
-    "prompt": "Which point satisfies $y = -x$?",
+    "prompt": "Which point represents a solution to the system $y > x$ and $y < 4$?",
     "graph": {
-      "xMin": -4, "xMax": 4, "yMin": -4, "yMax": 4,
+      "xMin": -5, "xMax": 5, "yMin": -5, "yMax": 5,
       "points": [
-        { "id": "A", "x": 1, "y": 1, "label": "A" },
-        { "id": "B", "x": 2, "y": -2, "label": "B" },
-        { "id": "C", "x": -1, "y": -1, "label": "C" },
-        { "id": "D", "x": 0, "y": 1, "label": "D" }
+        { "id": "A", "x": 1, "y": 2, "label": "A" },
+        { "id": "B", "x": 4, "y": 2, "label": "B" },
+        { "id": "C", "x": 1, "y": 5, "label": "C" },
+        { "id": "D", "x": -2, "y": -3, "label": "D" }
       ]
     },
-    "correct": "B"
+    "correct": "A"
+  },
+  {
+    "type": "graph_point",
+    "prompt": "Find the vertex of the parabola $y = -(x-2)^2 + 4$.",
+    "graph": {
+      "xMin": -5, "xMax": 5, "yMin": -5, "yMax": 5,
+      "points": [
+        { "id": "A", "x": 2, "y": 4, "label": "A" },
+        { "id": "B", "x": -2, "y": 4, "label": "B" },
+        { "id": "C", "x": 2, "y": -4, "label": "C" },
+        { "id": "D", "x": 0, "y": 0, "label": "D" }
+      ]
+    },
+    "correct": "A"
   }
 ]
