@@ -166,12 +166,17 @@ function updateHeaderStats() {
 }
 
 function updateNavigationState() {
+  const supportsElimination = ["multiple_choice", "select_multiple"].includes(questions[current]?.type);
+  if (!supportsElimination) {
+    eliminateMode = false;
+  }
+
   prevButton.disabled = current === 0 || submitted;
   nextButton.disabled = current === questions.length - 1 || submitted;
   submitButton.disabled = submitted;
   submitButton.hidden = current !== questions.length - 1 || submitted;
   markToggle.disabled = submitted;
-  eliminateModeButton.disabled = submitted;
+  eliminateModeButton.disabled = submitted || !supportsElimination;
   highlightModeButton.disabled = submitted;
   eliminateModeButton.classList.toggle("mode-active", eliminateMode);
   highlightModeButton.classList.toggle("mode-active", highlightMode);
@@ -311,6 +316,7 @@ function renderTextResponse(question) {
     answers[current] = event.target.value;
     saveState();
     updateHeaderStats();
+    renderGrid();
   });
 
   wrapper.appendChild(input);
