@@ -351,8 +351,11 @@ function renderQuestion() {
   const question = questions[current];
   questionNumberBadge.textContent = current + 1;
   questionText.innerHTML = getQuestionPromptMarkup(current);
-  typeset(questionText);
   renderQuestionInput(question);
+  // Typeset both the stem and the choices in one pass
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    window.MathJax.typesetPromise([questionText, choicesDiv]).catch(() => {});
+  }
   markToggle.classList.toggle("active", markedQuestions.has(current));
   markToggleLabel.textContent = markedQuestions.has(current) ? "Marked for Review" : "Mark for Review";
   renderGrid(); updateHeaderStats(); updateNavigationState();
@@ -676,6 +679,7 @@ window.prevQuestion = prevQuestion;
 window.toggleSidebar = toggleSidebar;
 window.openModal = openModal;
 window.closeModal = closeModal;
+window.togglePause = togglePause;
 
 async function init() {
   loadNotes();
