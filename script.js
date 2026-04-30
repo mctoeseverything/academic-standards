@@ -62,8 +62,7 @@ function escapeHtml(text) {
 }
 
 function getQuestionPromptMarkup(index) {
-  // stemMarkup stores highlighted HTML; otherwise use the raw prompt so LaTeX isn't escaped
-  return stemMarkup[index] || questions[index].prompt;
+  return stemMarkup[index] || escapeHtml(questions[index].prompt);
 }
 
 function normalizeText(value) {
@@ -224,7 +223,7 @@ function renderChoiceButton(question, choice, index) {
 
   const textEl = document.createElement("span");
   textEl.className = "choice-text";
-  textEl.innerHTML = choice;
+  textEl.textContent = choice;
 
   textWrapper.appendChild(alphaEl);
   textWrapper.appendChild(textEl);
@@ -595,99 +594,8 @@ function restartTest() {
   renderQuestion();
 }
 
-// ==============================
-// DESMOS SAFETY LAYER (NEW)
-// ==============================
-
-function isImplicitEquation(expr) {
-  // catches: 3x+2=11, x+1=y, etc.
-  return /^[^=]+=[^=]+$/.test(expr) && !/^y=|^x=/.test(expr.trim());
-}
-
-function isRegression(expr) {
-  return /~/.test(expr);
-}
-
-function isActionOrTicker(expr) {
-  return /->|\bslider\b|\bticker\b|\baction\b/i.test(expr);
-}
-
-function desmosSafeSetExpression(expr) {
-  if (!graphingCalculator) return;
-
-  const raw = String(expr).trim();
-
-  // Block implicit equations
-  if (isImplicitEquation(raw)) {
-    graphingCalculator.setExpression({
-      id: "error",
-      latex: "y=\\text{''}",
-      color: "#ff0000"
-    });
-
-    graphingCalculator.setExpression({
-      id: "errorMsg",
-      latex: "y=\\text{Implicit equations are disabled}"
-    });
-
-    return;
-  }
-
-  // Block regressions
-  if (isRegression(raw)) {
-    graphingCalculator.setExpression({
-      id: "errorMsg2",
-      latex: "y=\\text{Regression is disabled}"
-    });
-    return;
-  }
-
-  // Block actions/tickers
-  if (isActionOrTicker(raw)) {
-    graphingCalculator.setExpression({
-      id: "errorMsg3",
-      latex: "y=\\text{Actions are disabled}"
-    });
-    return;
-  }
-
-  // Otherwise allow normal Desmos behavior
-  graphingCalculator.setExpression({ latex: raw });
-}
-
-// ==============================
-// FIX: "=" INPUT BUG (NEW)
-// ==============================
-
-function preventBadCalculatorInput() {
-  document.addEventListener("keydown", (e) => {
-    // Prevent accidental form submit / input reset behavior
-    if (e.key === "=") {
-      e.preventDefault();
-      const active = document.activeElement;
-
-      // If typing inside Desmos or input fields, just insert "=" safely
-      if (active && active.tagName === "INPUT") {
-        const start = active.selectionStart;
-        const end = active.selectionEnd;
-        const val = active.value;
-
-        active.value = val.slice(0, start) + "=" + val.slice(end);
-        active.selectionStart = active.selectionEnd = start + 1;
-
-        active.dispatchEvent(new Event("input", { bubbles: true }));
-      }
-    }
-  });
-}
-
-// ==============================
-// PATCH DESMOS INIT
-// ==============================
-
 function initGraphingCalculator() {
   if (graphingCalculator || !window.Desmos || !graphingContainer) return;
-
   graphingCalculator = Desmos.GraphingCalculator(graphingContainer, {
     expressions: true,
     expressionsTopbar: false,
@@ -700,30 +608,7 @@ function initGraphingCalculator() {
     pasteGraphLink: false,
     links: false
   });
-
-  // Override expression setter with safety layer
-  const originalSetExpression = graphingCalculator.setExpression.bind(graphingCalculator);
-
-  graphingCalculator.setExpression = function (obj) {
-    if (obj && obj.latex) {
-      desmosSafeSetExpression(obj.latex);
-    } else {
-      originalSetExpression(obj);
-    }
-  };
 }
-
-// ==============================
-// CALL INPUT FIX ON LOAD
-// ==============================
-
-window.addEventListener("load", () => {
-  preventBadCalculatorInput();
-
-  if (calculatorFrame) {
-    calculatorFrame.src = "https://www.desmos.com/scientific";
-  }
-});
 
 function setupDraggableWindows() {
   document.querySelectorAll(".draggable-window").forEach((windowEl) => {
