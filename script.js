@@ -1,6 +1,6 @@
 const STORAGE_KEY = "standards-institute-algebra-1-state";
 const NOTES_KEY = "standards-institute-algebra-1-notes";
-const DEFAULT_TIME = 500;
+const DEFAULT_TIME = 5400;
 
 let questions = [];
 let current = 0;
@@ -14,6 +14,7 @@ let submitted = false;
 let eliminateMode = false;
 let highlightMode = false;
 let graphingCalculator = null;
+let paused = false;
 
 const questionText = document.getElementById("questionText");
 const choicesDiv = document.getElementById("choices");
@@ -49,6 +50,7 @@ const resultsCorrect = document.getElementById("resultsCorrect");
 const resultsMarked = document.getElementById("resultsMarked");
 const resultsTime = document.getElementById("resultsTime");
 const resultsReview = document.getElementById("resultsReview");
+const pauseButton = document.querySelector(".pause-button");
 
 function escapeHtml(text) {
   return text
@@ -209,11 +211,9 @@ function renderChoiceButton(question, choice, index) {
     }
   }
 
-  // Radio/checkbox indicator
   const radioEl = document.createElement("span");
   radioEl.className = "choice-letter";
 
-  // Text wrapper: letter + text
   const textWrapper = document.createElement("span");
   textWrapper.className = "choice-text-wrapper";
 
@@ -340,11 +340,18 @@ function renderQuestionInput(question) {
   if (question.type === "graph_point") { renderGraphQuestion(question); }
 }
 
+function typeset(el) {
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    window.MathJax.typesetPromise([el]).catch(() => {});
+  }
+}
+
 function renderQuestion() {
   if (!questions.length) return;
   const question = questions[current];
   questionNumberBadge.textContent = current + 1;
   questionText.innerHTML = getQuestionPromptMarkup(current);
+  typeset(questionText);
   renderQuestionInput(question);
   markToggle.classList.toggle("active", markedQuestions.has(current));
   markToggleLabel.textContent = markedQuestions.has(current) ? "Marked for Review" : "Mark for Review";
@@ -397,11 +404,38 @@ function applyHighlightFromSelection() {
   } catch { selection.removeAllRanges(); }
 }
 
+// ── PAUSE ─────────────────────────────────────────────────
+
+function togglePause() {
+  if (submitted) return;
+  paused = !paused;
+  const pauseOverlay = document.getElementById("pauseOverlay");
+  if (paused) {
+    // Stop the timer
+    if (timerId) { clearInterval(timerId); timerId = null; }
+    // Show overlay
+    pauseOverlay.style.display = "flex";
+    // Update button label
+    pauseButton.innerHTML = `<svg class="inline-icon pause-icon"><use href="#icon-chevron-right"></use></svg>Resume`;
+  } else {
+    // Hide overlay
+    pauseOverlay.style.display = "none";
+    // Restart timer
+    startTimer();
+    // Update button label
+    pauseButton.innerHTML = `<svg class="inline-icon pause-icon"><use href="#icon-pause"></use></svg>Pause`;
+  }
+}
+
+// ── MODALS ─────────────────────────────────────────────────
+
 function openModal(id) {
   const modal = document.getElementById(id);
   const windowEl = modal.querySelector(".draggable-window");
   if (windowEl) { windowEl.style.left = ""; windowEl.style.top = ""; windowEl.style.transform = ""; }
   modal.style.display = "flex";
+  // Typeset math in modals
+  typeset(modal);
 }
 
 function closeModal(id) {
@@ -419,7 +453,7 @@ function toggleSidebar(side) {
 }
 
 function updateTimer() {
-  if (submitted) return;
+  if (submitted || paused) return;
   if (time > 0) { time--; document.getElementById("time").textContent = formatTime(time); saveState(); return; }
   showSubmitModal(true);
 }
@@ -485,24 +519,18 @@ function describeCorrectAnswer(index) {
   return question.acceptedAnswers.join(" or ");
 }
 
-// ── DESMOS RESET HELPERS ──────────────────────────────────
-
 function resetCalculator() {
-  // Reset the scientific calculator iframe to a fresh load
   if (calculatorFrame) {
     calculatorFrame.src = "about:blank";
-    // Small delay then reload so it's fresh on next open
     setTimeout(() => { calculatorFrame.src = "https://www.desmos.com/scientific"; }, 50);
   }
 }
 
 function resetGraphingCalculator() {
-  // Destroy and nullify the graphing calculator instance
   if (graphingCalculator) {
     try { graphingCalculator.destroy(); } catch (e) { /* ignore */ }
     graphingCalculator = null;
   }
-  // Clear the container so it's blank
   if (graphingContainer) {
     graphingContainer.innerHTML = "";
   }
@@ -513,7 +541,6 @@ function finalizeSubmission() {
   saveState();
   closeModal("submitModal");
   if (timerId) clearInterval(timerId);
-  // Reset both calculators on submit
   resetCalculator();
   resetGraphingCalculator();
   renderQuestion();
@@ -554,17 +581,19 @@ function restartTest() {
   current = 0; answers = {}; markedQuestions = new Set();
   eliminatedChoices = {}; stemMarkup = {}; time = DEFAULT_TIME;
   submitted = false; eliminateMode = false; highlightMode = false;
+  paused = false;
   closeModal("resultsModal");
   localStorage.removeItem(STORAGE_KEY);
-  // Reset both calculators on restart too
   resetCalculator();
   resetGraphingCalculator();
+  // Reset pause button label
+  pauseButton.innerHTML = `<svg class="inline-icon pause-icon"><use href="#icon-pause"></use></svg>Pause`;
+  document.getElementById("pauseOverlay").style.display = "none";
   startTimer();
   renderQuestion();
 }
 
 function initGraphingCalculator() {
-  // If already initialized, do nothing
   if (graphingCalculator || !window.Desmos || !graphingContainer) return;
   graphingCalculator = Desmos.GraphingCalculator(graphingContainer, {
     expressions: true,
@@ -578,7 +607,6 @@ function initGraphingCalculator() {
     pasteGraphLink: false,
     links: false
   });
-  // Start blank — no starter expressions so state is clean
 }
 
 function setupDraggableWindows() {
@@ -621,8 +649,6 @@ async function loadQuestions() {
   }
 }
 
-// Load calculator iframe on page load (not on first open) so it's ready
-// but don't load graphing until opened to save memory
 window.addEventListener("load", () => {
   if (calculatorFrame) {
     calculatorFrame.src = "https://www.desmos.com/scientific";
@@ -643,6 +669,7 @@ restartButton.addEventListener("click", restartTest);
 eliminateModeButton.addEventListener("click", toggleEliminateMode);
 highlightModeButton.addEventListener("click", toggleHighlightMode);
 questionText.addEventListener("mouseup", applyHighlightFromSelection);
+pauseButton.addEventListener("click", togglePause);
 
 window.nextQuestion = nextQuestion;
 window.prevQuestion = prevQuestion;

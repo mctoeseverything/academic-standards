@@ -8,6 +8,21 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./style.css" />
+  <!-- MathJax config: render inline $...$ and display $$...$$ -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script','noscript','style','textarea','pre']
+      },
+      startup: { typeset: false }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
   <script src="https://www.desmos.com/api/v1.3/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
 </head>
 <body>
@@ -24,6 +39,13 @@
     <symbol id="icon-chart-no-axes" viewBox="0 0 24 24"><path d="M5 5v14h14"></path><path d="m8 15 3-3 2 2 4-6"></path></symbol>
     <symbol id="icon-square-pen" viewBox="0 0 24 24"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M16 3h5v5"></path><path d="m21 3-9 9"></path></symbol>
   </svg>
+
+  <!-- Pause overlay: covers the exam while paused -->
+  <div id="pauseOverlay" style="display:none; position:fixed; inset:0; z-index:200; background:rgba(15,20,30,0.82); align-items:center; justify-content:center; flex-direction:column; gap:18px;">
+    <div style="color:#fff; font-family:'DM Sans',sans-serif; font-size:1.5rem; font-weight:700; letter-spacing:-0.01em;">Exam Paused</div>
+    <div style="color:rgba(255,255,255,0.6); font-size:0.9rem; font-family:'DM Sans',sans-serif;">Your progress has been saved. Click Resume to continue.</div>
+    <button onclick="togglePause()" style="margin-top:10px; padding:12px 36px; background:#1e3a6e; color:#fff; border:none; border-radius:6px; font-family:'DM Sans',sans-serif; font-size:0.95rem; font-weight:600; cursor:pointer;">Resume Test</button>
+  </div>
 
   <header class="site-header">
     <div class="brand-block">
@@ -72,7 +94,6 @@
         </div>
 
         <div class="question-body">
-          <!-- Question number + mark on left; tools on right -->
           <div class="question-meta">
             <div class="question-meta-left">
               <div class="question-pill" id="questionNumberBadge">1</div>
@@ -126,22 +147,40 @@
   <!-- Reference Sheet Modal -->
   <div class="modal" id="referenceModal" aria-hidden="true">
     <div class="modal-content">
-      <div class="modal-sheet">
+      <div class="modal-sheet modal-sheet-scroll">
         <div class="sheet-header"><h3>Reference Sheet</h3><p>Algebra I — Authorized Testing Support Materials</p></div>
         <div class="sheet-section">
           <h4>Properties of Operations</h4>
           <div class="formula-list">
-            <div class="formula-row"><span class="formula-label">Commutative Property</span><span class="formula-expression"><em>a</em> + <em>b</em> = <em>b</em> + <em>a</em></span></div>
-            <div class="formula-row"><span class="formula-label">Associative Property</span><span class="formula-expression">(<em>a</em> + <em>b</em>) + <em>c</em> = <em>a</em> + (<em>b</em> + <em>c</em>)</span></div>
-            <div class="formula-row"><span class="formula-label">Distributive Property</span><span class="formula-expression"><em>a</em>(<em>b</em> + <em>c</em>) = <em>ab</em> + <em>ac</em></span></div>
+            <div class="formula-row">
+              <span class="formula-label">Commutative Property</span>
+              <span class="formula-expression">\(a + b = b + a\)</span>
+            </div>
+            <div class="formula-row">
+              <span class="formula-label">Associative Property</span>
+              <span class="formula-expression">\((a + b) + c = a + (b + c)\)</span>
+            </div>
+            <div class="formula-row">
+              <span class="formula-label">Distributive Property</span>
+              <span class="formula-expression">\(a(b + c) = ab + ac\)</span>
+            </div>
           </div>
         </div>
         <div class="sheet-section">
           <h4>Exponent Rules</h4>
           <div class="formula-list">
-            <div class="formula-row"><span class="formula-label">Product of Powers</span><span class="formula-expression"><em>x</em><sup>m</sup> · <em>x</em><sup>n</sup> = <em>x</em><sup>m+n</sup></span></div>
-            <div class="formula-row"><span class="formula-label">Power of a Power</span><span class="formula-expression">(<em>x</em><sup>m</sup>)<sup>n</sup> = <em>x</em><sup>mn</sup></span></div>
-            <div class="formula-row"><span class="formula-label">Zero Exponent</span><span class="formula-expression"><em>x</em><sup>0</sup> = 1, for <em>x</em> ≠ 0</span></div>
+            <div class="formula-row">
+              <span class="formula-label">Product of Powers</span>
+              <span class="formula-expression">\(x^m \cdot x^n = x^{m+n}\)</span>
+            </div>
+            <div class="formula-row">
+              <span class="formula-label">Power of a Power</span>
+              <span class="formula-expression">\((x^m)^n = x^{mn}\)</span>
+            </div>
+            <div class="formula-row">
+              <span class="formula-label">Zero Exponent</span>
+              <span class="formula-expression">\(x^0 = 1,\ \text{for } x \neq 0\)</span>
+            </div>
           </div>
         </div>
       </div>
@@ -152,23 +191,29 @@
   <!-- Formula Sheet Modal -->
   <div class="modal formula-modal" id="formulaModal" aria-hidden="true">
     <div class="modal-content">
-      <div class="modal-sheet">
+      <div class="modal-sheet modal-sheet-scroll">
         <div class="sheet-header"><h3>Formula Sheet</h3><p>Algebra I — Authorized Testing Support Materials</p></div>
         <div class="sheet-section">
           <h4>Linear and Slope Formulas</h4>
           <div class="formula-list">
             <div class="formula-row">
               <span class="formula-label">Slope Formula</span>
-              <span class="formula-expression formula-fraction"><span class="fraction"><span class="top"><em>y</em><sub>2</sub> - <em>y</em><sub>1</sub></span><span class="bottom"><em>x</em><sub>2</sub> - <em>x</em><sub>1</sub></span></span></span>
+              <span class="formula-expression">\(\dfrac{y_2 - y_1}{x_2 - x_1}\)</span>
             </div>
-            <div class="formula-row"><span class="formula-label">Slope-Intercept Form</span><span class="formula-expression"><em>y</em> = <em>mx</em> + <em>b</em></span></div>
-            <div class="formula-row"><span class="formula-label">Point-Slope Form</span><span class="formula-expression"><em>y</em> - <em>y</em><sub>1</sub> = <em>m</em>(<em>x</em> - <em>x</em><sub>1</sub>)</span></div>
+            <div class="formula-row">
+              <span class="formula-label">Slope-Intercept Form</span>
+              <span class="formula-expression">\(y = mx + b\)</span>
+            </div>
+            <div class="formula-row">
+              <span class="formula-label">Point-Slope Form</span>
+              <span class="formula-expression">\(y - y_1 = m(x - x_1)\)</span>
+            </div>
           </div>
         </div>
         <div class="sheet-section">
           <h4>Quadratic Formula</h4>
           <div class="featured-formula">
-            <span class="formula-expression"><em>x</em> = <span class="fraction"><span class="top">-<em>b</em> &plusmn; &radic;(<em>b</em><sup>2</sup> - 4<em>ac</em>)</span><span class="bottom">2<em>a</em></span></span></span>
+            <span class="formula-expression">\[x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}\]</span>
           </div>
         </div>
         <div class="sheet-section">
@@ -176,11 +221,11 @@
           <div class="formula-list">
             <div class="formula-row">
               <span class="formula-label">Distance Formula</span>
-              <span class="formula-expression"><em>d</em> = &radic;((<em>x</em><sub>2</sub> - <em>x</em><sub>1</sub>)<sup>2</sup> + (<em>y</em><sub>2</sub> - <em>y</em><sub>1</sub>)<sup>2</sup>)</span>
+              <span class="formula-expression">\(d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}\)</span>
             </div>
             <div class="formula-row">
               <span class="formula-label">Midpoint Formula</span>
-              <span class="formula-expression"><span class="midpoint-group">(<span class="fraction compact-fraction"><span class="top"><em>x</em><sub>1</sub> + <em>x</em><sub>2</sub></span><span class="bottom">2</span></span>, <span class="fraction compact-fraction"><span class="top"><em>y</em><sub>1</sub> + <em>y</em><sub>2</sub></span><span class="bottom">2</span></span>)</span></span>
+              <span class="formula-expression">\(\left(\dfrac{x_1 + x_2}{2},\ \dfrac{y_1 + y_2}{2}\right)\)</span>
             </div>
           </div>
         </div>
@@ -265,34 +310,35 @@
 
   <script id="questionsFallback" type="application/json">
 [
-  {"type":"multiple_choice","prompt":"Which expression is equivalent to 3(2x - 5) + 4x?","choices":["10x - 15","10x - 5","6x - 15","6x - 5"],"correct":0},
-  {"type":"select_multiple","prompt":"Select all equations that have the solution x = 4.","choices":["x + 3 = 7","2x = 8","x - 4 = 4","12 = 3x"],"correct":[0,1,3]},
-  {"type":"numeric","prompt":"Solve for y: 4y - 8 = 20. Enter your answer as an integer or decimal.","placeholder":"Enter a number","acceptedAnswers":["7"]},
-  {"type":"short_response","prompt":"Write the slope-intercept form of the line with slope 2 and y-intercept -3.","placeholder":"Example: y=2x-3","acceptedAnswers":["y=2x-3","y = 2x - 3","2x-3=y"]},
-  {"type":"graph_point","prompt":"Click the point that lies on the line y = x + 1.","graph":{"xMin":-4,"xMax":4,"yMin":-4,"yMax":4,"points":[{"id":"A","x":1,"y":2,"label":"A"},{"id":"B","x":2,"y":0,"label":"B"},{"id":"C","x":-1,"y":-3,"label":"C"},{"id":"D","x":3,"y":1,"label":"D"}]},"correct":"A"},
-  {"type":"multiple_choice","prompt":"Simplify: 7a - 2a + 9","choices":["5a + 9","9a - 2","5a - 9","7a + 7"],"correct":0},
-  {"type":"multiple_choice","prompt":"What is the solution to 3x = 24?","choices":["6","7","8","9"],"correct":2},
-  {"type":"select_multiple","prompt":"Select all ordered pairs that satisfy y = 2x + 1.","choices":["(0, 1)","(2, 5)","(3, 6)","(-1, -1)"],"correct":[0,1,3]},
-  {"type":"multiple_choice","prompt":"Factor: x^2 + 7x + 12","choices":["(x + 3)(x + 4)","(x + 2)(x + 6)","(x - 3)(x - 4)","(x + 1)(x + 12)"],"correct":0},
-  {"type":"numeric","prompt":"Solve: 5x - 9 = 16","placeholder":"Enter a value for x","acceptedAnswers":["5"]},
-  {"type":"multiple_choice","prompt":"Which inequality represents numbers greater than or equal to 12?","choices":["x > 12","x < 12","x >= 12","x <= 12"],"correct":2},
-  {"type":"numeric","prompt":"What is the value of 2^4?","placeholder":"Enter a number","acceptedAnswers":["16"]},
-  {"type":"multiple_choice","prompt":"Simplify: 6m + 3 - 2m","choices":["4m + 3","8m","4m - 3","6m + 1"],"correct":0},
-  {"type":"short_response","prompt":"Write an equation in slope-intercept form for the graph with slope 1 and y-intercept 4.","placeholder":"Example: y=x+4","acceptedAnswers":["y=x+4","y = x + 4","x+4=y"]},
-  {"type":"multiple_choice","prompt":"Which graph has a y-intercept of -2?","choices":["y = x - 2","y = x + 2","y = 2x","y = -2x + 2"],"correct":0},
-  {"type":"numeric","prompt":"Evaluate 3n - 1 when n = 4.","placeholder":"Enter a number","acceptedAnswers":["11"]},
-  {"type":"multiple_choice","prompt":"What is the solution to x - 7 = 15?","choices":["18","20","21","22"],"correct":3},
-  {"type":"multiple_choice","prompt":"Simplify: 4(p + 6)","choices":["4p + 6","4p + 24","p + 24","8p + 6"],"correct":1},
-  {"type":"select_multiple","prompt":"Select all expressions equivalent to 12 - 3(2 - x).","choices":["6 + 3x","3x + 6","6 - 3x","12 + 6x"],"correct":[0,1]},
-  {"type":"numeric","prompt":"Solve: 7x + 5 = 26","placeholder":"Enter a value for x","acceptedAnswers":["3"]},
-  {"type":"multiple_choice","prompt":"What is the domain of the relation {(1,2), (3,4), (5,6)}?","choices":["{2,4,6}","{1,3,5}","{1,2,3}","{4,5,6}"],"correct":1},
-  {"type":"short_response","prompt":"Simplify 10 - (3 + x). Write your final expression.","placeholder":"Example: 7-x","acceptedAnswers":["7-x","7 - x","-x+7"]},
-  {"type":"multiple_choice","prompt":"Which equation has the solution x = -4?","choices":["x + 4 = 0","x - 4 = 0","4x = -1","x/4 = 4"],"correct":0},
-  {"type":"numeric","prompt":"Solve for z: 2z + 11 = 19","placeholder":"Enter a value for z","acceptedAnswers":["4"]},
-  {"type":"graph_point","prompt":"Click the point that represents the y-intercept of y = -2x + 3.","graph":{"xMin":-4,"xMax":4,"yMin":-4,"yMax":4,"points":[{"id":"A","x":0,"y":3,"label":"A"},{"id":"B","x":3,"y":0,"label":"B"},{"id":"C","x":-2,"y":3,"label":"C"},{"id":"D","x":0,"y":-2,"label":"D"}]},"correct":"A"}
+  {"type":"multiple_choice","prompt":"Which expression is equivalent to $3(2x - 5) + 4x$?","choices":["$10x - 15$","$10x - 5$","$6x - 15$","$6x - 5$"],"correct":0},
+  {"type":"select_multiple","prompt":"Select all equations that have the solution $x = 4$.","choices":["$x + 3 = 7$","$2x = 8$","$x - 4 = 4$","$12 = 3x$"],"correct":[0,1,3]},
+  {"type":"numeric","prompt":"Solve for $y$: $4y - 8 = 20$. Enter your answer as an integer or decimal.","placeholder":"Enter a number","acceptedAnswers":["7"]},
+  {"type":"short_response","prompt":"Write the slope-intercept form of the line with slope $2$ and $y$-intercept $-3$.","placeholder":"Example: y=2x-3","acceptedAnswers":["y=2x-3","y = 2x - 3","2x-3=y"]},
+  {"type":"graph_point","prompt":"Click the point that lies on the line $y = x + 1$.","graph":{"xMin":-4,"xMax":4,"yMin":-4,"yMax":4,"points":[{"id":"A","x":1,"y":2,"label":"A"},{"id":"B","x":2,"y":0,"label":"B"},{"id":"C","x":-1,"y":-3,"label":"C"},{"id":"D","x":3,"y":1,"label":"D"}]},"correct":"A"},
+  {"type":"multiple_choice","prompt":"Simplify: $7a - 2a + 9$","choices":["$5a + 9$","$9a - 2$","$5a - 9$","$7a + 7$"],"correct":0},
+  {"type":"multiple_choice","prompt":"What is the solution to $3x = 24$?","choices":["$6$","$7$","$8$","$9$"],"correct":2},
+  {"type":"select_multiple","prompt":"Select all ordered pairs that satisfy $y = 2x + 1$.","choices":["$(0, 1)$","$(2, 5)$","$(3, 6)$","$(-1, -1)$"],"correct":[0,1,3]},
+  {"type":"multiple_choice","prompt":"Factor: $x^2 + 7x + 12$","choices":["$(x + 3)(x + 4)$","$(x + 2)(x + 6)$","$(x - 3)(x - 4)$","$(x + 1)(x + 12)$"],"correct":0},
+  {"type":"numeric","prompt":"Solve: $5x - 9 = 16$","placeholder":"Enter a value for x","acceptedAnswers":["5"]},
+  {"type":"multiple_choice","prompt":"Which inequality represents numbers greater than or equal to $12$?","choices":["$x > 12$","$x < 12$","$x \\geq 12$","$x \\leq 12$"],"correct":2},
+  {"type":"numeric","prompt":"What is the value of $2^4$?","placeholder":"Enter a number","acceptedAnswers":["16"]},
+  {"type":"multiple_choice","prompt":"Simplify: $6m + 3 - 2m$","choices":["$4m + 3$","$8m$","$4m - 3$","$6m + 1$"],"correct":0},
+  {"type":"short_response","prompt":"Write an equation in slope-intercept form for the graph with slope $1$ and $y$-intercept $4$.","placeholder":"Example: y=x+4","acceptedAnswers":["y=x+4","y = x + 4","x+4=y"]},
+  {"type":"multiple_choice","prompt":"Which graph has a $y$-intercept of $-2$?","choices":["$y = x - 2$","$y = x + 2$","$y = 2x$","$y = -2x + 2$"],"correct":0},
+  {"type":"numeric","prompt":"Evaluate $3n - 1$ when $n = 4$.","placeholder":"Enter a number","acceptedAnswers":["11"]},
+  {"type":"multiple_choice","prompt":"What is the solution to $x - 7 = 15$?","choices":["$18$","$20$","$21$","$22$"],"correct":3},
+  {"type":"multiple_choice","prompt":"Simplify: $4(p + 6)$","choices":["$4p + 6$","$4p + 24$","$p + 24$","$8p + 6$"],"correct":1},
+  {"type":"select_multiple","prompt":"Select all expressions equivalent to $12 - 3(2 - x)$.","choices":["$6 + 3x$","$3x + 6$","$6 - 3x$","$12 + 6x$"],"correct":[0,1]},
+  {"type":"numeric","prompt":"Solve: $7x + 5 = 26$","placeholder":"Enter a value for x","acceptedAnswers":["3"]},
+  {"type":"multiple_choice","prompt":"What is the domain of the relation $\\{(1,2), (3,4), (5,6)\\}$?","choices":["$\\{2,4,6\\}$","$\\{1,3,5\\}$","$\\{1,2,3\\}$","$\\{4,5,6\\}$"],"correct":1},
+  {"type":"short_response","prompt":"Simplify $10 - (3 + x)$. Write your final expression.","placeholder":"Example: 7-x","acceptedAnswers":["7-x","7 - x","-x+7"]},
+  {"type":"multiple_choice","prompt":"Which equation has the solution $x = -4$?","choices":["$x + 4 = 0$","$x - 4 = 0$","$4x = -1$","$x/4 = 4$"],"correct":0},
+  {"type":"numeric","prompt":"Solve for $z$: $2z + 11 = 19$","placeholder":"Enter a value for z","acceptedAnswers":["4"]},
+  {"type":"graph_point","prompt":"Click the point that represents the $y$-intercept of $y = -2x + 3$.","graph":{"xMin":-4,"xMax":4,"yMin":-4,"yMax":4,"points":[{"id":"A","x":0,"y":3,"label":"A"},{"id":"B","x":3,"y":0,"label":"B"},{"id":"C","x":-2,"y":3,"label":"C"},{"id":"D","x":0,"y":-2,"label":"D"}]},"correct":"A"}
 ]
   </script>
 
   <script src="./script.js"></script>
+  <script>window.togglePause = function() { /* will be overridden by script.js */ };</script>
 </body>
 </html>

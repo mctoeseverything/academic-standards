@@ -425,7 +425,6 @@ svg {
 .choice.eliminated .choice-text { text-decoration: line-through; opacity: 0.4; }
 .choice.eliminated .choice-letter { opacity: 0.4; }
 
-/* Selected: just a slightly darker border + very subtle bg, no glow */
 .choice.selected {
   border-color: var(--accent);
   background: var(--surface);
@@ -452,7 +451,6 @@ svg {
 .choice.selected .choice-letter {
   border-color: var(--accent);
   background: #fff;
-  /* Filled dot via box-shadow inset */
   box-shadow: inset 0 0 0 5px var(--accent);
 }
 
@@ -685,6 +683,10 @@ svg {
 .modal-content {
   position: relative;
   width: min(500px, 100%);
+  /* KEY FIX: allow modal content to size to viewport with scroll */
+  max-height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
   padding: 26px;
   border-radius: var(--radius);
   background: #fff;
@@ -700,6 +702,19 @@ svg {
   margin-bottom: 6px;
 }
 
+/* Sheet scroll: the scrollable region inside the modal */
+.modal-sheet-scroll {
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Close button stays pinned at bottom */
+.modal-content > .primary-button {
+  flex-shrink: 0;
+  margin-top: 14px;
+}
+
 .modal-content-wide { width: min(820px, 100%); }
 .formula-modal .modal-content { width: min(820px, 100%); }
 
@@ -709,6 +724,7 @@ svg {
   justify-content: space-between;
   gap: 14px;
   margin-bottom: 14px;
+  flex-shrink: 0;
 }
 
 .drag-handle { cursor: move; user-select: none; }
@@ -739,7 +755,7 @@ svg {
 }
 .notes-field:focus { outline: none; border-color: var(--accent); }
 
-.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; flex-shrink: 0; }
 
 .submit-summary-list { display: grid; gap: 6px; margin-top: 14px; }
 
@@ -762,6 +778,7 @@ svg {
   grid-template-columns: 210px minmax(0, 1fr);
   gap: 14px;
   margin-bottom: 14px;
+  flex-shrink: 0;
 }
 
 .results-hero, .results-stats, .results-review {
@@ -843,10 +860,20 @@ svg {
   overflow: hidden;
 }
 
+/* When scrollable, don't clip inner content */
+.modal-sheet.modal-sheet-scroll {
+  overflow-y: auto;
+  margin-bottom: 0;
+  border-radius: var(--radius);
+}
+
 .sheet-header {
   padding: 12px 18px 10px;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 .sheet-header h3 { margin: 0; font-size: 0.98rem; }
 .sheet-header p { margin: 3px 0 0; font-size: 0.78rem; color: var(--muted); }
@@ -874,6 +901,8 @@ svg {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--surface);
+  /* prevent overflow */
+  overflow: hidden;
 }
 
 .formula-label { font-size: 0.82rem; font-weight: 600; color: var(--text-soft); }
@@ -882,7 +911,9 @@ svg {
   font-family: 'Source Serif 4', Georgia, serif;
   font-size: 1rem;
   color: var(--text);
-  line-height: 1.5;
+  line-height: 1.6;
+  /* allow MathJax to overflow if it needs more vertical space */
+  overflow-x: auto;
 }
 .formula-expression em { font-style: italic; }
 .formula-expression sub, .formula-expression sup { font-size: 0.7em; }
@@ -895,9 +926,33 @@ svg {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--surface);
+  min-height: 70px;
 }
 .featured-formula .formula-expression { font-size: 1.14rem; }
 
+/* MathJax display fix — prevent it breaking the layout */
+.MJX-TEX { max-width: 100%; }
+mjx-container { overflow-x: auto; max-width: 100%; }
+mjx-container[display="true"] { display: block; }
+
+.highlighted-text { padding: 0 2px; border-radius: 2px; background: #fde68a; }
+
+/* Formula modal overrides */
+.formula-modal .modal-content { width: min(680px, 100%); }
+.formula-modal .sheet-section { padding: 14px 20px 16px; }
+.formula-modal .formula-list { gap: 8px; }
+.formula-modal .formula-row {
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 16px;
+  min-height: 54px;
+  padding: 11px 14px;
+}
+.formula-modal .formula-label { align-self: center; font-size: 0.86rem; }
+.formula-modal .formula-expression { font-size: 1rem; overflow-x: auto; }
+.formula-modal .featured-formula { min-height: 80px; }
+.formula-modal .featured-formula .formula-expression { font-size: 1.2rem; }
+
+/* Fraction helpers kept for fallback but MathJax takes over */
 .fraction {
   display: inline-grid;
   grid-template-rows: auto auto;
@@ -909,22 +964,6 @@ svg {
 .fraction .bottom { padding-top: 3px; }
 .compact-fraction .top { padding-left: 3px; padding-right: 3px; }
 .midpoint-group { display: inline-flex; align-items: center; gap: 4px; }
-
-.highlighted-text { padding: 0 2px; border-radius: 2px; background: #fde68a; }
-
-.formula-modal .sheet-section { padding: 14px 20px 16px; }
-.formula-modal .formula-list { gap: 8px; }
-.formula-modal .formula-row {
-  grid-template-columns: 185px minmax(0, 1fr);
-  gap: 16px;
-  min-height: 56px;
-  padding: 11px 14px;
-}
-.formula-modal .formula-label { align-self: center; font-size: 0.86rem; }
-.formula-modal .formula-expression { font-size: 1.02rem; }
-.formula-modal .formula-row .formula-expression { white-space: nowrap; }
-.formula-modal .featured-formula { min-height: 90px; }
-.formula-modal .featured-formula .formula-expression { font-size: 1.3rem; }
 
 /* ── RESPONSIVE ──────────────────────────────────────────── */
 
@@ -956,6 +995,5 @@ svg {
 
 @media (max-width: 720px) {
   .formula-modal .formula-row { grid-template-columns: 1fr; gap: 6px; min-height: 0; }
-  .formula-modal .formula-row .formula-expression { white-space: normal; }
   .formula-modal .featured-formula .formula-expression { font-size: 1rem; }
 }
