@@ -1,6 +1,6 @@
 const STORAGE_KEY = "standards-institute-algebra-1-state";
 const NOTES_KEY = "standards-institute-algebra-1-notes";
-const DEFAULT_TIME = 5400;
+const DEFAULT_TIME = 500;
 
 let questions = [];
 let current = 0;
