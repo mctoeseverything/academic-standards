@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./style.css" />
-  <!-- MathJax config: render inline $...$ and display $$...$$ -->
+  <!-- MathJax: render $...$ inline and $$...$$ display math -->
   <script>
     window.MathJax = {
       tex: {
@@ -19,7 +19,12 @@
       options: {
         skipHtmlTags: ['script','noscript','style','textarea','pre']
       },
-      startup: { typeset: false }
+      startup: {
+        ready() {
+          MathJax.startup.defaultReady();
+        },
+        typeset: false
+      }
     };
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>

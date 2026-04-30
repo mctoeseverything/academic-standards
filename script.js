@@ -340,9 +340,10 @@ function renderQuestionInput(question) {
   if (question.type === "graph_point") { renderGraphQuestion(question); }
 }
 
-function typeset(el) {
+function typeset(...els) {
   if (window.MathJax && window.MathJax.typesetPromise) {
-    window.MathJax.typesetPromise([el]).catch(() => {});
+    els.forEach(el => { if (window.MathJax.typesetClear) window.MathJax.typesetClear([el]); });
+    window.MathJax.typesetPromise(els).catch(() => {});
   }
 }
 
@@ -352,10 +353,7 @@ function renderQuestion() {
   questionNumberBadge.textContent = current + 1;
   questionText.innerHTML = getQuestionPromptMarkup(current);
   renderQuestionInput(question);
-  // Typeset both the stem and the choices in one pass
-  if (window.MathJax && window.MathJax.typesetPromise) {
-    window.MathJax.typesetPromise([questionText, choicesDiv]).catch(() => {});
-  }
+  typeset(questionText, choicesDiv);
   markToggle.classList.toggle("active", markedQuestions.has(current));
   markToggleLabel.textContent = markedQuestions.has(current) ? "Marked for Review" : "Mark for Review";
   renderGrid(); updateHeaderStats(); updateNavigationState();
@@ -688,6 +686,22 @@ async function init() {
   setupDraggableWindows();
   if (current > questions.length - 1) current = 0;
   startTimer();
+  // Wait for MathJax to finish loading before first render so math displays correctly
+  if (window.MathJax && window.MathJax.startup && window.MathJax.startup.promise) {
+    await window.MathJax.startup.promise;
+  } else {
+    // MathJax not yet defined — wait for it
+    await new Promise(resolve => {
+      const check = setInterval(() => {
+        if (window.MathJax && window.MathJax.typesetPromise) {
+          clearInterval(check);
+          resolve();
+        }
+      }, 50);
+      // Give up after 4 seconds and render anyway
+      setTimeout(() => { clearInterval(check); resolve(); }, 4000);
+    });
+  }
   renderQuestion();
   if (submitted) {
     if (timerId) clearInterval(timerId);
