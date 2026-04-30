@@ -3,151 +3,83 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Standards Institute - Assessment</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet" />
+  <title>Standards Institute – Algebra I Assessment</title>
   <link rel="stylesheet" href="./style.css" />
   <script src="https://www.desmos.com/api/v1.3/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
 </head>
 <body>
   <svg class="icon-sprite" aria-hidden="true" focusable="false">
-    <symbol id="icon-home" viewBox="0 0 24 24">
-      <path d="M3 10.5 12 3l9 7.5"></path>
-      <path d="M5 9.5V21h5v-6h4v6h5V9.5"></path>
-    </symbol>
-    <symbol id="icon-book-open" viewBox="0 0 24 24">
-      <path d="M12 7v14"></path>
-      <path d="M3 18a3 3 0 0 1 3-3h6"></path>
-      <path d="M21 18a3 3 0 0 0-3-3h-6"></path>
-      <path d="M6 4h6v11H6a3 3 0 0 0-3 3V7a3 3 0 0 1 3-3Z"></path>
-      <path d="M18 4h-6v11h6a3 3 0 0 1 3 3V7a3 3 0 0 0-3-3Z"></path>
-    </symbol>
-    <symbol id="icon-chart" viewBox="0 0 24 24">
-      <path d="M4 20V10"></path>
-      <path d="M10 20V4"></path>
-      <path d="M16 20v-7"></path>
-      <path d="M22 20v-4"></path>
-    </symbol>
-    <symbol id="icon-circle-help" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="9"></circle>
-      <path d="M9.1 9a3 3 0 1 1 5.8 1c0 2-3 2-3 4"></path>
-      <path d="M12 17h.01"></path>
-    </symbol>
-    <symbol id="icon-chevron-down" viewBox="0 0 24 24">
-      <path d="m6 9 6 6 6-6"></path>
-    </symbol>
-    <symbol id="icon-clock-3" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="9"></circle>
-      <path d="M12 7v5l3 3"></path>
-    </symbol>
-    <symbol id="icon-bookmark" viewBox="0 0 24 24">
-      <path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-    </symbol>
-    <symbol id="icon-calculator" viewBox="0 0 24 24">
-      <rect x="5" y="2.5" width="14" height="19" rx="2"></rect>
-      <path d="M8 6.5h8"></path>
-      <path d="M8 11h2"></path>
-      <path d="M14 11h2"></path>
-      <path d="M8 15h2"></path>
-      <path d="M14 15h2"></path>
-      <path d="M8 19h2"></path>
-      <path d="M14 19h2"></path>
-    </symbol>
-    <symbol id="icon-file-text" viewBox="0 0 24 24">
-      <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path>
-      <path d="M14 2v5h5"></path>
-      <path d="M9 13h6"></path>
-      <path d="M9 17h6"></path>
-      <path d="M9 9h1"></path>
-    </symbol>
-    <symbol id="icon-function-square" viewBox="0 0 24 24">
-      <path d="M20 20h-3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3"></path>
-      <path d="M4 20h3a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H4"></path>
-      <path d="m9 12 3-3 3 3"></path>
-      <path d="m15 15-3-3-3 3"></path>
-    </symbol>
-    <symbol id="icon-chart-no-axes" viewBox="0 0 24 24">
-      <path d="M5 5v14h14"></path>
-      <path d="m8 15 3-3 2 2 4-6"></path>
-    </symbol>
-    <symbol id="icon-square-pen" viewBox="0 0 24 24">
-      <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-      <path d="M16 3h5v5"></path>
-      <path d="m21 3-9 9"></path>
-    </symbol>
-    <symbol id="icon-chevron-left" viewBox="0 0 24 24">
-      <path d="m15 18-6-6 6-6"></path>
-    </symbol>
-    <symbol id="icon-chevron-right" viewBox="0 0 24 24">
-      <path d="m9 18 6-6-6-6"></path>
-    </symbol>
-    <symbol id="icon-pause" viewBox="0 0 24 24">
-      <path d="M9 5h2v14H9z"></path>
-      <path d="M13 5h2v14h-2z"></path>
-    </symbol>
+    <symbol id="icon-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h5v-6h4v6h5V9.5"></path></symbol>
+    <symbol id="icon-book-open" viewBox="0 0 24 24"><path d="M12 7v14"></path><path d="M3 18a3 3 0 0 1 3-3h6"></path><path d="M21 18a3 3 0 0 0-3-3h-6"></path><path d="M6 4h6v11H6a3 3 0 0 0-3 3V7a3 3 0 0 1 3-3Z"></path><path d="M18 4h-6v11h6a3 3 0 0 1 3 3V7a3 3 0 0 0-3-3Z"></path></symbol>
+    <symbol id="icon-chart" viewBox="0 0 24 24"><path d="M4 20V10"></path><path d="M10 20V4"></path><path d="M16 20v-7"></path><path d="M22 20v-4"></path></symbol>
+    <symbol id="icon-circle-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M9.1 9a3 3 0 1 1 5.8 1c0 2-3 2-3 4"></path><path d="M12 17h.01"></path></symbol>
+    <symbol id="icon-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></symbol>
+    <symbol id="icon-clock-3" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></symbol>
+    <symbol id="icon-bookmark" viewBox="0 0 24 24"><path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></symbol>
+    <symbol id="icon-calculator" viewBox="0 0 24 24"><rect x="5" y="2.5" width="14" height="19" rx="2"></rect><path d="M8 6.5h8"></path><path d="M8 11h2"></path><path d="M14 11h2"></path><path d="M8 15h2"></path><path d="M14 15h2"></path><path d="M8 19h2"></path><path d="M14 19h2"></path></symbol>
+    <symbol id="icon-file-text" viewBox="0 0 24 24"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path><path d="M14 2v5h5"></path><path d="M9 13h6"></path><path d="M9 17h6"></path><path d="M9 9h1"></path></symbol>
+    <symbol id="icon-function-square" viewBox="0 0 24 24"><path d="M20 20h-3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3"></path><path d="M4 20h3a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H4"></path><path d="m9 12 3-3 3 3"></path><path d="m15 15-3-3-3 3"></path></symbol>
+    <symbol id="icon-chart-no-axes" viewBox="0 0 24 24"><path d="M5 5v14h14"></path><path d="m8 15 3-3 2 2 4-6"></path></symbol>
+    <symbol id="icon-square-pen" viewBox="0 0 24 24"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M16 3h5v5"></path><path d="m21 3-9 9"></path></symbol>
+    <symbol id="icon-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"></path></symbol>
+    <symbol id="icon-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"></path></symbol>
+    <symbol id="icon-pause" viewBox="0 0 24 24"><path d="M9 5h2v14H9z"></path><path d="M13 5h2v14h-2z"></path></symbol>
   </svg>
 
   <header class="site-header">
     <div class="brand-block">
-      <div class="brand-name">Standards Institute</div>
-      <div class="brand-tag">Setting the standard for academic excellence</div>
+      <div class="brand-name">Standards Institute &mdash; Algebra I Assessment</div>
     </div>
 
-    <nav class="main-nav" aria-label="Primary">
-      <a href="#"><svg class="nav-icon"><use href="#icon-home"></use></svg><span>Dashboard</span></a>
-      <a href="#" class="active"><svg class="nav-icon"><use href="#icon-book-open"></use></svg><span>Assessments</span></a>
-      <a href="#"><svg class="nav-icon"><use href="#icon-chart"></use></svg><span>My Results</span></a>
-      <a href="#"><svg class="nav-icon"><use href="#icon-circle-help"></use></svg><span>Help</span></a>
-    </nav>
-
-    <div class="user-chip">
-      <div class="avatar">JS</div>
-      <span>John Smith</span>
-      <svg class="caret-icon"><use href="#icon-chevron-down"></use></svg>
+    <div class="timer-block">
+      <svg class="clock-icon"><use href="#icon-clock-3"></use></svg>
+      <div>
+        <div class="timer-label">Time Remaining</div>
+        <div class="timer-value" id="time">01:30:00</div>
+      </div>
     </div>
+
+    <button class="secondary-button pause-button" type="button">
+      <svg class="inline-icon pause-icon"><use href="#icon-pause"></use></svg>Pause
+    </button>
   </header>
 
   <main class="page-shell">
     <section class="exam-shell">
+
+      <!-- Left: Question Navigator -->
       <aside class="panel questions-panel" id="leftSidebar">
         <div class="panel-head">
-          <h2>Questions</h2>
-          <button class="collapse-button" type="button" onclick="toggleSidebar('left')" aria-label="Collapse questions panel">
+          <h2>Question Navigator</h2>
+          <button class="collapse-button" type="button" onclick="toggleSidebar('left')" aria-label="Collapse question navigator">
             <svg class="inline-icon tiny-icon"><use href="#icon-chevron-left"></use></svg>
           </button>
         </div>
         <div class="question-grid" id="questionGrid"></div>
 
         <div class="legend">
-          <div class="legend-item"><span class="legend-swatch current"></span>Current</div>
+          <div class="legend-item"><span class="legend-swatch current"></span>Current Item</div>
           <div class="legend-item"><span class="legend-swatch unanswered"></span>Not Answered</div>
           <div class="legend-item"><span class="legend-swatch answered"></span>Answered</div>
-          <div class="legend-item"><span class="legend-swatch marked"></span>Marked for Review</div>
+          <div class="legend-item"><span class="legend-swatch marked"></span>Flagged for Review</div>
         </div>
-
       </aside>
 
+      <!-- Center: Question Content -->
       <section class="panel center-panel">
         <div class="exam-header">
           <div>
-            <p class="eyebrow">Algebra I - Test Form</p>
-            <button class="text-button" type="button">Directions <svg class="inline-icon tiny-icon"><use href="#icon-chevron-down"></use></svg></button>
+            <p class="eyebrow">Algebra I &ndash; Form A</p>
+            <button class="text-button" type="button">Test Directions <svg class="inline-icon tiny-icon"><use href="#icon-chevron-down"></use></svg></button>
             <div class="exam-status">
-              <span class="status-chip">Answered <strong id="answeredCount">0</strong>/<span id="totalQuestions">0</span></span>
-              <span class="status-chip">Marked <strong id="markedCount">0</strong></span>
+              <span class="status-chip">Items Answered: <strong id="answeredCount">0</strong>&nbsp;of&nbsp;<span id="totalQuestions">0</span></span>
+              <span class="status-chip">Flagged for Review: <strong id="markedCount">0</strong></span>
             </div>
           </div>
 
-          <div class="timer-block">
-            <svg class="inline-icon clock-icon"><use href="#icon-clock-3"></use></svg>
-            <div>
-              <div class="timer-label">Time Remaining</div>
-              <div class="timer-value" id="time">01:30:00</div>
-            </div>
-          </div>
+          <div style="display:none" class="timer-block-inline"><!-- timer moved to header --></div>
 
-          <button class="secondary-button pause-button" type="button"><svg class="inline-icon pause-icon"><use href="#icon-pause"></use></svg>Pause</button>
+          <button class="secondary-button submit-button" id="submitButton" type="button">Submit Test</button>
         </div>
 
         <div class="question-body">
@@ -155,13 +87,13 @@
             <div class="question-pill" id="questionNumberBadge">1</div>
             <button class="mark-toggle" id="markToggle" type="button">
               <svg class="inline-icon"><use href="#icon-bookmark"></use></svg>
-              <span>Mark for Review</span>
+              <span>Flag for Review</span>
             </button>
           </div>
 
           <div class="question-tools">
-            <button class="secondary-button utility-button" id="eliminateModeButton" type="button">Strikethrough Mode</button>
-            <button class="secondary-button utility-button" id="highlightModeButton" type="button">Highlight Mode</button>
+            <button class="secondary-button utility-button" id="eliminateModeButton" type="button">Answer Eliminator</button>
+            <button class="secondary-button utility-button" id="highlightModeButton" type="button">Highlight Text</button>
           </div>
 
           <div id="questionText" class="question-stem"></div>
@@ -169,17 +101,21 @@
         </div>
 
         <div class="action-bar">
-          <button class="secondary-button nav-button" id="prevButton" type="button" onclick="prevQuestion()"><svg class="inline-icon tiny-icon"><use href="#icon-chevron-left"></use></svg>Previous</button>
+          <button class="secondary-button nav-button" id="prevButton" type="button" onclick="prevQuestion()">
+            <svg class="inline-icon tiny-icon"><use href="#icon-chevron-left"></use></svg>Previous Item
+          </button>
           <div class="action-group">
-            <button class="secondary-button nav-button submit-button" id="submitButton" type="button">Submit Test</button>
-            <button class="primary-button nav-button" id="nextButton" type="button" onclick="nextQuestion()">Next<svg class="inline-icon tiny-icon"><use href="#icon-chevron-right"></use></svg></button>
+            <button class="primary-button nav-button" id="nextButton" type="button" onclick="nextQuestion()">
+              Next Item<svg class="inline-icon tiny-icon"><use href="#icon-chevron-right"></use></svg>
+            </button>
           </div>
         </div>
       </section>
 
+      <!-- Right: Testing Tools -->
       <aside class="panel tools-panel" id="rightSidebar">
         <div class="panel-head">
-          <h2>Tools</h2>
+          <h2>Testing Tools</h2>
           <button class="collapse-button" type="button" onclick="toggleSidebar('right')" aria-label="Collapse tools panel">
             <svg class="inline-icon tiny-icon"><use href="#icon-chevron-right"></use></svg>
           </button>
@@ -203,21 +139,22 @@
           </button>
           <button class="tool-link" id="notesButton" type="button">
             <svg class="tool-svg"><use href="#icon-square-pen"></use></svg>
-            <span>Notes</span>
+            <span>Scratch Notes</span>
           </button>
         </div>
       </aside>
+
     </section>
   </main>
 
+  <!-- Reference Sheet Modal -->
   <div class="modal" id="referenceModal" aria-hidden="true">
     <div class="modal-content">
       <div class="modal-sheet">
         <div class="sheet-header">
           <h3>Reference Sheet</h3>
-          <p>Algebra I testing support</p>
+          <p>Algebra I — Authorized Testing Support Materials</p>
         </div>
-
         <div class="sheet-section">
           <h4>Properties of Operations</h4>
           <div class="formula-list">
@@ -235,7 +172,6 @@
             </div>
           </div>
         </div>
-
         <div class="sheet-section">
           <h4>Exponent Rules</h4>
           <div class="formula-list">
@@ -258,14 +194,14 @@
     </div>
   </div>
 
+  <!-- Formula Sheet Modal -->
   <div class="modal formula-modal" id="formulaModal" aria-hidden="true">
     <div class="modal-content">
       <div class="modal-sheet">
         <div class="sheet-header">
           <h3>Formula Sheet</h3>
-          <p>Algebra I testing support</p>
+          <p>Algebra I — Authorized Testing Support Materials</p>
         </div>
-
         <div class="sheet-section">
           <h4>Linear and Slope Formulas</h4>
           <div class="formula-list">
@@ -288,7 +224,6 @@
             </div>
           </div>
         </div>
-
         <div class="sheet-section">
           <h4>Quadratic Formula</h4>
           <div class="featured-formula">
@@ -301,7 +236,6 @@
             </span>
           </div>
         </div>
-
         <div class="sheet-section">
           <h4>Distance and Midpoint</h4>
           <div class="formula-list">
@@ -333,12 +267,13 @@
     </div>
   </div>
 
+  <!-- Calculator Modal -->
   <div class="modal tool-modal" id="calculatorModal" aria-hidden="true">
     <div class="modal-content modal-content-wide draggable-window">
       <div class="tool-modal-header drag-handle">
         <div>
-          <h3>Calculator</h3>
-          <p>Powered by Desmos scientific calculator.</p>
+          <h3>Scientific Calculator</h3>
+          <p>Authorized testing tool — powered by Desmos.</p>
         </div>
         <button class="secondary-button" type="button" onclick="closeModal('calculatorModal')">Close</button>
       </div>
@@ -353,12 +288,13 @@
     </div>
   </div>
 
+  <!-- Graphing Modal -->
   <div class="modal tool-modal" id="graphingModal" aria-hidden="true">
     <div class="modal-content modal-content-wide draggable-window">
       <div class="tool-modal-header drag-handle">
         <div>
           <h3>Graphing Tool</h3>
-          <p>Powered by embedded Desmos graphing calculator.</p>
+          <p>Authorized testing tool — powered by Desmos.</p>
         </div>
         <button class="secondary-button" type="button" onclick="closeModal('graphingModal')">Close</button>
       </div>
@@ -368,57 +304,61 @@
     </div>
   </div>
 
+  <!-- Notes Modal -->
   <div class="modal" id="notesModal" aria-hidden="true">
     <div class="modal-content notes-modal-content draggable-window">
       <div class="tool-modal-header drag-handle">
         <div>
           <h3>Scratch Notes</h3>
-          <p>Your notes auto-save in this browser.</p>
+          <p>Notes are saved locally in this browser session only.</p>
         </div>
         <button class="secondary-button" type="button" onclick="closeModal('notesModal')">Close</button>
       </div>
-      <textarea id="notesField" class="notes-field" placeholder="Work out equations, record steps, or jot down reminders here."></textarea>
+      <textarea id="notesField" class="notes-field" placeholder="Use this space for scratch work. Notes are not submitted with your test."></textarea>
     </div>
   </div>
 
+  <!-- Submit Confirmation Modal -->
   <div class="modal" id="submitModal" aria-hidden="true">
     <div class="modal-content">
       <h3>Submit Test?</h3>
       <p id="submitSummary"></p>
       <div class="submit-summary-list" id="submitChecklist"></div>
       <div class="modal-actions">
-        <button class="secondary-button" type="button" onclick="closeModal('submitModal')">Keep Working</button>
-        <button class="primary-button" type="button" id="confirmSubmitButton">Submit Now</button>
+        <button class="secondary-button" type="button" onclick="closeModal('submitModal')">Return to Test</button>
+        <button class="primary-button" type="button" id="confirmSubmitButton">Confirm Submission</button>
       </div>
     </div>
   </div>
 
+  <!-- Results Modal -->
   <div class="modal results-modal" id="resultsModal" aria-hidden="true">
     <div class="modal-content modal-content-wide">
       <div class="tool-modal-header">
         <div>
-          <h3>Results Summary</h3>
-          <p>Your mock Algebra I attempt is complete.</p>
+          <h3>Score Report</h3>
+          <p>Algebra I Assessment — Practice Attempt Complete</p>
         </div>
         <button class="secondary-button" type="button" id="restartButton">Restart Test</button>
       </div>
       <div class="results-grid">
         <div class="results-hero">
-          <span class="results-label">Score</span>
+          <span class="results-label">Final Score</span>
           <div class="results-score" id="resultsScore">0%</div>
           <p id="resultsBreakdown"></p>
         </div>
         <div class="results-stats">
-          <div class="result-stat"><span>Answered</span><strong id="resultsAnswered">0</strong></div>
-          <div class="result-stat"><span>Correct</span><strong id="resultsCorrect">0</strong></div>
-          <div class="result-stat"><span>Marked</span><strong id="resultsMarked">0</strong></div>
-          <div class="result-stat"><span>Time Left</span><strong id="resultsTime">00:00:00</strong></div>
+          <div class="result-stat"><span>Items Answered</span><strong id="resultsAnswered">0</strong></div>
+          <div class="result-stat"><span>Items Correct</span><strong id="resultsCorrect">0</strong></div>
+          <div class="result-stat"><span>Flagged for Review</span><strong id="resultsMarked">0</strong></div>
+          <div class="result-stat"><span>Time Remaining</span><strong id="resultsTime">00:00:00</strong></div>
         </div>
       </div>
       <div class="results-review" id="resultsReview"></div>
     </div>
   </div>
 
+  <!-- Fallback question data -->
   <script id="questionsFallback" type="application/json">
 [
   {"type":"multiple_choice","prompt":"Which expression is equivalent to 3(2x - 5) + 4x?","choices":["10x - 15","10x - 5","6x - 15","6x - 5"],"correct":0},
