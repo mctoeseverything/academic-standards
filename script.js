@@ -62,7 +62,8 @@ function escapeHtml(text) {
 }
 
 function getQuestionPromptMarkup(index) {
-  return stemMarkup[index] || escapeHtml(questions[index].prompt);
+  // stemMarkup stores highlighted HTML; otherwise use the raw prompt so LaTeX isn't escaped
+  return stemMarkup[index] || questions[index].prompt;
 }
 
 function normalizeText(value) {
@@ -223,7 +224,7 @@ function renderChoiceButton(question, choice, index) {
 
   const textEl = document.createElement("span");
   textEl.className = "choice-text";
-  textEl.textContent = choice;
+  textEl.innerHTML = choice;
 
   textWrapper.appendChild(alphaEl);
   textWrapper.appendChild(textEl);
@@ -255,29 +256,238 @@ function renderMultipleChoice(question) {
   question.choices.forEach((choice, index) => choicesDiv.appendChild(renderChoiceButton(question, choice, index)));
 }
 
+// ── MATH INPUT / KEYPAD ──────────────────────────────────
+
+const KEYPAD_ROWS = [
+  [
+    { label: "x",   insert: "x" },
+    { label: "y",   insert: "y" },
+    { label: "(",   insert: "(" },
+    { label: ")",   insert: ")" },
+    null,
+    { label: "7", insert: "7" },
+    { label: "8", insert: "8" },
+    { label: "9", insert: "9" },
+    { label: "÷", insert: "/" },
+    null,
+    { label: "⌫",  action: "backspace", cls: "key-action" },
+    { label: "✕",  action: "clear",     cls: "key-action" }
+  ],
+  [
+    { label: "x²",  insert: "^2" },
+    { label: "xⁿ",  insert: "^" },
+    { label: "√",   insert: "sqrt(" },
+    { label: "π",   insert: "pi" },
+    null,
+    { label: "4", insert: "4" },
+    { label: "5", insert: "5" },
+    { label: "6", insert: "6" },
+    { label: "×", insert: "*" },
+    null,
+    { label: "←",  action: "left",  cls: "key-nav" },
+    { label: "→",  action: "right", cls: "key-nav" }
+  ],
+  [
+    { label: "=",   insert: "=" },
+    { label: "≠",   insert: "!=" },
+    { label: "≤",   insert: "<=" },
+    { label: "≥",   insert: ">=" },
+    null,
+    { label: "1", insert: "1" },
+    { label: "2", insert: "2" },
+    { label: "3", insert: "3" },
+    { label: "−", insert: "-" },
+    null,
+    { label: "0", insert: "0" },
+    { label: ".", insert: "." }
+  ],
+  [
+    { label: "−",   insert: "-" },
+    { label: "+",   insert: "+" },
+    { label: "/",   insert: "/" },
+    { label: "|x|", insert: "abs(" },
+    null,
+    { label: "0",   insert: "0" },
+    { label: ".",   insert: "." },
+    { label: "+",   insert: "+" },
+    { label: "−",   insert: "-" },
+    null,
+    { label: "( )", action: "parens", cls: "key-wide" },
+    { label: "±",   action: "negate", cls: "key-action" }
+  ]
+];
+
+// Simpler flat keypad layout — easier to render cleanly
+const KEYPAD_DEF = [
+  // row 1: symbols
+  [ {l:"x",i:"x"}, {l:"y",i:"y"}, {l:"(",i:"("}, {l:")",i:")"}, {l:"x²",i:"^2"}, {l:"xⁿ",i:"^"}, {l:"√",i:"sqrt("}, {l:"=",i:"="} ],
+  // row 2: top numbers + ops
+  [ {l:"7",i:"7"}, {l:"8",i:"8"}, {l:"9",i:"9"}, {l:"÷",i:"/"}, {l:"≤",i:"<="}, {l:"≥",i:">="}, {l:"←",a:"left",c:"key-nav"}, {l:"→",a:"right",c:"key-nav"} ],
+  // row 3: mid numbers + ops
+  [ {l:"4",i:"4"}, {l:"5",i:"5"}, {l:"6",i:"6"}, {l:"×",i:"*"}, {l:"−",i:"-"}, {l:"+",i:"+"}, {l:"⌫",a:"backspace",c:"key-action"}, {l:"✕",a:"clear",c:"key-action"} ],
+  // row 4: low numbers
+  [ {l:"1",i:"1"}, {l:"2",i:"2"}, {l:"3",i:"3"}, {l:"0",i:"0"}, {l:".",i:"."}, {l:"−",i:"-"}, {l:"π",i:"pi"}, {l:"|x|",i:"abs("} ]
+];
+
+let keypadsVisible = {};
+
+function getOrCreateKeypad(questionIndex, inputEl) {
+  const existingKeypad = document.getElementById(`keypad-${questionIndex}`);
+  if (existingKeypad) return existingKeypad;
+
+  const keypad = document.createElement("div");
+  keypad.className = "math-keypad";
+  keypad.id = `keypad-${questionIndex}`;
+
+  KEYPAD_DEF.forEach(row => {
+    const rowEl = document.createElement("div");
+    rowEl.className = "keypad-row";
+    row.forEach(key => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "keypad-key" + (key.c ? ` ${key.c}` : "");
+      btn.textContent = key.l;
+      btn.addEventListener("mousedown", (e) => {
+        e.preventDefault(); // don't blur the input
+        if (key.a === "backspace") {
+          const pos = inputEl.selectionStart;
+          if (pos > 0) {
+            const val = inputEl.value;
+            inputEl.value = val.slice(0, pos - 1) + val.slice(pos);
+            inputEl.setSelectionRange(pos - 1, pos - 1);
+          }
+        } else if (key.a === "clear") {
+          inputEl.value = "";
+          inputEl.setSelectionRange(0, 0);
+        } else if (key.a === "left") {
+          const p = (inputEl.selectionStart || 0) - 1;
+          inputEl.setSelectionRange(Math.max(0, p), Math.max(0, p));
+        } else if (key.a === "right") {
+          const p = (inputEl.selectionStart || 0) + 1;
+          const max = inputEl.value.length;
+          inputEl.setSelectionRange(Math.min(max, p), Math.min(max, p));
+        } else if (key.i) {
+          const pos = inputEl.selectionStart || inputEl.value.length;
+          const val = inputEl.value;
+          const newVal = val.slice(0, pos) + key.i + val.slice(pos);
+          inputEl.value = newVal;
+          const newPos = pos + key.i.length;
+          inputEl.setSelectionRange(newPos, newPos);
+        }
+        inputEl.focus();
+        inputEl.dispatchEvent(new Event("input"));
+      });
+      rowEl.appendChild(btn);
+    });
+    keypad.appendChild(rowEl);
+  });
+
+  return keypad;
+}
+
+function renderMathPreview(raw, previewEl) {
+  if (!raw.trim()) {
+    previewEl.innerHTML = '<span class="preview-placeholder">Your answer will appear here</span>';
+    if (window.MathJax && window.MathJax.typesetClear) window.MathJax.typesetClear([previewEl]);
+    return;
+  }
+  // Convert raw input to displayable LaTeX
+  let display = raw
+    .replace(/\*\*/g, "^")
+    .replace(/\*/g, "\\cdot ")
+    .replace(/sqrt\(/g, "\\sqrt{")
+    .replace(/abs\(/g, "\\left|")
+    .replace(/pi/g, "\\pi ")
+    .replace(/<=/g, "\\leq ")
+    .replace(/>=/g, "\\geq ")
+    .replace(/!=/g, "\\neq ")
+    // simple fraction: a/b where a,b are single tokens
+    .replace(/([0-9a-zA-Z\)]+)\/([0-9a-zA-Z\(]+)/g, "\\frac{$1}{$2}");
+
+  previewEl.innerHTML = `\\(${display}\\)`;
+  if (window.MathJax && window.MathJax.typesetClear) window.MathJax.typesetClear([previewEl]);
+  if (window.MathJax && window.MathJax.typesetPromise) window.MathJax.typesetPromise([previewEl]).catch(() => {});
+}
+
 function renderTextResponse(question) {
   choicesDiv.className = "response-panel";
   const value = typeof answers[current] === "string" ? answers[current] : "";
+  const qIndex = current;
+
   const wrapper = document.createElement("div");
-  wrapper.className = "response-card";
+  wrapper.className = "response-card math-response-card";
+
+  // ── Input row ──
+  const inputRow = document.createElement("div");
+  inputRow.className = "math-input-row";
+
+  const inputLabel = document.createElement("span");
+  inputLabel.className = "math-input-label";
+  inputLabel.textContent = question.type === "short_response" ? "Answer:" : "Answer:";
+
   const input = document.createElement("input");
-  input.className = "response-input";
+  input.className = "response-input math-response-input";
   input.type = "text";
-  input.placeholder = question.placeholder || "Enter your response";
+  input.placeholder = question.placeholder || "Type or use keypad";
   input.value = value;
   input.disabled = submitted;
-  input.addEventListener("input", (event) => {
-    answers[current] = event.target.value;
-    saveState(); updateHeaderStats(); renderGrid();
-  });
-  wrapper.appendChild(input);
+  input.setAttribute("autocomplete", "off");
+  input.setAttribute("autocorrect", "off");
+  input.setAttribute("spellcheck", "false");
+
+  const keypadToggle = document.createElement("button");
+  keypadToggle.type = "button";
+  keypadToggle.className = "keypad-toggle-btn";
+  keypadToggle.title = "Toggle keypad";
+  keypadToggle.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M7 8h2M11 8h2M15 8h2M7 12h2M11 12h2M15 12h2M7 16h10"/></svg>`;
+
+  inputRow.appendChild(inputLabel);
+  inputRow.appendChild(input);
+  if (!submitted) inputRow.appendChild(keypadToggle);
+  wrapper.appendChild(inputRow);
+
+  // ── Math preview ──
+  const preview = document.createElement("div");
+  preview.className = "math-preview";
+  renderMathPreview(value, preview);
+  wrapper.appendChild(preview);
+
+  // ── Keypad (hidden by default) ──
+  if (!submitted) {
+    const keypadWrap = document.createElement("div");
+    keypadWrap.className = "keypad-wrap";
+    keypadWrap.style.display = keypadsVisible[qIndex] ? "block" : "none";
+    const keypad = getOrCreateKeypad(qIndex, input);
+    keypadWrap.appendChild(keypad);
+    wrapper.appendChild(keypadWrap);
+
+    keypadToggle.addEventListener("click", () => {
+      const isVisible = keypadWrap.style.display !== "none";
+      keypadWrap.style.display = isVisible ? "none" : "block";
+      keypadsVisible[qIndex] = !isVisible;
+      keypadToggle.classList.toggle("keypad-toggle-active", !isVisible);
+    });
+
+    if (keypadsVisible[qIndex]) keypadToggle.classList.add("keypad-toggle-active");
+  }
+
+  // ── Feedback after submit ──
   if (submitted) {
     const feedback = document.createElement("div");
     feedback.className = isCorrect(current) ? "response-feedback review-good" : "response-feedback review-bad";
     feedback.textContent = isCorrect(current) ? "Accepted response" : "Check response";
     wrapper.appendChild(feedback);
   }
+
+  input.addEventListener("input", (event) => {
+    answers[current] = event.target.value;
+    renderMathPreview(event.target.value, preview);
+    saveState(); updateHeaderStats(); renderGrid();
+  });
+
   choicesDiv.appendChild(wrapper);
+  // Focus the input
+  if (!submitted) setTimeout(() => input.focus(), 0);
 }
 
 function renderGraphQuestion(question) {
@@ -582,7 +792,7 @@ function restartTest() {
   current = 0; answers = {}; markedQuestions = new Set();
   eliminatedChoices = {}; stemMarkup = {}; time = DEFAULT_TIME;
   submitted = false; eliminateMode = false; highlightMode = false;
-  paused = false;
+  paused = false; keypadsVisible = {};
   closeModal("resultsModal");
   localStorage.removeItem(STORAGE_KEY);
   resetCalculator();
