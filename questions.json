@@ -1,9 +1,51 @@
 [
   {
     "type": "multiple_choice",
+    "prompt": "Which inequality is equivalent to $-2x > 6$?",
+    "choices": ["$x < -3$", "$x > -3$", "$x < 3$", "$x > 3$"],
+    "correct": 0
+  },
+  {
+    "type": "numeric",
+    "prompt": "Find the $x$-coordinate of the vertex for $y = x^2 - 4x + 5$.",
+    "placeholder": "Enter x",
+    "acceptedAnswers": ["2"]
+  },
+  {
+    "type": "multiple_choice",
+    "prompt": "What is the value of $f(-3)$ for the function $f(x) = 2x^2 - 5$?",
+    "choices": ["$13$", "$-23$", "$7$", "$-11$"],
+    "correct": 0
+  },
+  {
+    "type": "select_multiple",
+    "prompt": "Which expressions are equivalent to $\\sqrt{72}$?",
+    "choices": ["$6\\sqrt{2}$", "$2\\sqrt{18}$", "$3\\sqrt{8}$", "$36\\sqrt{2}$"],
+    "correct": [0, 1, 2]
+  },
+  {
+    "type": "multiple_choice",
     "prompt": "Which expression is equivalent to $3(2x - 5) + 4x$?",
     "choices": ["$10x - 15$", "$10x - 5$", "$6x - 15$", "$6x - 5$"],
     "correct": 0
+  },
+  {
+    "type": "multiple_choice",
+    "prompt": "What is the zero of the linear function $f(x) = \\frac{2}{5}x - 10$?",
+    "choices": ["$25$", "$10$", "$-10$", "$-25$"],
+    "correct": 0
+  },
+  {
+    "type": "numeric",
+    "prompt": "If $f(x) = 5x - 2$, what is the value of $x$ when $f(x) = 13$?",
+    "placeholder": "Enter x",
+    "acceptedAnswers": ["3"]
+  },
+  {
+    "type": "short_response",
+    "prompt": "Factor the quadratic $x^2 + 5x + 6$",
+    "placeholder": "Example: (x+2)(x+3)",
+    "acceptedAnswers": ["(x+2)(x+3)", "(x+3)(x+2)", "(x + 2)(x + 3)"]
   },
   {
     "type": "multiple_choice",
@@ -23,58 +65,15 @@
     "correct": 0
   },
   {
-    "type": "multiple_choice",
-    "prompt": "A gym charges a $30$ registration fee plus $15$ per month. Which equation represents the total cost, $c$, after $m$ months?",
-    "choices": ["$c = 15m + 30$", "$c = 30m + 15$", "$c = 45m$", "$c = 15(m + 30)$"],
-    "correct": 0
+    "type": "select_multiple",
+    "prompt": "Which of the following are factors of $x^2 - 5x - 6$?",
+    "choices": ["$(x - 6)$", "$(x + 1)$", "$(x - 1)$", "$(x + 6)$"],
+    "correct": [0, 1]
   },
   {
     "type": "multiple_choice",
-    "prompt": "Solve the system: $y = x + 1$ and $y = 2x - 1$.",
-    "choices": ["$(2, 3)$", "$(1, 2)$", "$(0, 1)$", "$(3, 4)$"],
-    "correct": 0
-  },
-  {
-    "type": "multiple_choice",
-    "prompt": "Which inequality represents 'a number decreased by $4$ is at most $6$'?",
-    "choices": ["$x - 4 \\leq 6$", "$x - 4 < 6$", "$x - 4 \\geq 6$", "$4 - x \\leq 6$"],
-    "correct": 0
-  },
-  {
-    "type": "multiple_choice",
-    "prompt": "What is the value of $f(-3)$ for the function $f(x) = 2x^2 - 5$?",
-    "choices": ["$13$", "$-23$", "$7$", "$-11$"],
-    "correct": 0
-  },
-  {
-    "type": "multiple_choice",
-    "prompt": "A population of bacteria doubles every hour. If there are $100$ bacteria initially, which function models the population after $t$ hours?",
-    "choices": ["$f(t) = 100(2)^t$", "$f(t) = 2(100)^t$", "$f(t) = 100 + 2t$", "$f(t) = 2t + 100$"],
-    "correct": 0
-  },
-  {
-    "type": "multiple_choice",
-    "prompt": "What is the zero of the linear function $f(x) = \\frac{2}{5}x - 10$?",
-    "choices": ["$25$", "$10$", "$-10$", "$-25$"],
-    "correct": 0
-  },
-  {
-    "type": "multiple_choice",
-    "prompt": "Which inequality is equivalent to $-2x > 6$?",
-    "choices": ["$x < -3$", "$x > -3$", "$x < 3$", "$x > 3$"],
-    "correct": 0
-  },
-
-  {
-    "type": "multiple_choice",
-    "prompt": "What is the slope of the line represented by $5x + 2y = 10$?",
-    "choices": ["$-2.5$", "$2.5$", "$-5$", "$5$"],
-    "correct": 0
-  },
-  {
-    "type": "multiple_choice",
-    "prompt": "The graph of $f(x) = x^2$ is shifted $3$ units down. What is the new equation?",
-    "choices": ["$g(x) = x^2 - 3$", "$g(x) = (x - 3)^2$", "$g(x) = x^2 + 3$", "$g(x) = (x + 3)^2$"],
+    "prompt": "The equation $d = rt$ is used to find distance. Which equation shows the formula solved for $r$?",
+    "choices": ["$r = \\frac{d}{t}$", "$r = dt$", "$r = d - t$", "$r = \\frac{t}{d}$"],
     "correct": 0
   },
   {
@@ -84,26 +83,15 @@
     "correct": 0
   },
   {
-    "type": "multiple_choice",
-    "prompt": "Which value of $x$ is a solution to $x^2 - 12x + 36 = 0$?",
-    "choices": ["$6$", "$-6$", "$0$", "$12$"],
-    "correct": 0
+    "type": "numeric",
+    "prompt": "Evaluate $3 + 2(4 - 1)^2$.",
+    "placeholder": "Enter value",
+    "acceptedAnswers": ["21"]
   },
   {
     "type": "multiple_choice",
-    "prompt": "A student calculates slope using $\\frac{4 - 2}{7 - 3}$. What mistake did they make?",
-    "choices": [
-      "They used $\\frac{\\Delta x}{\\Delta y}$ instead of $\\frac{\\Delta y}{\\Delta x}$",
-      "They added instead of subtracting",
-      "They inverted both coordinates incorrectly",
-      "They used intercepts instead of points"
-    ],
-    "correct": 0
-  },
-  {
-    "type": "multiple_choice",
-    "prompt": "Which expression is equivalent to $3(2x - 5) + 4x$?",
-    "choices": ["$10x - 15$", "$10x - 5$", "$6x - 15$", "$6x - 5$"],
+    "prompt": "What is the slope of the line represented by $5x + 2y = 10$?",
+    "choices": ["$-2.5$", "$2.5$", "$-5$", "$5$"],
     "correct": 0
   },
   {
@@ -114,87 +102,43 @@
   },
   {
     "type": "multiple_choice",
-    "prompt": "Which inequality is equivalent to $-2x > 6$?",
-    "choices": ["$x < -3$", "$x > -3$", "$x < 3$", "$x > 3$"],
+    "prompt": "Which inequality represents 'a number decreased by $4$ is at most $6$'?",
+    "choices": ["$x - 4 \\leq 6$", "$x - 4 < 6$", "$x - 4 \\geq 6$", "$4 - x \\leq 6$"],
     "correct": 0
   },
-
   {
     "type": "multiple_choice",
-    "prompt": "A taxi charges $5$ plus $2.50 per mile. If the total is $25, how many miles were traveled?",
-    "choices": ["8", "6", "10", "12"],
+    "prompt": "A population of bacteria doubles every hour. If there are 100 bacteria initially, which function models the population after $t$ hours?",
+    "choices": ["$f(t) = 100(2)^t$", "$f(t) = 2(100)^t$", "$f(t) = 100 + 2t$", "$f(t) = 2t + 100$"],
     "correct": 0
   },
-
   {
     "type": "multiple_choice",
-    "prompt": "A student simplifies $(x^3)^2$ incorrectly. What rule was misused?",
-    "choices": [
-      "Power of a power rule",
-      "Distributive property",
-      "Product rule",
-      "Quotient rule"
-    ],
+    "prompt": "Which value of $x$ is a solution to $x^2 - 12x + 36 = 0$?",
+    "choices": ["$6$", "$-6$", "$0$", "$12$"],
     "correct": 0
   },
-
   {
-    "type": "select_multiple",
-    "prompt": "Which of the following are factors of $x^2 - 5x - 6$?",
-    "choices": ["$(x - 6)$", "$(x + 1)$", "$(x - 1)$", "$(x + 6)$"],
-    "correct": [0, 1]
+    "type": "multiple_choice",
+    "prompt": "What is the $y$-intercept of $f(x) = 3(2)^x$?",
+    "choices": ["$3$", "$2$", "$0$", "$6$"],
+    "correct": 0
   },
-
-  {
-    "type": "select_multiple",
-    "prompt": "Which expressions are equivalent to $\\sqrt{72}$?",
-    "choices": ["$6\\sqrt{2}$", "$2\\sqrt{18}$", "$3\\sqrt{8}$", "$36\\sqrt{2}$"],
-    "correct": [0, 1, 2]
-  },
-
-  {
-    "type": "select_multiple",
-    "prompt": "Which systems have no solution?",
-    "choices": [
-      "$y = 2x + 5$ and $y = 2x - 3$",
-      "$x + y = 4$ and $2x + 2y = 8$",
-      "$x + y = 4$ and $x + y = 10$",
-      "$y = 3x + 1$ and $y = -3x + 1$"
-    ],
-    "correct": [0, 2]
-  },
-
-  {
-    "type": "numeric",
-    "prompt": "Evaluate $3 + 2(4 - 1)^2$.",
-    "placeholder": "Enter value",
-    "acceptedAnswers": ["21"]
-  },
-
-  {
-    "type": "numeric",
-    "prompt": "Find the x-coordinate of the vertex of $y = x^2 - 4x + 5$.",
-    "placeholder": "Enter x",
-    "acceptedAnswers": ["2"]
-  },
-
   {
     "type": "short_response",
-    "prompt": "Factor $x^2 + 5x + 6$",
-    "placeholder": "(x+2)(x+3)",
-    "acceptedAnswers": ["(x+2)(x+3)", "(x+3)(x+2)"]
-  },
-
-  {
-    "type": "short_response",
-    "prompt": "Write the equation of a vertical line through (4, -7).",
-    "placeholder": "x=4",
+    "prompt": "Write the equation of a vertical line passing through $(4, -7)$.",
+    "placeholder": "Example: x=4",
     "acceptedAnswers": ["x=4", "x = 4"]
   },
-
+  {
+    "type": "short_response",
+    "prompt": "Simplify the expression: $4x + 2(x - 3)$.",
+    "placeholder": "Example: 6x-6",
+    "acceptedAnswers": ["6x-6", "6x - 6"]
+  },
   {
     "type": "graph_point",
-    "prompt": "Find the y-intercept of $y = 2x - 3$.",
+    "prompt": "Identify the y-intercept of the line $y = 2x - 3$.",
     "graph": {
       "xMin": -5,
       "xMax": 5,
@@ -211,21 +155,41 @@
   },
 
   {
-    "type": "graph_point",
-    "prompt": "Which point satisfies $y > x$ and $y < 4$?",
-    "graph": {
-      "xMin": -5,
-      "xMax": 5,
-      "yMin": -5,
-      "yMax": 5,
-      "points": [
-        { "id": "A", "x": 1, "y": 2, "label": "A" },
-        { "id": "B", "x": 4, "y": 2, "label": "B" },
-        { "id": "C", "x": 1, "y": 5, "label": "C" },
-        { "id": "D", "x": -2, "y": -3, "label": "D" }
-      ]
-    },
-    "correct": "A"
+    "type": "multiple_choice",
+    "prompt": "Solve the system: $y = x + 1$ and $y = 2x - 1$.",
+    "choices": ["$(2, 3)$", "$(1, 2)$", "$(0, 1)$", "$(3, 4)$"],
+    "correct": 0
+  },
+
+  {
+    "type": "numeric",
+    "prompt": "A taxi charges $5 plus $2.50 per mile. If the total is $25, how many miles were traveled?",
+    "placeholder": "Enter miles",
+    "acceptedAnswers": ["8"]
+  },
+
+  {
+    "type": "multiple_choice",
+    "prompt": "A student calculates slope as $\\frac{4 - 2}{7 - 3}$. What is the correct interpretation?",
+    "choices": [
+      "Correct slope calculation",
+      "Used x-values in numerator",
+      "Used y-values incorrectly",
+      "Reversed subtraction order"
+    ],
+    "correct": 0
+  },
+
+  {
+    "type": "select_multiple",
+    "prompt": "Which systems have no solution?",
+    "choices": [
+      "$y = 2x + 5$ and $y = 2x - 3$",
+      "$y = 3x + 1$ and $y = -3x + 1$",
+      "$x + y = 4$ and $2x + 2y = 8$",
+      "$x + y = 4$ and $x + y = 10$"
+    ],
+    "correct": [0, 3]
   },
 
   {
@@ -248,32 +212,211 @@
 
   {
     "type": "multiple_choice",
-    "prompt": "A streaming service offers two plans: Plan A costs $12/month. Plan B costs $5/month plus $0.02 per song. A student streams 450 songs. Which statement is correct?",
+    "prompt": "Which expression represents the length if area is $w^2 - 7w$ and width is $w$?",
+    "choices": ["$w - 7$", "$w + 7$", "$7 - w$", "$w^2$"],
+    "correct": 0
+  },
+
+  {
+    "type": "multiple_choice",
+    "prompt": "What is the zero of $f(x) = \\frac{2}{5}x - 10$?",
+    "choices": ["$25$", "$10$", "$-10$", "$-25$"],
+    "correct": 0
+  },
+
+  {
+    "type": "multiple_choice",
+    "prompt": "Which function shifts $x^2$ down by 3?",
+    "choices": ["$x^2 - 3$", "$(x-3)^2$", "$x^2 + 3$", "$(x+3)^2$"],
+    "correct": 0
+  },
+
+  {
+    "type": "multiple_choice",
+    "prompt": "Which expression is equivalent to $3(2x - 5) + 4x$ after expansion?",
+    "choices": ["$10x - 15$", "$10x - 5$", "$6x - 15$", "$6x - 5$"],
+    "correct": 0
+  },
+
+  {
+    "type": "multiple_choice",
+    "prompt": "Which system has infinite solutions?",
     "choices": [
-      "Plan A costs $2 more",
-      "Plan B costs $2 more",
-      "Both cost the same",
-      "Plan B costs $9 more"
+      "$x + y = 4$ and $2x + 2y = 8$",
+      "$y = x + 1$ and $y = x - 1$",
+      "$y = 2x$ and $y = -2x$",
+      "$x + y = 4$ and $x + y = 10$"
+    ],
+    "correct": 0
+  },
+
+  {
+    "type": "multiple_choice",
+    "prompt": "Which exponential function has y-intercept 3?",
+    "choices": ["$3(2)^x$", "$2(3)^x$", "$3x^2$", "$2x + 3$"],
+    "correct": 0
+  },
+
+  {
+    "type": "multiple_choice",
+    "prompt": "Which inequality is true when $x = -4$?",
+    "choices": ["$x < -3$", "$x > -3$", "$x < 3$", "$x > 3$"],
+    "correct": 0
+  },
+
+  {
+    "type": "multiple_choice",
+    "prompt": "Which expression simplifies to $x^2 - x - 3$?",
+    "choices": [
+      "$(2x^2 + 3x - 5) - (x^2 - 4x + 2)$",
+      "$(x^2 + x - 3)$",
+      "$(x^2 - 2x - 3)$",
+      "$(x^2 - x + 3)$"
+    ],
+    "correct": 0
+  },
+
+  {
+    "type": "multiple_choice",
+    "prompt": "Which correlation is strongest?",
+    "choices": ["$-0.94$", "$0.88$", "$0.01$", "$0.50$"],
+    "correct": 0
+  },
+
+  {
+    "type": "select_multiple",
+    "prompt": "Which are factors of $x^2 - 5x - 6$?",
+    "choices": ["$(x - 6)$", "$(x + 1)$", "$(x - 1)$", "$(x + 6)$"],
+    "correct": [0, 1]
+  },
+
+  {
+    "type": "multiple_choice",
+    "prompt": "What is the slope of $5x + 2y = 10$?",
+    "choices": ["$-2.5$", "$2.5$", "$-5$", "$5$"],
+    "correct": 0
+  },
+
+  {
+    "type": "numeric",
+    "prompt": "Solve $3x - y = 7$ for slope of the line.",
+    "placeholder": "Enter slope",
+    "acceptedAnswers": ["3"]
+  },
+
+  {
+    "type": "numeric",
+    "prompt": "Find $x$ if $3 + 2(4 - 1)^2$.",
+    "placeholder": "Enter value",
+    "acceptedAnswers": ["21"]
+  },
+
+  {
+    "type": "short_response",
+    "prompt": "Factor $x^2 + 5x + 6$.",
+    "placeholder": "(x+2)(x+3)",
+    "acceptedAnswers": ["(x+2)(x+3)", "(x+3)(x+2)"]
+  },
+
+  {
+    "type": "short_response",
+    "prompt": "Vertical line through (4, -7).",
+    "placeholder": "x=4",
+    "acceptedAnswers": ["x=4", "x = 4"]
+  },
+
+  {
+    "type": "short_response",
+    "prompt": "Simplify $4x + 2(x - 3)$.",
+    "placeholder": "6x-6",
+    "acceptedAnswers": ["6x-6", "6x - 6"]
+  },
+
+  {
+    "type": "numeric",
+    "prompt": "Solve $5x - 2 = 13$.",
+    "placeholder": "Enter x",
+    "acceptedAnswers": ["3"]
+  },
+
+  {
+    "type": "multiple_choice",
+    "prompt": "What is common ratio of $16, 8, 4, 2$?",
+    "choices": ["$0.5$", "$2$", "$-0.5$", "$-2$"],
+    "correct": 0
+  },
+
+  {
+    "type": "multiple_choice",
+    "prompt": "Which point is solution to $y < 2x + 1$?",
+    "choices": ["$(2,1)$", "$(0,0)$", "$(1,5)$", "$(5,20)$"],
+    "correct": 0
+  },
+
+  {
+    "type": "multiple_choice",
+    "prompt": "Which system has no solution?",
+    "choices": [
+      "$y=2x+5$ and $y=2x-3$",
+      "$x+y=4$ and $2x+2y=8$",
+      "$y=x+1$ and $y=x+1$",
+      "$y=3x+1$ and $y=-3x+1$"
     ],
     "correct": 0
   },
 
   {
     "type": "numeric",
-    "prompt": "Two contractors charge differently. A: $150 + 25h. B: $40h. They cost the same. How many hours is the job?",
-    "placeholder": "Enter hours",
-    "acceptedAnswers": ["5"]
+    "prompt": "Taxi: $5 + 2.50m = 25$. Solve m.",
+    "placeholder": "Enter miles",
+    "acceptedAnswers": ["8"]
   },
 
   {
-    "type": "select_multiple",
-    "prompt": "A school sells tickets for $8. For each $1 increase, 25 fewer tickets are sold. Which expressions model the situation?",
+    "type": "multiple_choice",
+    "prompt": "Which describes regression misuse?",
     "choices": [
-      "Price = 8 + x",
-      "Tickets = 300 - 25x",
-      "Revenue = (8 + x)(300 - 25x)",
-      "Revenue = 300 + 25x"
+      "Using calculator instead of slope formula",
+      "Using slope formula instead of graph",
+      "Using intercepts correctly",
+      "Using substitution method"
     ],
-    "correct": [0, 1, 2]
+    "correct": 0
+  },
+
+  {
+    "type": "multiple_choice",
+    "prompt": "Which model is exponential?",
+    "choices": [
+      "$f(t)=100(2)^t$",
+      "$f(t)=100+2t$",
+      "$f(t)=2t+100$",
+      "$f(t)=100t+2$"
+    ],
+    "correct": 0
+  },
+
+  {
+    "type": "multiple_choice",
+    "prompt": "Which inequality is equivalent?",
+    "choices": [
+      "$x-4 \\le 6$",
+      "$x-4 \\ge 6$",
+      "$4-x \\le 6$",
+      "$x+4 \\le 6$"
+    ],
+    "correct": 0
+  },
+
+  {
+    "type": "multiple_choice",
+    "prompt": "Which system is consistent and dependent?",
+    "choices": [
+      "$x+y=4$ and $2x+2y=8$",
+      "$y=2x+1$ and $y=2x-1$",
+      "$x+y=4$ and $x+y=10$",
+      "$y=x$ and $y=-x$"
+    ],
+    "correct": 0
   }
 ]
