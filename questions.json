@@ -64,6 +64,7 @@
     "choices": ["$13$", "$-23$", "$7$", "$-11$"],
     "correct": 0
   },
+
   {
     "type": "multiple_choice",
     "prompt": "Which inequality is equivalent to $-2x > 6$?",
@@ -129,6 +130,7 @@
     "choices": ["$0.5$", "$-8$", "$2$", "$-0.5$"],
     "correct": 0
   },
+
   {
     "type": "select_multiple",
     "prompt": "Which of the following are factors of $x^2 - 5x - 6$?",
@@ -158,6 +160,7 @@
     ],
     "correct": [0, 3]
   },
+
   {
     "type": "numeric",
     "prompt": "A taxi charges $5$ dollars plus $2.50$ per mile. If the total fare is $25$ dollars, how many miles were traveled?",
@@ -188,6 +191,7 @@
     "placeholder": "Enter x",
     "acceptedAnswers": ["3"]
   },
+
   {
     "type": "short_response",
     "prompt": "Factor the quadratic $x^2 + 5x + 6$",
@@ -206,6 +210,7 @@
     "placeholder": "Example: 6x-6",
     "acceptedAnswers": ["6x-6", "6x - 6"]
   },
+
   {
     "type": "graph_point",
     "prompt": "Identify the y-intercept of the line $y = 2x - 3$.",
@@ -247,5 +252,39 @@
       ]
     },
     "correct": "A"
+  },
+
+  {
+    "type": "multiple_choice",
+    "prompt": "A student is comparing two phone plans. Plan A costs $20 per month plus $0.10 per text message. Plan B costs $35 per month with unlimited texts. The student estimates 200 texts per month. Which plan is cheaper, and what is the total cost difference?",
+    "choices": [
+      "Plan A is cheaper by $5",
+      "Plan B is cheaper by $5",
+      "Plan A is cheaper by $15",
+      "Plan B is cheaper by $15"
+    ],
+    "correct": 1
+  },
+  {
+    "type": "multiple_choice",
+    "prompt": "A small business tracks profits using $P = 50x - 200$, where $x$ is the number of items sold. The owner says they need to sell at least 5 items to make a profit. Is this correct? Justify using the inequality model.",
+    "choices": [
+      "Yes, because $50(5) - 200 = 50$",
+      "No, because the break-even point is 4 items",
+      "Yes, because profit is always positive",
+      "No, because the model is nonlinear"
+    ],
+    "correct": 0
+  },
+  {
+    "type": "multiple_choice",
+    "prompt": "A runner trains using the function $d(t) = 2t^2 + 3t$, where $t$ is time in weeks. The runner claims their distance increases by a constant rate each week. Is this claim correct?",
+    "choices": [
+      "No, because the function is quadratic, not linear",
+      "Yes, because both terms increase",
+      "Yes, because the coefficient is constant",
+      "No, because the graph is decreasing"
+    ],
+    "correct": 0
   }
 ]
