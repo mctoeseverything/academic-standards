@@ -1,971 +1,941 @@
-const STORAGE_KEY = "standards-institute-algebra-1-state";
-const NOTES_KEY = "standards-institute-algebra-1-notes";
+const STORAGE_KEY = "standards-institute-algebra-1-state-v3";
+const NOTES_KEY   = "standards-institute-algebra-1-notes";
 const DEFAULT_TIME = 5400;
 
 let questions = [];
-let current = 0;
-let answers = {};
-let markedQuestions = new Set();
-let eliminatedChoices = {};
-let stemMarkup = {};
-let time = DEFAULT_TIME;
-let timerId = null;
+let current   = 0;
+let answers   = {};
+let markedQuestions    = new Set();
+let eliminatedChoices  = {};
+let stemMarkup         = {};
+let dragOrder          = {};   // ordering question state  { qIndex: [permuted indices] }
+let matchState         = {};   // matching question state  { qIndex: { leftIdx: rightIdx|null } }
+let hotspotState       = {};   // hotspot state            { qIndex: {x,y}|null }
+let time      = DEFAULT_TIME;
+let timerId   = null;
 let submitted = false;
-let eliminateMode = false;
-let highlightMode = false;
+let eliminateMode  = false;
+let highlightMode  = false;
 let graphingCalculator = null;
 let paused = false;
 
-const questionText = document.getElementById("questionText");
-const choicesDiv = document.getElementById("choices");
-const questionGrid = document.getElementById("questionGrid");
+// ── DOM refs ──────────────────────────────────────────────
+const questionText        = document.getElementById("questionText");
+const choicesDiv          = document.getElementById("choices");
+const questionGrid        = document.getElementById("questionGrid");
 const questionNumberBadge = document.getElementById("questionNumberBadge");
-const markToggle = document.getElementById("markToggle");
-const markToggleLabel = markToggle.querySelector("span:last-child");
-const answeredCount = document.getElementById("answeredCount");
-const totalQuestions = document.getElementById("totalQuestions");
-const markedCount = document.getElementById("markedCount");
-const prevButton = document.getElementById("prevButton");
-const nextButton = document.getElementById("nextButton");
-const submitButton = document.getElementById("submitButton");
+const markToggle          = document.getElementById("markToggle");
+const markToggleLabel     = markToggle.querySelector("span:last-child");
+const answeredCount       = document.getElementById("answeredCount");
+const totalQuestions      = document.getElementById("totalQuestions");
+const markedCount         = document.getElementById("markedCount");
+const prevButton          = document.getElementById("prevButton");
+const nextButton          = document.getElementById("nextButton");
+const submitButton        = document.getElementById("submitButton");
 const eliminateModeButton = document.getElementById("eliminateModeButton");
 const highlightModeButton = document.getElementById("highlightModeButton");
-const examShell = document.querySelector(".exam-shell");
-const leftSidebar = document.getElementById("leftSidebar");
-const rightSidebar = document.getElementById("rightSidebar");
-const calculatorButton = document.getElementById("calculatorButton");
-const graphingButton = document.getElementById("graphingButton");
-const notesButton = document.getElementById("notesButton");
-const notesField = document.getElementById("notesField");
-const graphingContainer = document.getElementById("desmosGraphingCalculator");
-const calculatorFrame = document.getElementById("calculatorFrame");
-const submitSummary = document.getElementById("submitSummary");
-const submitChecklist = document.getElementById("submitChecklist");
+const examShell           = document.querySelector(".exam-shell");
+const leftSidebar         = document.getElementById("leftSidebar");
+const rightSidebar        = document.getElementById("rightSidebar");
+const calculatorButton    = document.getElementById("calculatorButton");
+const graphingButton      = document.getElementById("graphingButton");
+const notesButton         = document.getElementById("notesButton");
+const notesField          = document.getElementById("notesField");
+const graphingContainer   = document.getElementById("desmosGraphingCalculator");
+const calculatorFrame     = document.getElementById("calculatorFrame");
+const submitSummary       = document.getElementById("submitSummary");
+const submitChecklist     = document.getElementById("submitChecklist");
 const confirmSubmitButton = document.getElementById("confirmSubmitButton");
-const restartButton = document.getElementById("restartButton");
-const resultsScore = document.getElementById("resultsScore");
-const resultsBreakdown = document.getElementById("resultsBreakdown");
-const resultsAnswered = document.getElementById("resultsAnswered");
-const resultsCorrect = document.getElementById("resultsCorrect");
-const resultsMarked = document.getElementById("resultsMarked");
-const resultsTime = document.getElementById("resultsTime");
-const resultsReview = document.getElementById("resultsReview");
-const pauseButton = document.querySelector(".pause-button");
+const restartButton       = document.getElementById("restartButton");
+const resultsScore        = document.getElementById("resultsScore");
+const resultsBreakdown    = document.getElementById("resultsBreakdown");
+const resultsAnswered     = document.getElementById("resultsAnswered");
+const resultsCorrect      = document.getElementById("resultsCorrect");
+const resultsMarked       = document.getElementById("resultsMarked");
+const resultsTime         = document.getElementById("resultsTime");
+const resultsReview       = document.getElementById("resultsReview");
+const pauseButton         = document.querySelector(".pause-button");
 
-function escapeHtml(text) {
-  return text
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
+// ── UTILITIES ─────────────────────────────────────────────
+function escapeHtml(t) {
+  return String(t).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#39;");
 }
-
-function getQuestionPromptMarkup(index) {
-  return stemMarkup[index] || questions[index].prompt;
-}
-
-function normalizeText(value) {
-  return String(value)
-    .trim()
-    .toLowerCase()
-    .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, "($1)/($2)")
-    .replace(/\\left\|([^|]+)\|/g, "|$1|")
-    .replace(/\\sqrt\{([^}]+)\}/g, "sqrt($1)")
-    .replace(/\\pi/g, "pi")
-    .replace(/\\cdot/g, "*")
-    .replace(/\\times/g, "*")
-    .replace(/\\div/g, "/")
-    .replace(/\\le/g, "<=")
-    .replace(/\\ge/g, ">=")
-    .replace(/\\neq/g, "!=")
-    .replace(/\\/g, "")
-    .replace(/\{|\}/g, "")
-    .replace(/\s+/g, "");
-}
+function getQuestionPromptMarkup(i) { return stemMarkup[i] || questions[i].prompt; }
 
 function normalizeNumeric(value) {
-  const trimmed = String(value).trim();
-  if (!trimmed) return "";
-  if (trimmed.includes("/")) {
-    const [numerator, denominator] = trimmed.split("/");
-    const top = Number(numerator);
-    const bottom = Number(denominator);
-    if (!Number.isNaN(top) && !Number.isNaN(bottom) && bottom !== 0) {
-      return String(top / bottom);
-    }
+  const t = String(value).trim();
+  if (!t) return "";
+  if (t.includes("/")) {
+    const [n,d] = t.split("/").map(Number);
+    if (!isNaN(n) && !isNaN(d) && d !== 0) return String(n/d);
   }
-  const numeric = Number(trimmed);
-  return Number.isNaN(numeric) ? normalizeText(trimmed) : String(numeric);
+  const n = Number(t);
+  return isNaN(n) ? t.toLowerCase().replace(/\s+/g,"") : String(n);
+}
+function normalizeText(v) {
+  return String(v).trim().toLowerCase()
+    .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g,"($1)/($2)")
+    .replace(/\\/g,"").replace(/\{|\}/g,"").replace(/\s+/g,"");
 }
 
-function getAnsweredCount() {
-  return questions.filter((_, index) => hasAnswer(index)).length;
+function hasAnswer(i) {
+  const q = questions[i], a = answers[i];
+  switch(q.type) {
+    case "select_multiple": return Array.isArray(a) && a.length > 0;
+    case "numeric":
+    case "short_response":  return typeof a === "string" && a.trim().length > 0;
+    case "fill_blank":      return a && typeof a === "object" && Object.values(a).some(v => v.trim().length > 0);
+    case "ordering":        return Array.isArray(dragOrder[i]) && dragOrder[i].length === q.items.length;
+    case "matching":        return matchState[i] && Object.values(matchState[i]).every(v => v !== null);
+    case "graph_point":
+    case "graph_line":      return typeof a === "string" && a.length > 0;
+    case "hotspot":         return hotspotState[i] != null;
+    default:                return Number.isInteger(a);
+  }
+}
+function getAnsweredCount() { return questions.filter((_,i) => hasAnswer(i)).length; }
+function formatTime(s) {
+  return [Math.floor(s/3600), Math.floor((s%3600)/60), s%60].map(n=>String(n).padStart(2,"0")).join(":");
 }
 
-function hasAnswer(index) {
-  const question = questions[index];
-  const answer = answers[index];
-  if (question.type === "select_multiple") return Array.isArray(answer) && answer.length > 0;
-  if (question.type === "numeric" || question.type === "short_response") return typeof answer === "string" && answer.trim().length > 0;
-  if (question.type === "graph_point" || question.type === "graph_line") return typeof answer === "string" && answer.length > 0;
-  return Number.isInteger(answer);
-}
-
-function formatTime(totalSeconds) {
-  const h = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
-  const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
-  const s = String(totalSeconds % 60).padStart(2, "0");
-  return `${h}:${m}:${s}`;
-}
-
+// ── PERSIST ───────────────────────────────────────────────
 function saveState() {
-  const state = { current, answers, markedQuestions: [...markedQuestions], eliminatedChoices, stemMarkup, time, submitted };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    current, answers, markedQuestions:[...markedQuestions],
+    eliminatedChoices, stemMarkup, dragOrder, matchState, hotspotState, time, submitted
+  }));
 }
-
 function restoreState() {
-  const rawState = localStorage.getItem(STORAGE_KEY);
-  if (!rawState) return;
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return;
   try {
-    const state = JSON.parse(rawState);
-    current = Number.isInteger(state.current) ? state.current : 0;
-    answers = state.answers && typeof state.answers === "object" ? state.answers : {};
-    markedQuestions = new Set(Array.isArray(state.markedQuestions) ? state.markedQuestions : []);
-    eliminatedChoices = state.eliminatedChoices && typeof state.eliminatedChoices === "object" ? state.eliminatedChoices : {};
-    stemMarkup = state.stemMarkup && typeof state.stemMarkup === "object" ? state.stemMarkup : {};
-    time = typeof state.time === "number" ? state.time : DEFAULT_TIME;
-    submitted = Boolean(state.submitted);
-  } catch {
-    current = 0; answers = {}; markedQuestions = new Set();
-    eliminatedChoices = {}; stemMarkup = {}; time = DEFAULT_TIME; submitted = false;
-  }
+    const s = JSON.parse(raw);
+    current          = Number.isInteger(s.current) ? s.current : 0;
+    answers          = s.answers          || {};
+    markedQuestions  = new Set(s.markedQuestions || []);
+    eliminatedChoices= s.eliminatedChoices|| {};
+    stemMarkup       = s.stemMarkup       || {};
+    dragOrder        = s.dragOrder        || {};
+    matchState       = s.matchState       || {};
+    hotspotState     = s.hotspotState     || {};
+    time             = typeof s.time === "number" ? s.time : DEFAULT_TIME;
+    submitted        = Boolean(s.submitted);
+  } catch { current=0; answers={}; markedQuestions=new Set(); time=DEFAULT_TIME; submitted=false; }
 }
+function loadNotes()  { notesField.value = localStorage.getItem(NOTES_KEY) || ""; }
+function saveNotes()  { localStorage.setItem(NOTES_KEY, notesField.value); }
 
-function loadNotes() { notesField.value = localStorage.getItem(NOTES_KEY) || ""; }
-function saveNotes() { localStorage.setItem(NOTES_KEY, notesField.value); }
-
+// ── HEADER STATS ──────────────────────────────────────────
 function updateHeaderStats() {
-  answeredCount.textContent = getAnsweredCount();
+  answeredCount.textContent  = getAnsweredCount();
   totalQuestions.textContent = questions.length;
-  markedCount.textContent = markedQuestions.size;
+  markedCount.textContent    = markedQuestions.size;
 }
-
 function updateNavigationState() {
-  const supportsElimination = ["multiple_choice", "select_multiple"].includes(questions[current]?.type);
-  if (!supportsElimination) eliminateMode = false;
+  const supportsElim = ["multiple_choice","select_multiple"].includes(questions[current]?.type);
+  if (!supportsElim) eliminateMode = false;
   prevButton.disabled = current === 0 || submitted;
-  nextButton.disabled = current === questions.length - 1 || submitted;
+  nextButton.disabled = current === questions.length-1 || submitted;
   submitButton.disabled = submitted;
-  submitButton.hidden = current !== questions.length - 1 || submitted;
-  markToggle.disabled = submitted;
-  eliminateModeButton.disabled = submitted || !supportsElimination;
+  submitButton.hidden   = current !== questions.length-1 || submitted;
+  markToggle.disabled   = submitted;
+  eliminateModeButton.disabled = submitted || !supportsElim;
   highlightModeButton.disabled = submitted;
   eliminateModeButton.classList.toggle("mode-active", eliminateMode);
   highlightModeButton.classList.toggle("mode-active", highlightMode);
 }
 
-function getQuestionState(index) {
-  if (index === current) return "current";
-  if (markedQuestions.has(index)) return "marked";
-  if (hasAnswer(index)) return "answered";
-  return "unanswered";
-}
-
+// ── QUESTION GRID (with section dividers) ─────────────────
 function renderGrid() {
   questionGrid.innerHTML = "";
-  questions.forEach((_, index) => {
-    const button = document.createElement("button");
-    button.className = `q-box ${getQuestionState(index)}`;
-    button.type = "button";
-    button.textContent = index + 1;
-    button.disabled = submitted;
-    button.onclick = () => { current = index; saveState(); renderQuestion(); };
-    questionGrid.appendChild(button);
+  let lastSection = null;
+
+  questions.forEach((q, i) => {
+    if (q.section !== lastSection) {
+      lastSection = q.section;
+      const header = document.createElement("div");
+      header.className = "section-nav-header";
+      header.textContent = `§${q.section} · ${q.sectionTitle}`;
+      questionGrid.appendChild(header);
+    }
+    const btn = document.createElement("button");
+    const state = i === current ? "current" : markedQuestions.has(i) ? "marked" : hasAnswer(i) ? "answered" : "";
+    btn.className = `q-box${state ? " " + state : ""}`;
+    btn.type = "button";
+    btn.textContent = i + 1;
+    btn.disabled = submitted;
+    btn.title = `Q${i+1}: ${q.type.replace(/_/g," ")}`;
+    btn.onclick = () => { current = i; saveState(); renderQuestion(); };
+    questionGrid.appendChild(btn);
   });
 }
 
-function getEliminatedChoices(index) {
-  return Array.isArray(eliminatedChoices[index]) ? eliminatedChoices[index] : [];
-}
-
-function toggleEliminatedChoice(questionIndex, choiceIndex) {
-  const list = new Set(getEliminatedChoices(questionIndex));
-  if (list.has(choiceIndex)) { list.delete(choiceIndex); } else { list.add(choiceIndex); }
-  eliminatedChoices[questionIndex] = [...list];
-}
-
-// ── INFO BOX ─────────────────────────────────────────────
-// Renders the gray context panel shown in the docx (like a system of equations, table, or step list)
-
+// ── INFO BOX ──────────────────────────────────────────────
 function renderInfoBox(lines) {
   const box = document.createElement("div");
   box.className = "info-box";
   lines.forEach(line => {
     const row = document.createElement("div");
     row.className = "info-box-row";
-    row.innerHTML = line; // LaTeX inline — typeset later
+    row.innerHTML = line;
     box.appendChild(row);
   });
   return box;
 }
 
-// ── CHOICE BUTTONS ───────────────────────────────────────
+// ── TYPE BADGE ────────────────────────────────────────────
+const TYPE_LABELS = {
+  multiple_choice: "Multiple Choice",
+  select_multiple: "Select All That Apply",
+  numeric:         "Numeric Entry",
+  short_response:  "Short Response",
+  fill_blank:      "Fill in the Blank",
+  ordering:        "Drag to Order",
+  matching:        "Matching",
+  graph_point:     "Graph",
+  graph_line:      "Graph",
+  hotspot:         "Click on Graph"
+};
+function typeBadge(type) {
+  const badge = document.createElement("span");
+  badge.className = "question-type-badge";
+  badge.textContent = TYPE_LABELS[type] || type;
+  return badge;
+}
 
-function renderChoiceButton(question, choice, index) {
-  const button = document.createElement("button");
-  button.className = "choice";
-  button.type = "button";
-
-  const isMulti = question.type === "select_multiple";
-  const eliminated = getEliminatedChoices(current).includes(index);
-  const letter = String.fromCharCode(65 + index);
-
-  if (isMulti) button.classList.add("choice-multi");
-  if (eliminated) button.classList.add("eliminated");
-
-  const isSelected = isMulti
-    ? Array.isArray(answers[current]) && answers[current].includes(index)
-    : answers[current] === index;
-
-  if (isSelected) button.classList.add("selected");
-
+// ── MULTIPLE CHOICE ───────────────────────────────────────
+function getEliminatedChoices(i) { return Array.isArray(eliminatedChoices[i]) ? eliminatedChoices[i] : []; }
+function toggleEliminated(qi, ci) {
+  const s = new Set(getEliminatedChoices(qi));
+  s.has(ci) ? s.delete(ci) : s.add(ci);
+  eliminatedChoices[qi] = [...s];
+}
+function renderChoiceButton(q, choice, ci) {
+  const btn = document.createElement("button");
+  btn.className = "choice" + (q.type==="select_multiple" ? " choice-multi" : "");
+  btn.type = "button";
+  const elim = getEliminatedChoices(current).includes(ci);
+  if (elim) btn.classList.add("eliminated");
+  const isMulti = q.type === "select_multiple";
+  const sel = isMulti ? (Array.isArray(answers[current]) && answers[current].includes(ci))
+                      : answers[current] === ci;
+  if (sel) btn.classList.add("selected");
   if (submitted) {
-    button.disabled = true;
+    btn.disabled = true;
     if (isMulti) {
-      const correct = question.correct.includes(index);
-      if (correct) button.classList.add("correct");
-      if (isSelected && !correct) button.classList.add("incorrect");
-    } else if (index === question.correct) {
-      button.classList.add("correct");
-    } else if (answers[current] === index) {
-      button.classList.add("incorrect");
+      if (q.correct.includes(ci)) btn.classList.add("correct");
+      if (sel && !q.correct.includes(ci)) btn.classList.add("incorrect");
+    } else {
+      if (ci === q.correct) btn.classList.add("correct");
+      else if (answers[current] === ci) btn.classList.add("incorrect");
     }
   }
-
-  const radioEl = document.createElement("span");
-  radioEl.className = "choice-letter";
-
-  const textWrapper = document.createElement("span");
-  textWrapper.className = "choice-text-wrapper";
-
-  const alphaEl = document.createElement("span");
-  alphaEl.className = "choice-alpha";
-  alphaEl.textContent = letter;
-
-  const textEl = document.createElement("span");
-  textEl.className = "choice-text";
-  textEl.innerHTML = choice;
-
-  textWrapper.appendChild(alphaEl);
-  textWrapper.appendChild(textEl);
-
-  button.appendChild(radioEl);
-  button.appendChild(textWrapper);
-
-  button.onclick = () => {
+  const radio = document.createElement("span"); radio.className = "choice-letter";
+  const wrap  = document.createElement("span"); wrap.className  = "choice-text-wrapper";
+  const alpha = document.createElement("span"); alpha.className = "choice-alpha";
+  alpha.textContent = String.fromCharCode(65+ci);
+  const text = document.createElement("span"); text.className = "choice-text";
+  text.innerHTML = choice;
+  wrap.append(alpha, text);
+  btn.append(radio, wrap);
+  btn.onclick = () => {
     if (submitted) return;
-    if (eliminateMode) {
-      toggleEliminatedChoice(current, index);
-      saveState(); renderQuestion(); return;
-    }
+    if (eliminateMode) { toggleEliminated(current,ci); saveState(); renderQuestion(); return; }
     if (isMulti) {
-      const selected = new Set(Array.isArray(answers[current]) ? answers[current] : []);
-      if (selected.has(index)) { selected.delete(index); } else { selected.add(index); }
-      answers[current] = [...selected].sort((a, b) => a - b);
-    } else {
-      answers[current] = index;
-    }
+      const s = new Set(Array.isArray(answers[current]) ? answers[current] : []);
+      s.has(ci) ? s.delete(ci) : s.add(ci);
+      answers[current] = [...s].sort((a,b)=>a-b);
+    } else { answers[current] = ci; }
     saveState(); renderQuestion();
   };
-
-  return button;
+  return btn;
+}
+function renderMultipleChoice(q) {
+  const wrap = document.createElement("div"); wrap.className = "choices";
+  q.choices.forEach((c,i) => wrap.appendChild(renderChoiceButton(q,c,i)));
+  choicesDiv.appendChild(wrap);
 }
 
-function renderMultipleChoice(question) {
-  choicesDiv.className = "choices";
-  question.choices.forEach((choice, index) => choicesDiv.appendChild(renderChoiceButton(question, choice, index)));
-}
-
-// ── MATH INPUT / KEYPAD ──────────────────────────────────
-
-const KEYPAD_DEF = [
-  [ {l:"x",i:"x"}, {l:"y",i:"y"}, {l:"(",i:"("}, {l:")",i:")"}, {l:"x²",i:"^{2}"}, {l:"xⁿ",i:"^{"}, {l:"√",i:"\\sqrt{"}, {l:"=",i:"="} ],
-  [ {l:"7",i:"7"}, {l:"8",i:"8"}, {l:"9",i:"9"}, {l:"÷",i:"\\div"}, {l:"≤",i:"\\le"}, {l:"≥",i:"\\ge"}, {l:"←",a:"left",c:"key-nav"}, {l:"→",a:"right",c:"key-nav"} ],
-  [ {l:"4",i:"4"}, {l:"5",i:"5"}, {l:"6",i:"6"}, {l:"×",i:"\\times"}, {l:"−",i:"-"}, {l:"+",i:"+"}, {l:"⌫",a:"backspace",c:"key-action"}, {l:"✕",a:"clear",c:"key-action"} ],
-  [ {l:"1",i:"1"}, {l:"2",i:"2"}, {l:"3",i:"3"}, {l:"0",i:"0"}, {l:".",i:"."}, {l:"π",i:"\\pi"}, {l:"a/b",i:"\\frac{",c:"key-wide"}, {l:"±",i:"-"} ]
-];
-
+// ── NUMERIC / SHORT RESPONSE ──────────────────────────────
 let keypadsVisible = {};
 const mqFields = {};
-
-function buildKeypad(mqField) {
-  const keypad = document.createElement("div");
-  keypad.className = "math-keypad";
+const KEYPAD_DEF = [
+  [{l:"x",i:"x"},{l:"y",i:"y"},{l:"(",i:"("},{l:")",i:")"},{l:"x²",i:"^{2}"},{l:"xⁿ",i:"^{"},{l:"√",i:"\\sqrt{"},{l:"=",i:"="}],
+  [{l:"7",i:"7"},{l:"8",i:"8"},{l:"9",i:"9"},{l:"÷",i:"\\div"},{l:"≤",i:"\\le"},{l:"≥",i:"\\ge"},{l:"←",a:"left",c:"key-nav"},{l:"→",a:"right",c:"key-nav"}],
+  [{l:"4",i:"4"},{l:"5",i:"5"},{l:"6",i:"6"},{l:"×",i:"\\times"},{l:"−",i:"-"},{l:"+",i:"+"},{l:"⌫",a:"backspace",c:"key-action"},{l:"✕",a:"clear",c:"key-action"}],
+  [{l:"1",i:"1"},{l:"2",i:"2"},{l:"3",i:"3"},{l:"0",i:"0"},{l:".",i:"."},{l:"π",i:"\\pi"},{l:"a/b",i:"\\frac{",c:"key-wide"},{l:"±",i:"-"}]
+];
+function buildKeypad(mf) {
+  const kp = document.createElement("div"); kp.className = "math-keypad";
   KEYPAD_DEF.forEach(row => {
-    const rowEl = document.createElement("div");
-    rowEl.className = "keypad-row";
-    row.forEach(key => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "keypad-key" + (key.c ? ` ${key.c}` : "");
-      btn.textContent = key.l;
-      btn.addEventListener("mousedown", (e) => {
-        e.preventDefault();
-        if (!mqField) return;
-        if (key.a === "backspace") {
-          mqField.keystroke("Backspace");
-        } else if (key.a === "clear") {
-          mqField.select();
-          mqField.keystroke("Backspace");
-        } else if (key.a === "left") {
-          mqField.keystroke("Left");
-        } else if (key.a === "right") {
-          mqField.keystroke("Right");
-        } else if (key.i) {
-          mqField.write(key.i);
-        }
-        mqField.focus();
-      });
-      rowEl.appendChild(btn);
-    });
-    keypad.appendChild(rowEl);
-  });
-  return keypad;
+    const r = document.createElement("div"); r.className = "keypad-row";
+    row.forEach(k => {
+      const b = document.createElement("button"); b.type="button";
+      b.className = "keypad-key"+(k.c?" "+k.c:""); b.textContent=k.l;
+      b.addEventListener("mousedown",e=>{ e.preventDefault(); if(!mf)return;
+        if(k.a==="backspace") mf.keystroke("Backspace");
+        else if(k.a==="clear"){ mf.select(); mf.keystroke("Backspace"); }
+        else if(k.a==="left")  mf.keystroke("Left");
+        else if(k.a==="right") mf.keystroke("Right");
+        else if(k.i) mf.write(k.i);
+        mf.focus();
+      }); r.appendChild(b);
+    }); kp.appendChild(r);
+  }); return kp;
 }
-
-function renderTextResponse(question) {
-  choicesDiv.className = "response-panel";
-  const value = typeof answers[current] === "string" ? answers[current] : "";
-  const qIndex = current;
-
-  const wrapper = document.createElement("div");
-  wrapper.className = "response-card math-response-card";
-
-  const fieldRow = document.createElement("div");
-  fieldRow.className = "math-input-row";
-
-  const inputLabel = document.createElement("span");
-  inputLabel.className = "math-input-label";
-  inputLabel.textContent = "Answer:";
-
-  const mqSpan = document.createElement("span");
-  mqSpan.className = "mq-field-wrap" + (submitted ? " mq-disabled" : "");
-
-  const keypadToggle = document.createElement("button");
-  keypadToggle.type = "button";
-  keypadToggle.className = "keypad-toggle-btn";
-  keypadToggle.title = "Toggle keypad";
-  keypadToggle.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M7 8h2M11 8h2M15 8h2M7 12h2M11 12h2M15 12h2M7 16h10"/></svg>`;
-
-  fieldRow.appendChild(inputLabel);
-  fieldRow.appendChild(mqSpan);
-  if (!submitted) fieldRow.appendChild(keypadToggle);
-  wrapper.appendChild(fieldRow);
-
-  const keypadWrap = document.createElement("div");
-  keypadWrap.className = "keypad-wrap";
-  keypadWrap.style.display = keypadsVisible[qIndex] ? "block" : "none";
-  wrapper.appendChild(keypadWrap);
-
+function renderTextResponse(q) {
+  const qi = current;
+  const value = typeof answers[qi]==="string" ? answers[qi] : "";
+  const wrapper = document.createElement("div"); wrapper.className="response-card math-response-card";
+  const row = document.createElement("div"); row.className="math-input-row";
+  const lbl = document.createElement("span"); lbl.className="math-input-label"; lbl.textContent="Answer:";
+  const mqSpan = document.createElement("span"); mqSpan.className="mq-field-wrap"+(submitted?" mq-disabled":"");
+  const kbtn = document.createElement("button"); kbtn.type="button"; kbtn.className="keypad-toggle-btn"; kbtn.title="Toggle keypad";
+  kbtn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M7 8h2M11 8h2M15 8h2M7 12h2M11 12h2M15 12h2M7 16h10"/></svg>`;
+  row.append(lbl, mqSpan); if(!submitted) row.append(kbtn);
+  wrapper.appendChild(row);
+  const kpWrap = document.createElement("div"); kpWrap.className="keypad-wrap";
+  kpWrap.style.display = keypadsVisible[qi]?"block":"none";
+  wrapper.appendChild(kpWrap);
   if (submitted) {
-    const feedback = document.createElement("div");
-    feedback.className = isCorrect(current) ? "response-feedback review-good" : "response-feedback review-bad";
-    feedback.textContent = isCorrect(current) ? "Accepted response" : "Check response";
-    wrapper.appendChild(feedback);
+    const fb = document.createElement("div");
+    fb.className = isCorrect(qi)?"response-feedback review-good":"response-feedback review-bad";
+    fb.textContent = isCorrect(qi)?"Accepted":"Incorrect";
+    wrapper.appendChild(fb);
   }
-
   choicesDiv.appendChild(wrapper);
-
   if (window.MathQuill) {
     const MQ = window.MathQuill.getInterface(2);
-    const config = {
-      spaceBehavesLikeTab: false,
-      leftRightIntoCmdGoes: "up",
-      restrictMismatchedBrackets: false,
-      handlers: {
-        edit: (field) => {
-          const latex = field.latex();
-          answers[qIndex] = latex;
-          saveState(); updateHeaderStats(); renderGrid();
-        }
-      }
+    const cfg = { spaceBehavesLikeTab:false, leftRightIntoCmdGoes:"up", restrictMismatchedBrackets:false,
+      handlers:{ edit(f){ answers[qi]=f.latex(); saveState(); updateHeaderStats(); renderGrid(); } }
     };
-
-    let mf;
-    if (submitted) {
-      mf = MQ.StaticMath(mqSpan);
-      mf.latex(value);
-    } else {
-      mf = MQ.MathField(mqSpan, config);
-      if (value) mf.latex(value);
-      mqFields[qIndex] = mf;
-
-      const keypad = buildKeypad(mf);
-      keypadWrap.appendChild(keypad);
-
-      keypadToggle.addEventListener("click", () => {
-        const isVisible = keypadWrap.style.display !== "none";
-        keypadWrap.style.display = isVisible ? "none" : "block";
-        keypadsVisible[qIndex] = !isVisible;
-        keypadToggle.classList.toggle("keypad-toggle-active", !isVisible);
-        if (!isVisible) mf.focus();
+    if (submitted) { const mf=MQ.StaticMath(mqSpan); mf.latex(value); }
+    else {
+      const mf=MQ.MathField(mqSpan,cfg); if(value) mf.latex(value); mqFields[qi]=mf;
+      const kp=buildKeypad(mf); kpWrap.appendChild(kp);
+      kbtn.addEventListener("click",()=>{
+        const v=kpWrap.style.display!=="none";
+        kpWrap.style.display=v?"none":"block"; keypadsVisible[qi]=!v;
+        kbtn.classList.toggle("keypad-toggle-active",!v); if(!v) mf.focus();
       });
-
-      if (keypadsVisible[qIndex]) keypadToggle.classList.add("keypad-toggle-active");
-      setTimeout(() => mf.focus(), 0);
+      if(keypadsVisible[qi]) kbtn.classList.add("keypad-toggle-active");
+      setTimeout(()=>mf.focus(),0);
     }
   } else {
-    const input = document.createElement("input");
-    input.className = "response-input";
-    input.type = "text";
-    input.placeholder = question.placeholder || "Type your answer";
-    input.value = value;
-    input.disabled = submitted;
-    input.addEventListener("input", (e) => {
-      answers[qIndex] = e.target.value;
-      saveState(); updateHeaderStats(); renderGrid();
+    const inp=document.createElement("input"); inp.className="response-input"; inp.type="text";
+    inp.placeholder=q.placeholder||"Enter answer"; inp.value=value; inp.disabled=submitted;
+    inp.addEventListener("input",e=>{ answers[qi]=e.target.value; saveState(); updateHeaderStats(); renderGrid(); });
+    mqSpan.replaceWith(inp);
+  }
+}
+
+// ── FILL IN THE BLANK ─────────────────────────────────────
+function renderFillBlank(q) {
+  const qi = current;
+  if (!answers[qi] || typeof answers[qi] !== "object") answers[qi] = {};
+  const card = document.createElement("div"); card.className = "fill-blank-card";
+
+  // Parse template: [label] becomes an input
+  const tpl = q.template;
+  const parts = tpl.split(/\[([^\]]+)\]/g);
+  const templateRow = document.createElement("div"); templateRow.className = "fill-blank-template";
+
+  q.blanks.forEach(b => { if (!answers[qi][b.id]) answers[qi][b.id] = ""; });
+
+  parts.forEach((part, pi) => {
+    if (pi % 2 === 0) {
+      if (part) { const s = document.createElement("span"); s.className="fill-blank-text"; s.innerHTML=part; templateRow.appendChild(s); }
+    } else {
+      const blankDef = q.blanks.find(b => b.label === part || b.id === part);
+      const inp = document.createElement("input");
+      inp.type = "text"; inp.className = "fill-blank-input";
+      inp.placeholder = blankDef ? blankDef.label : part;
+      inp.value = blankDef ? (answers[qi][blankDef.id]||"") : "";
+      inp.disabled = submitted;
+      if (submitted && blankDef) {
+        const correct = blankDef.acceptedAnswers.some(a => normalizeNumeric(answers[qi][blankDef.id]) === normalizeNumeric(a) || normalizeText(answers[qi][blankDef.id]) === normalizeText(a));
+        inp.classList.add(correct ? "fill-input-correct" : "fill-input-incorrect");
+      }
+      if (blankDef) {
+        inp.addEventListener("input", e => {
+          answers[qi][blankDef.id] = e.target.value;
+          saveState(); updateHeaderStats(); renderGrid();
+        });
+      }
+      templateRow.appendChild(inp);
+    }
+  });
+  card.appendChild(templateRow);
+  choicesDiv.appendChild(card);
+}
+
+// ── ORDERING (drag to reorder) ────────────────────────────
+function renderOrdering(q) {
+  const qi = current;
+  if (!Array.isArray(dragOrder[qi]) || dragOrder[qi].length !== q.items.length) {
+    dragOrder[qi] = q.items.map((_,i)=>i); // initial order: 0,1,2,3
+  }
+  const card = document.createElement("div"); card.className = "ordering-card";
+  const hint = document.createElement("p"); hint.className = "ordering-hint";
+  hint.textContent = submitted ? "" : "Drag items into the correct order ↕";
+  card.appendChild(hint);
+
+  const list = document.createElement("div"); list.className = "ordering-list";
+  let dragSrc = null;
+
+  const renderItems = () => {
+    list.innerHTML = "";
+    dragOrder[qi].forEach((origIdx, pos) => {
+      const item = document.createElement("div");
+      item.className = "ordering-item";
+      item.draggable = !submitted;
+      item.dataset.pos = pos;
+
+      if (submitted) {
+        const correct = q.correct[pos] === origIdx;
+        item.classList.add(correct ? "ordering-correct" : "ordering-incorrect");
+      }
+
+      const handle = document.createElement("span"); handle.className = "ordering-handle";
+      handle.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><circle cx="9" cy="5" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="5" r="1" fill="currentColor" stroke="none"/><circle cx="9" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="9" cy="19" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="19" r="1" fill="currentColor" stroke="none"/></svg>`;
+
+      const num = document.createElement("span"); num.className = "ordering-num"; num.textContent = pos+1;
+      const text = document.createElement("span"); text.className = "ordering-text"; text.innerHTML = q.items[origIdx];
+      item.append(handle, num, text);
+
+      if (!submitted) {
+        item.addEventListener("dragstart", e => { dragSrc = pos; item.classList.add("dragging"); e.dataTransfer.effectAllowed="move"; });
+        item.addEventListener("dragend",   () => { item.classList.remove("dragging"); dragSrc=null; });
+        item.addEventListener("dragover",  e => { e.preventDefault(); e.dataTransfer.dropEffect="move"; item.classList.add("drag-over"); });
+        item.addEventListener("dragleave", () => item.classList.remove("drag-over"));
+        item.addEventListener("drop", e => {
+          e.preventDefault(); item.classList.remove("drag-over");
+          if (dragSrc === null || dragSrc === pos) return;
+          const arr = [...dragOrder[qi]];
+          const [moved] = arr.splice(dragSrc, 1);
+          arr.splice(pos, 0, moved);
+          dragOrder[qi] = arr;
+          saveState(); renderItems(); typeset(list);
+        });
+      }
+      list.appendChild(item);
     });
-    mqSpan.replaceWith(input);
-  }
+  };
+  renderItems();
+  card.appendChild(list);
+  choicesDiv.appendChild(card);
 }
 
-// ── GRAPH POINT ──────────────────────────────────────────
-
-function renderGraphQuestion(question) {
-  choicesDiv.className = "graph-question-panel";
-  const wrapper = document.createElement("div");
-  wrapper.className = "graph-card";
-  const svg = buildGraphSVG(question, "graph_point");
-  wrapper.appendChild(svg);
-  choicesDiv.appendChild(wrapper);
-}
-
-// ── GRAPH LINE ───────────────────────────────────────────
-// Student sees the line drawn and must identify the correct labeled point (e.g. y-intercept)
-
-function renderGraphLine(question) {
-  choicesDiv.className = "graph-question-panel";
-  const wrapper = document.createElement("div");
-  wrapper.className = "graph-card";
-
-  const typeLabel = document.createElement("div");
-  typeLabel.className = "graph-type-label";
-  typeLabel.textContent = "Graph Question — Select the correct labeled point";
-  wrapper.appendChild(typeLabel);
-
-  const svg = buildGraphSVG(question, "graph_line");
-  wrapper.appendChild(svg);
-  choicesDiv.appendChild(wrapper);
-}
-
-function buildGraphSVG(question, mode) {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("viewBox", "0 0 400 300");
-  svg.setAttribute("class", "graph-plane");
-
-  const { xMin, xMax, yMin, yMax, points } = question.graph;
-  const W = 400, H = 300, PAD = 36;
-  const toSvgX = x => PAD + ((x - xMin) / (xMax - xMin)) * (W - PAD * 2);
-  const toSvgY = y => H - PAD - ((y - yMin) / (yMax - yMin)) * (H - PAD * 2);
-
-  // Grid lines
-  for (let x = xMin; x <= xMax; x++) {
-    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    line.setAttribute("x1", toSvgX(x)); line.setAttribute("x2", toSvgX(x));
-    line.setAttribute("y1", PAD); line.setAttribute("y2", H - PAD);
-    line.setAttribute("class", x === 0 ? "axis-line" : "grid-line");
-    svg.appendChild(line);
-    // x-axis tick labels
-    if (x !== 0) {
-      const lbl = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      lbl.setAttribute("x", toSvgX(x));
-      lbl.setAttribute("y", toSvgY(0) + 14);
-      lbl.setAttribute("class", "axis-label");
-      lbl.setAttribute("text-anchor", "middle");
-      lbl.textContent = x;
-      svg.appendChild(lbl);
-    }
+// ── MATCHING ──────────────────────────────────────────────
+function renderMatching(q) {
+  const qi = current;
+  if (!matchState[qi]) {
+    matchState[qi] = {};
+    q.pairs.forEach((_,i) => { matchState[qi][i] = null; });
   }
-  for (let y = yMin; y <= yMax; y++) {
-    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    line.setAttribute("x1", PAD); line.setAttribute("x2", W - PAD);
-    line.setAttribute("y1", toSvgY(y)); line.setAttribute("y2", toSvgY(y));
-    line.setAttribute("class", y === 0 ? "axis-line" : "grid-line");
-    svg.appendChild(line);
-    // y-axis tick labels
-    if (y !== 0) {
-      const lbl = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      lbl.setAttribute("x", toSvgX(0) - 10);
-      lbl.setAttribute("y", toSvgY(y) + 4);
-      lbl.setAttribute("class", "axis-label");
-      lbl.setAttribute("text-anchor", "end");
-      lbl.textContent = y;
-      svg.appendChild(lbl);
-    }
-  }
+  const card = document.createElement("div"); card.className = "matching-card";
+  const hint = document.createElement("p"); hint.className = "ordering-hint";
+  hint.textContent = submitted ? "" : "Select a left item then the right item it matches.";
+  card.appendChild(hint);
 
-  // Axis arrow heads
-  const arrowHead = (x1, y1, x2, y2) => {
-    const arr = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    arr.setAttribute("x1", x1); arr.setAttribute("y1", y1);
-    arr.setAttribute("x2", x2); arr.setAttribute("y2", y2);
-    arr.setAttribute("stroke", "#9ca3af"); arr.setAttribute("stroke-width", "1.5");
-    svg.appendChild(arr);
+  // Shuffle right-side display order (fixed per question via seeded index)
+  const rightOrder = q.pairs.map((_,i)=>i).sort((a,b)=> ((a*7+qi*3)%q.pairs.length) - ((b*7+qi*3)%q.pairs.length));
+
+  let selectedLeft = null;
+
+  const grid = document.createElement("div"); grid.className = "matching-grid";
+
+  const rebuild = () => {
+    grid.innerHTML = "";
+    // Build reverse map: rightIdx -> leftIdx that selected it
+    const rightToLeft = {};
+    Object.entries(matchState[qi]).forEach(([li,ri]) => { if (ri!==null) rightToLeft[ri]=Number(li); });
+
+    q.pairs.forEach((pair, li) => {
+      const lBtn = document.createElement("button"); lBtn.type="button";
+      lBtn.className = "match-btn match-left";
+      lBtn.innerHTML = pair.left;
+      const matched = matchState[qi][li] !== null;
+      if (matched) lBtn.classList.add("match-selected");
+      if (selectedLeft === li) lBtn.classList.add("match-active");
+      if (submitted) {
+        const isCorr = matchState[qi][li] === q.correct[li];
+        lBtn.classList.add(isCorr ? "match-correct" : "match-incorrect");
+        lBtn.disabled = true;
+      } else {
+        lBtn.onclick = () => { selectedLeft = selectedLeft===li ? null : li; rebuild(); };
+      }
+      grid.appendChild(lBtn);
+
+      // Placeholder right cell (filled below by right column)
+      const placeholder = document.createElement("div"); placeholder.className="match-connector";
+      const arrow = matched ? "→" : "·";
+      placeholder.textContent = arrow;
+      grid.appendChild(placeholder);
+    });
+
+    // Right column
+    rightOrder.forEach(ri => {
+      const rBtn = document.createElement("button"); rBtn.type="button";
+      rBtn.className = "match-btn match-right";
+      rBtn.innerHTML = q.pairs[ri].right;
+      const assignedTo = rightToLeft[ri];
+      if (assignedTo !== undefined) rBtn.classList.add("match-selected");
+      if (submitted) {
+        // Correct if the left item that selected this right item matches the correct pairing
+        const correctLi = q.correct.indexOf(ri); // pairs[correctLi].correct === ri
+        const isCorr = assignedTo === correctLi;
+        rBtn.classList.add(isCorr ? "match-correct" : "match-incorrect");
+        rBtn.disabled = true;
+      } else {
+        rBtn.onclick = () => {
+          if (selectedLeft === null) return;
+          // Deselect if same right was already assigned to selectedLeft
+          if (matchState[qi][selectedLeft] === ri) {
+            matchState[qi][selectedLeft] = null;
+          } else {
+            // Un-assign from whoever had this right before
+            Object.keys(matchState[qi]).forEach(k => { if (matchState[qi][k]===ri) matchState[qi][k]=null; });
+            matchState[qi][selectedLeft] = ri;
+          }
+          selectedLeft = null;
+          saveState(); updateHeaderStats(); renderGrid(); rebuild(); typeset(grid);
+        };
+      }
+      grid.appendChild(rBtn);
+    });
   };
 
-  // For graph_line mode: draw the reference line
-  if (mode === "graph_line" && question.graph.line) {
-    const { slope, intercept } = question.graph.line;
-    // Clamp to graph bounds
-    const xL = xMin, xR = xMax;
-    const yL = slope * xL + intercept;
-    const yR = slope * xR + intercept;
+  rebuild();
+  card.appendChild(grid);
+  choicesDiv.appendChild(card);
+}
 
-    const linePath = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    linePath.setAttribute("x1", toSvgX(xL));
-    linePath.setAttribute("y1", toSvgY(yL));
-    linePath.setAttribute("x2", toSvgX(xR));
-    linePath.setAttribute("y2", toSvgY(yR));
-    linePath.setAttribute("class", "graph-drawn-line");
-    svg.appendChild(linePath);
+// ── SVG GRAPH HELPER ──────────────────────────────────────
+function buildGraphSVG(q, mode) {
+  const W=420, H=320, PAD=40;
+  const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+  svg.setAttribute("class","graph-plane");
+  const { xMin,xMax,yMin,yMax } = q.graph;
+  const toX = x => PAD + (x-xMin)/(xMax-xMin)*(W-PAD*2);
+  const toY = y => H-PAD - (y-yMin)/(yMax-yMin)*(H-PAD*2);
+
+  // Grid
+  for(let x=xMin;x<=xMax;x++){
+    const l=document.createElementNS("http://www.w3.org/2000/svg","line");
+    l.setAttribute("x1",toX(x));l.setAttribute("x2",toX(x));l.setAttribute("y1",PAD);l.setAttribute("y2",H-PAD);
+    l.setAttribute("class",x===0?"axis-line":"grid-line"); svg.appendChild(l);
+    if(x!==0){const t=document.createElementNS("http://www.w3.org/2000/svg","text");t.setAttribute("x",toX(x));t.setAttribute("y",toY(0)+14);t.setAttribute("class","axis-label");t.setAttribute("text-anchor","middle");t.textContent=x;svg.appendChild(t);}
+  }
+  for(let y=yMin;y<=yMax;y++){
+    const l=document.createElementNS("http://www.w3.org/2000/svg","line");
+    l.setAttribute("x1",PAD);l.setAttribute("x2",W-PAD);l.setAttribute("y1",toY(y));l.setAttribute("y2",toY(y));
+    l.setAttribute("class",y===0?"axis-line":"grid-line"); svg.appendChild(l);
+    if(y!==0){const t=document.createElementNS("http://www.w3.org/2000/svg","text");t.setAttribute("x",toX(0)-8);t.setAttribute("y",toY(y)+4);t.setAttribute("class","axis-label");t.setAttribute("text-anchor","end");t.textContent=y;svg.appendChild(t);}
   }
 
-  // Points
-  points.forEach((point) => {
-    const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-    group.setAttribute("class", "graph-point-group");
-    const isSelected = answers[current] === point.id;
-    const isCorrectPoint = submitted && point.id === question.correct;
-    const isIncorrectPoint = submitted && isSelected && point.id !== question.correct;
+  // Drawn line (graph_line / hotspot)
+  if (q.graph.line) {
+    const {slope:m, intercept:b} = q.graph.line;
+    const x0=xMin, x1=xMax, y0=m*x0+b, y1=m*x1+b;
+    const ln=document.createElementNS("http://www.w3.org/2000/svg","line");
+    ln.setAttribute("x1",toX(x0));ln.setAttribute("y1",toY(y0));ln.setAttribute("x2",toX(x1));ln.setAttribute("y2",toY(y1));
+    ln.setAttribute("class","graph-drawn-line"); svg.appendChild(ln);
+  }
 
-    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    circle.setAttribute("cx", toSvgX(point.x));
-    circle.setAttribute("cy", toSvgY(point.y));
-    circle.setAttribute("r", 9);
-    circle.setAttribute("class", `graph-point${isSelected ? " selected" : ""}${isCorrectPoint ? " correct" : ""}${isIncorrectPoint ? " incorrect" : ""}`);
+  // Parabola (hotspot)
+  if (q.graph.parabola) {
+    const {a,h,k} = q.graph.parabola;
+    const pts=[]; const step=(xMax-xMin)/80;
+    for(let x=xMin;x<=xMax;x+=step){ const y=a*(x-h)**2+k; if(y>=yMin&&y<=yMax) pts.push(`${toX(x)},${toY(y)}`); }
+    if(pts.length>1){const poly=document.createElementNS("http://www.w3.org/2000/svg","polyline");poly.setAttribute("points",pts.join(" "));poly.setAttribute("class","graph-drawn-line");poly.setAttribute("fill","none");svg.appendChild(poly);}
+  }
 
-    // Label — position smartly to avoid overlap
-    const lx = toSvgX(point.x);
-    const ly = toSvgY(point.y);
-    const labelOffsetX = lx > W - 60 ? -20 : 14;
-    const labelOffsetY = ly < PAD + 20 ? 18 : -12;
+  // Shading polygon (hotspot feasible region)
+  if (q.graph.shading) {
+    const pts = q.graph.shading.vertices.map(([x,y])=>`${toX(x)},${toY(y)}`).join(" ");
+    const poly=document.createElementNS("http://www.w3.org/2000/svg","polygon");
+    poly.setAttribute("points",pts); poly.setAttribute("class","graph-shading"); svg.appendChild(poly);
+  }
 
-    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    text.setAttribute("x", lx + labelOffsetX);
-    text.setAttribute("y", ly + labelOffsetY);
-    text.setAttribute("class", "graph-point-label");
-    text.textContent = `${point.label} (${point.x}, ${point.y})`;
+  return { svg, toX, toY };
+}
 
-    group.appendChild(circle);
-    group.appendChild(text);
-
-    if (!submitted) {
-      group.style.cursor = "pointer";
-      group.addEventListener("click", () => {
-        answers[current] = point.id;
-        saveState(); renderQuestion();
-      });
-    }
-    svg.appendChild(group);
+// ── GRAPH POINT ───────────────────────────────────────────
+function renderGraphQuestion(q) {
+  const {svg,toX,toY} = buildGraphSVG(q,"graph_point");
+  q.graph.points.forEach(pt => {
+    const g=document.createElementNS("http://www.w3.org/2000/svg","g"); g.setAttribute("class","graph-point-group");
+    const sel = answers[current]===pt.id;
+    const isCorr = submitted && pt.id===q.correct;
+    const isWrong= submitted && sel && pt.id!==q.correct;
+    const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("cx",toX(pt.x));c.setAttribute("cy",toY(pt.y));c.setAttribute("r",9);
+    c.setAttribute("class",`graph-point${sel?" selected":""}${isCorr?" correct":""}${isWrong?" incorrect":""}`);
+    const lx=toX(pt.x), ly=toY(pt.y);
+    const t=document.createElementNS("http://www.w3.org/2000/svg","text");
+    t.setAttribute("x",lx+(lx>370?-20:14));t.setAttribute("y",ly+(ly<50?18:-12));
+    t.setAttribute("class","graph-point-label");t.textContent=`${pt.label} (${pt.x},${pt.y})`;
+    g.append(c,t);
+    if(!submitted){g.style.cursor="pointer";g.addEventListener("click",()=>{answers[current]=pt.id;saveState();renderQuestion();});}
+    svg.appendChild(g);
   });
+  const wrap=document.createElement("div");wrap.className="graph-card";wrap.appendChild(svg);
+  choicesDiv.appendChild(wrap);
+}
 
-  return svg;
+// ── GRAPH LINE ────────────────────────────────────────────
+function renderGraphLine(q) {
+  const {svg,toX,toY} = buildGraphSVG(q,"graph_line");
+  q.graph.points.forEach(pt => {
+    const g=document.createElementNS("http://www.w3.org/2000/svg","g");g.setAttribute("class","graph-point-group");
+    const sel=answers[current]===pt.id;
+    const isCorr=submitted&&pt.id===q.correct;
+    const isWrong=submitted&&sel&&pt.id!==q.correct;
+    const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("cx",toX(pt.x));c.setAttribute("cy",toY(pt.y));c.setAttribute("r",9);
+    c.setAttribute("class",`graph-point${sel?" selected":""}${isCorr?" correct":""}${isWrong?" incorrect":""}`);
+    const lx=toX(pt.x),ly=toY(pt.y);
+    const t=document.createElementNS("http://www.w3.org/2000/svg","text");
+    t.setAttribute("x",lx+(lx>370?-20:14));t.setAttribute("y",ly+(ly<50?18:-12));
+    t.setAttribute("class","graph-point-label");t.textContent=`${pt.label} (${pt.x},${pt.y})`;
+    g.append(c,t);
+    if(!submitted){g.style.cursor="pointer";g.addEventListener("click",()=>{answers[current]=pt.id;saveState();renderQuestion();});}
+    svg.appendChild(g);
+  });
+  const wrap=document.createElement("div");wrap.className="graph-card";wrap.appendChild(svg);
+  choicesDiv.appendChild(wrap);
+}
+
+// ── HOTSPOT ───────────────────────────────────────────────
+function renderHotspot(q) {
+  const qi = current;
+  const {svg, toX, toY} = buildGraphSVG(q, "hotspot");
+  const { xMin,xMax,yMin,yMax } = q.graph;
+  const W=420,H=320,PAD=40;
+  const fromSvgX = sx => xMin + (sx-PAD)/(W-PAD*2)*(xMax-xMin);
+  const fromSvgY = sy => yMin + (H-PAD-sy)/(H-PAD*2)*(yMax-yMin);
+
+  const snap = q.graph.snapGrid || 1;
+  const doSnap = v => Math.round(v/snap)*snap;
+
+  // Crosshair for placed point
+  if (hotspotState[qi]) {
+    const {x,y} = hotspotState[qi];
+    const cx = toX(x), cy = toY(y);
+    const circle = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    circle.setAttribute("cx",cx);circle.setAttribute("cy",cy);circle.setAttribute("r",10);
+    const isCorr = submitted && isCorrect(qi);
+    circle.setAttribute("class",`graph-point selected${submitted?(isCorr?" correct":" incorrect"):""}`);
+    svg.appendChild(circle);
+    const lbl=document.createElementNS("http://www.w3.org/2000/svg","text");
+    lbl.setAttribute("x",cx+14);lbl.setAttribute("y",cy-12);lbl.setAttribute("class","graph-point-label");
+    lbl.textContent=`(${x}, ${y})`; svg.appendChild(lbl);
+  }
+
+  if (!submitted) {
+    // Preview ghost on hover
+    const ghost = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    ghost.setAttribute("r",8); ghost.setAttribute("class","hotspot-ghost"); ghost.style.display="none";
+    svg.appendChild(ghost);
+
+    const rect = document.createElementNS("http://www.w3.org/2000/svg","rect");
+    rect.setAttribute("x",PAD);rect.setAttribute("y",PAD);
+    rect.setAttribute("width",W-PAD*2);rect.setAttribute("height",H-PAD*2);
+    rect.setAttribute("fill","transparent");rect.style.cursor="crosshair";
+    svg.appendChild(rect);
+
+    rect.addEventListener("mousemove", e => {
+      const bbox = svg.getBoundingClientRect();
+      const scaleX = W/bbox.width, scaleY = H/bbox.height;
+      const rx = (e.clientX-bbox.left)*scaleX, ry = (e.clientY-bbox.top)*scaleY;
+      const wx = doSnap(fromSvgX(rx)), wy = doSnap(fromSvgY(ry));
+      ghost.setAttribute("cx", toX(wx)); ghost.setAttribute("cy", toY(wy)); ghost.style.display="";
+    });
+    rect.addEventListener("mouseleave", () => { ghost.style.display="none"; });
+    rect.addEventListener("click", e => {
+      const bbox = svg.getBoundingClientRect();
+      const scaleX = W/bbox.width, scaleY = H/bbox.height;
+      const rx = (e.clientX-bbox.left)*scaleX, ry = (e.clientY-bbox.top)*scaleY;
+      const wx = doSnap(fromSvgX(rx)), wy = doSnap(fromSvgY(ry));
+      hotspotState[qi] = {x:wx, y:wy};
+      saveState(); renderQuestion();
+    });
+  }
+
+  const wrap=document.createElement("div");wrap.className="graph-card";wrap.appendChild(svg);
+  if (!submitted && hotspotState[qi]) {
+    const clr=document.createElement("button");clr.type="button";clr.className="secondary-button hotspot-clear-btn";
+    clr.textContent="Clear selection";
+    clr.onclick=()=>{ hotspotState[qi]=null; saveState(); renderQuestion(); };
+    wrap.appendChild(clr);
+  }
+  choicesDiv.appendChild(wrap);
 }
 
 // ── QUESTION DISPATCHER ───────────────────────────────────
+function renderQuestionInput(q) {
+  choicesDiv.innerHTML="";
 
-function renderQuestionInput(question) {
-  choicesDiv.innerHTML = "";
+  // Info box before question content
+  if (q.info_box?.length) choicesDiv.appendChild(renderInfoBox(q.info_box));
 
-  // Render info_box if present (before choices)
-  if (question.info_box && question.info_box.length > 0) {
-    const box = renderInfoBox(question.info_box);
-    choicesDiv.classList.add("has-info-box");
-    choicesDiv.appendChild(box);
-  }
-
-  if (question.type === "multiple_choice" || question.type === "select_multiple") {
-    const choicesContainer = document.createElement("div");
-    choicesContainer.className = "choices";
-    question.choices.forEach((choice, index) => choicesContainer.appendChild(renderChoiceButton(question, choice, index)));
-    choicesDiv.appendChild(choicesContainer);
-    return;
-  }
-  if (question.type === "numeric" || question.type === "short_response") {
-    renderTextResponse(question);
-    return;
-  }
-  if (question.type === "graph_point") {
-    renderGraphQuestion(question);
-    return;
-  }
-  if (question.type === "graph_line") {
-    renderGraphLine(question);
-    return;
+  switch(q.type) {
+    case "multiple_choice":
+    case "select_multiple":  renderMultipleChoice(q); break;
+    case "numeric":
+    case "short_response":   renderTextResponse(q); break;
+    case "fill_blank":       renderFillBlank(q); break;
+    case "ordering":         renderOrdering(q); break;
+    case "matching":         renderMatching(q); break;
+    case "graph_point":      renderGraphQuestion(q); break;
+    case "graph_line":       renderGraphLine(q); break;
+    case "hotspot":          renderHotspot(q); break;
   }
 }
 
+// ── TYPESET ───────────────────────────────────────────────
 function typeset(...els) {
-  if (window.MathJax && window.MathJax.typesetPromise) {
-    els.forEach(el => { if (window.MathJax.typesetClear) window.MathJax.typesetClear([el]); });
-    window.MathJax.typesetPromise(els).catch(() => {});
+  if (window.MathJax?.typesetPromise) {
+    els.forEach(el=>{ if(MathJax.typesetClear) MathJax.typesetClear([el]); });
+    MathJax.typesetPromise(els).catch(()=>{});
   }
 }
 
+// ── RENDER QUESTION ───────────────────────────────────────
 function renderQuestion() {
   if (!questions.length) return;
-  const question = questions[current];
-  questionNumberBadge.textContent = current + 1;
+  const q = questions[current];
+  questionNumberBadge.textContent = current+1;
   questionText.innerHTML = getQuestionPromptMarkup(current);
-  choicesDiv.className = "";
-  renderQuestionInput(question);
+
+  // Replace type badge in meta-left
+  const metaLeft = document.querySelector(".question-meta-left");
+  const existingBadge = metaLeft.querySelector(".question-type-badge");
+  if (existingBadge) existingBadge.remove();
+  metaLeft.appendChild(typeBadge(q.type));
+
+  // Section label in exam header eyebrow
+  const eyebrow = document.querySelector(".eyebrow");
+  if (eyebrow && q.sectionTitle) eyebrow.textContent = `§${q.section} · ${q.sectionTitle}`;
+
+  renderQuestionInput(q);
   typeset(questionText, choicesDiv);
   markToggle.classList.toggle("active", markedQuestions.has(current));
   markToggleLabel.textContent = markedQuestions.has(current) ? "Marked for Review" : "Mark for Review";
   renderGrid(); updateHeaderStats(); updateNavigationState();
 }
 
-function nextQuestion() {
-  if (current < questions.length - 1) { current++; saveState(); renderQuestion(); }
-}
-
-function prevQuestion() {
-  if (current > 0) { current--; saveState(); renderQuestion(); }
-}
-
-function toggleMarked() {
-  if (submitted) return;
-  if (markedQuestions.has(current)) { markedQuestions.delete(current); } else { markedQuestions.add(current); }
-  saveState(); renderQuestion();
-}
-
-function toggleEliminateMode() {
-  if (submitted) return;
-  eliminateMode = !eliminateMode;
-  if (eliminateMode) highlightMode = false;
-  updateNavigationState();
-}
-
-function toggleHighlightMode() {
-  if (submitted) return;
-  highlightMode = !highlightMode;
-  if (highlightMode) eliminateMode = false;
-  updateNavigationState();
-}
-
+function nextQuestion() { if(current<questions.length-1){current++;saveState();renderQuestion();} }
+function prevQuestion() { if(current>0){current--;saveState();renderQuestion();} }
+function toggleMarked() { if(submitted)return; markedQuestions.has(current)?markedQuestions.delete(current):markedQuestions.add(current); saveState();renderQuestion(); }
+function toggleEliminateMode() { if(submitted)return; eliminateMode=!eliminateMode; if(eliminateMode)highlightMode=false; updateNavigationState(); }
+function toggleHighlightMode() { if(submitted)return; highlightMode=!highlightMode; if(highlightMode)eliminateMode=false; updateNavigationState(); }
 function applyHighlightFromSelection() {
-  if (!highlightMode || submitted) return;
-  const selection = window.getSelection();
-  if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return;
-  const range = selection.getRangeAt(0);
-  if (!questionText.contains(range.commonAncestorContainer)) return;
-  const highlight = document.createElement("span");
-  highlight.className = "highlighted-text";
-  try {
-    const fragment = range.extractContents();
-    highlight.appendChild(fragment);
-    range.insertNode(highlight);
-    selection.removeAllRanges();
-    stemMarkup[current] = questionText.innerHTML;
-    saveState();
-  } catch { selection.removeAllRanges(); }
+  if(!highlightMode||submitted)return;
+  const sel=window.getSelection(); if(!sel||sel.rangeCount===0||sel.isCollapsed)return;
+  const range=sel.getRangeAt(0); if(!questionText.contains(range.commonAncestorContainer))return;
+  const span=document.createElement("span");span.className="highlighted-text";
+  try{const frag=range.extractContents();span.appendChild(frag);range.insertNode(span);sel.removeAllRanges();stemMarkup[current]=questionText.innerHTML;saveState();}catch{sel.removeAllRanges();}
 }
 
 // ── PAUSE ─────────────────────────────────────────────────
-
 function togglePause() {
-  if (submitted) return;
-  paused = !paused;
-  const pauseOverlay = document.getElementById("pauseOverlay");
-  if (paused) {
-    if (timerId) { clearInterval(timerId); timerId = null; }
-    pauseOverlay.style.display = "flex";
-    pauseButton.innerHTML = `<svg class="inline-icon pause-icon"><use href="#icon-chevron-right"></use></svg>Resume`;
+  if(submitted)return; paused=!paused;
+  const overlay=document.getElementById("pauseOverlay");
+  if(paused){
+    if(timerId){clearInterval(timerId);timerId=null;}
+    overlay.style.display="flex";
+    pauseButton.innerHTML=`<svg class="inline-icon pause-icon"><use href="#icon-chevron-right"></use></svg>Resume`;
   } else {
-    pauseOverlay.style.display = "none";
-    startTimer();
-    pauseButton.innerHTML = `<svg class="inline-icon pause-icon"><use href="#icon-pause"></use></svg>Pause`;
+    overlay.style.display="none"; startTimer();
+    pauseButton.innerHTML=`<svg class="inline-icon pause-icon"><use href="#icon-pause"></use></svg>Pause`;
   }
 }
 
-// ── MODALS ─────────────────────────────────────────────────
-
-function openModal(id) {
-  const modal = document.getElementById(id);
-  const windowEl = modal.querySelector(".draggable-window");
-  if (windowEl) { windowEl.style.left = ""; windowEl.style.top = ""; windowEl.style.transform = ""; }
-  modal.style.display = "flex";
-  typeset(modal);
+// ── MODALS ────────────────────────────────────────────────
+function openModal(id){ const m=document.getElementById(id); const w=m.querySelector(".draggable-window"); if(w){w.style.left="";w.style.top="";w.style.transform="";} m.style.display="flex"; typeset(m); }
+function closeModal(id){ document.getElementById(id).style.display="none"; }
+function toggleSidebar(side){
+  const isL=side==="left"; const sb=isL?leftSidebar:rightSidebar;
+  const vn=isL?"--left-sidebar-width":"--right-sidebar-width";
+  const exp=isL?"248px":"210px";
+  sb.classList.toggle("collapsed");
+  examShell.style.setProperty(vn, sb.classList.contains("collapsed")?"56px":exp);
 }
 
-function closeModal(id) {
-  document.getElementById(id).style.display = "none";
-}
-
-function toggleSidebar(side) {
-  const isLeft = side === "left";
-  const sidebar = isLeft ? leftSidebar : rightSidebar;
-  const variableName = isLeft ? "--left-sidebar-width" : "--right-sidebar-width";
-  const expandedWidth = isLeft ? "248px" : "210px";
-  const collapsedWidth = "56px";
-  sidebar.classList.toggle("collapsed");
-  examShell.style.setProperty(variableName, sidebar.classList.contains("collapsed") ? collapsedWidth : expandedWidth);
-}
-
+// ── TIMER ─────────────────────────────────────────────────
 function updateTimer() {
-  if (submitted || paused) return;
-  if (time > 0) { time--; document.getElementById("time").textContent = formatTime(time); saveState(); return; }
-  showSubmitModal(true);
+  if(submitted||paused)return;
+  if(time>0){time--;document.getElementById("time").textContent=formatTime(time);saveState();}
+  else showSubmitModal(true);
 }
-
 function startTimer() {
-  if (timerId) clearInterval(timerId);
-  document.getElementById("time").textContent = formatTime(time);
-  timerId = setInterval(updateTimer, 1000);
+  if(timerId)clearInterval(timerId);
+  document.getElementById("time").textContent=formatTime(time);
+  timerId=setInterval(updateTimer,1000);
 }
 
-function showSubmitModal(autoSubmit = false) {
-  if (timerId && autoSubmit) { clearInterval(timerId); timerId = null; }
-  const unanswered = questions.length - getAnsweredCount();
-  submitSummary.textContent = autoSubmit
-    ? "Time has expired. Review your counts below and submit your mock exam."
-    : "You are about to finish this mock exam. Review your progress before submitting.";
-  submitChecklist.innerHTML = `
-    <div class="submit-line"><span>Answered questions</span><strong>${getAnsweredCount()} of ${questions.length}</strong></div>
-    <div class="submit-line"><span>Unanswered questions</span><strong>${unanswered}</strong></div>
+// ── SUBMIT ────────────────────────────────────────────────
+function showSubmitModal(auto=false) {
+  if(timerId&&auto){clearInterval(timerId);timerId=null;}
+  const unanswered=questions.length-getAnsweredCount();
+  submitSummary.textContent=auto?"Time has expired. Submit your exam.":"Review your progress before submitting.";
+  submitChecklist.innerHTML=`
+    <div class="submit-line"><span>Answered</span><strong>${getAnsweredCount()} of ${questions.length}</strong></div>
+    <div class="submit-line"><span>Unanswered</span><strong>${unanswered}</strong></div>
     <div class="submit-line"><span>Marked for review</span><strong>${markedQuestions.size}</strong></div>
-    <div class="submit-line"><span>Time remaining</span><strong>${formatTime(time)}</strong></div>
-  `;
+    <div class="submit-line"><span>Time remaining</span><strong>${formatTime(time)}</strong></div>`;
   openModal("submitModal");
 }
 
-function isCorrect(index) {
-  const question = questions[index];
-  const answer = answers[index];
-  if (!hasAnswer(index)) return false;
-  if (question.type === "multiple_choice") return answer === question.correct;
-  if (question.type === "select_multiple") {
-    const actual = Array.isArray(answer) ? [...answer].sort((a, b) => a - b) : [];
-    const expected = [...question.correct].sort((a, b) => a - b);
-    return JSON.stringify(actual) === JSON.stringify(expected);
-  }
-  if (question.type === "numeric") {
-    const normalizedAnswer = normalizeNumeric(answer);
-    return question.acceptedAnswers.some((accepted) => normalizeNumeric(accepted) === normalizedAnswer);
-  }
-  if (question.type === "short_response") {
-    const normalizedAnswer = normalizeText(answer);
-    return question.acceptedAnswers.some((accepted) => normalizeText(accepted) === normalizedAnswer);
-  }
-  if (question.type === "graph_point" || question.type === "graph_line") return answer === question.correct;
-  return false;
-}
-
-function describeAnswer(index) {
-  const question = questions[index];
-  const answer = answers[index];
-  if (!hasAnswer(index)) return "Unanswered";
-  if (question.type === "multiple_choice") return `${String.fromCharCode(65 + answer)}. ${question.choices[answer]}`;
-  if (question.type === "select_multiple") return answer.map((i) => `${String.fromCharCode(65 + i)}. ${question.choices[i]}`).join(", ");
-  if (question.type === "graph_point" || question.type === "graph_line") return `Point ${answer}`;
-  return String(answer);
-}
-
-function describeCorrectAnswer(index) {
-  const question = questions[index];
-  if (question.type === "multiple_choice") return `${String.fromCharCode(65 + question.correct)}. ${question.choices[question.correct]}`;
-  if (question.type === "select_multiple") return question.correct.map((i) => `${String.fromCharCode(65 + i)}. ${question.choices[i]}`).join(", ");
-  if (question.type === "graph_point" || question.type === "graph_line") return `Point ${question.correct}`;
-  return question.acceptedAnswers.join(" or ");
-}
-
-function resetCalculator() {
-  if (calculatorFrame) {
-    calculatorFrame.src = "about:blank";
-    setTimeout(() => { calculatorFrame.src = "https://www.desmos.com/scientific"; }, 50);
+// ── SCORING ───────────────────────────────────────────────
+function isCorrect(i) {
+  const q=questions[i]; if(!hasAnswer(i))return false;
+  switch(q.type){
+    case "multiple_choice": return answers[i]===q.correct;
+    case "select_multiple": {
+      const ac=[...( answers[i]||[])].sort((a,b)=>a-b);
+      const ec=[...q.correct].sort((a,b)=>a-b);
+      return JSON.stringify(ac)===JSON.stringify(ec);
+    }
+    case "numeric": return q.acceptedAnswers.some(a=>normalizeNumeric(a)===normalizeNumeric(answers[i]));
+    case "short_response": return q.acceptedAnswers.some(a=>normalizeText(a)===normalizeText(answers[i]));
+    case "fill_blank": return q.blanks.every(b=> b.acceptedAnswers.some(a=> normalizeNumeric(a)===normalizeNumeric((answers[i]||{})[b.id]||"") || normalizeText(a)===normalizeText((answers[i]||{})[b.id]||"")));
+    case "ordering": return Array.isArray(dragOrder[i]) && dragOrder[i].every((v,j)=>q.correct[j]===v);
+    case "matching": return q.pairs.every((_,li)=>matchState[i]&&matchState[i][li]===q.correct[li]);
+    case "graph_point":
+    case "graph_line": return answers[i]===q.correct;
+    case "hotspot": {
+      const s=hotspotState[i]; if(!s)return false;
+      if(q.graph.checkFn==="feasible_region"){
+        return s.y>=(0.5*s.x+1) && s.y<=(-s.x+7) && s.x>=0 && !(s.y===(0.5*s.x+1)||s.y===(-s.x+7)||s.x===0);
+      }
+      const dx=s.x-q.graph.correctX, dy=s.y-q.graph.correctY;
+      return Math.sqrt(dx*dx+dy*dy)<=q.graph.tolerance;
+    }
+    default: return false;
   }
 }
-
-function resetGraphingCalculator() {
-  if (graphingCalculator) {
-    try { graphingCalculator.destroy(); } catch (e) { /* ignore */ }
-    graphingCalculator = null;
+function describeAnswer(i){
+  const q=questions[i]; if(!hasAnswer(i))return"Unanswered";
+  switch(q.type){
+    case "multiple_choice": return `${String.fromCharCode(65+answers[i])}. ${q.choices[answers[i]]}`;
+    case "select_multiple": return (answers[i]||[]).map(j=>`${String.fromCharCode(65+j)}. ${q.choices[j]}`).join(", ");
+    case "ordering":        return (dragOrder[i]||[]).map((oi,pos)=>`${pos+1}. ${q.items[oi].replace(/<[^>]+>/g,"")}`).join(" → ");
+    case "matching":        return q.pairs.map((_,li)=>{ const ri=matchState[i]?.[li]; return ri!=null?`${q.pairs[li].left.replace(/<[^>]+>/g,"")} → ${q.pairs[ri].right.replace(/<[^>]+>/g,"")}`:"-"; }).join(", ");
+    case "fill_blank":      return q.blanks.map(b=>`${b.label}: ${(answers[i]||{})[b.id]||"—"}`).join(", ");
+    case "hotspot":         return hotspotState[i]?`(${hotspotState[i].x}, ${hotspotState[i].y})`:"No point placed";
+    case "graph_point":
+    case "graph_line":      return `Point ${answers[i]}`;
+    default:                return String(answers[i]);
   }
-  if (graphingContainer) {
-    graphingContainer.innerHTML = "";
+}
+function describeCorrect(i){
+  const q=questions[i];
+  switch(q.type){
+    case "multiple_choice": return `${String.fromCharCode(65+q.correct)}. ${q.choices[q.correct]}`;
+    case "select_multiple": return q.correct.map(j=>`${String.fromCharCode(65+j)}. ${q.choices[j]}`).join(", ");
+    case "ordering":        return q.correct.map((oi,pos)=>`${pos+1}. ${q.items[oi].replace(/<[^>]+>/g,"")}`).join(" → ");
+    case "matching":        return q.pairs.map((_,li)=>`${q.pairs[li].left.replace(/<[^>]+>/g,"")} → ${q.pairs[q.correct[li]].right.replace(/<[^>]+>/g,"")}`).join(", ");
+    case "fill_blank":      return q.blanks.map(b=>`${b.label}: ${b.acceptedAnswers[0]}`).join(", ");
+    case "hotspot":         return `Near (${q.graph.correctX}, ${q.graph.correctY})`;
+    case "graph_point":
+    case "graph_line":      return `Point ${q.correct}`;
+    default:                return q.acceptedAnswers?.join(" or ")||"—";
   }
 }
 
-function finalizeSubmission() {
-  submitted = true;
-  saveState();
-  closeModal("submitModal");
-  if (timerId) clearInterval(timerId);
-  resetCalculator();
-  resetGraphingCalculator();
-  renderQuestion();
-  renderResults();
-  openModal("resultsModal");
+// ── RESULTS ───────────────────────────────────────────────
+function finalizeSubmission(){
+  submitted=true; saveState(); closeModal("submitModal");
+  if(timerId)clearInterval(timerId);
+  resetCalculator(); resetGraphingCalculator();
+  renderQuestion(); renderResults(); openModal("resultsModal");
 }
-
-function renderResults() {
-  let correct = 0;
-  resultsReview.innerHTML = "";
-  questions.forEach((question, index) => {
-    if (isCorrect(index)) correct++;
-    const row = document.createElement("div");
-    row.className = "review-row";
-    row.innerHTML = `
-      <div class="review-row-top">
-        <strong>Question ${index + 1}</strong>
-        <span class="${isCorrect(index) ? "review-good" : "review-bad"}">${isCorrect(index) ? "Correct" : "Check"}</span>
-      </div>
-      <p>${escapeHtml(question.prompt)}</p>
+function renderResults(){
+  let correct=0; resultsReview.innerHTML="";
+  questions.forEach((q,i)=>{
+    if(isCorrect(i))correct++;
+    const row=document.createElement("div");row.className="review-row";
+    row.innerHTML=`
+      <div class="review-row-top"><strong>Q${i+1} · ${q.sectionTitle}</strong>
+        <span class="${isCorrect(i)?"review-good":"review-bad"}">${isCorrect(i)?"Correct":"Incorrect"}</span></div>
+      <p>${escapeHtml(q.prompt)}</p>
       <div class="review-meta">
-        <span>Your answer: ${escapeHtml(describeAnswer(index))}</span>
-        <span>Correct answer: ${escapeHtml(describeCorrectAnswer(index))}</span>
-      </div>
-    `;
+        <span>Your answer: ${escapeHtml(describeAnswer(i))}</span>
+        <span>Correct answer: ${escapeHtml(describeCorrect(i))}</span>
+      </div>`;
     resultsReview.appendChild(row);
   });
-  const score = Math.round((correct / questions.length) * 100);
-  resultsScore.textContent = `${score}%`;
-  resultsBreakdown.textContent = `${correct} correct out of ${questions.length} questions`;
-  resultsAnswered.textContent = getAnsweredCount();
-  resultsCorrect.textContent = correct;
-  resultsMarked.textContent = markedQuestions.size;
-  resultsTime.textContent = formatTime(time);
+  const pct=Math.round(correct/questions.length*100);
+  resultsScore.textContent=`${pct}%`;
+  resultsBreakdown.textContent=`${correct} correct out of ${questions.length}`;
+  resultsAnswered.textContent=getAnsweredCount();
+  resultsCorrect.textContent=correct;
+  resultsMarked.textContent=markedQuestions.size;
+  resultsTime.textContent=formatTime(time);
+}
+function restartTest(){
+  current=0;answers={};markedQuestions=new Set();eliminatedChoices={};stemMarkup={};
+  dragOrder={};matchState={};hotspotState={};
+  time=DEFAULT_TIME;submitted=false;eliminateMode=false;highlightMode=false;paused=false;keypadsVisible={};
+  closeModal("resultsModal");localStorage.removeItem(STORAGE_KEY);
+  resetCalculator();resetGraphingCalculator();
+  pauseButton.innerHTML=`<svg class="inline-icon pause-icon"><use href="#icon-pause"></use></svg>Pause`;
+  document.getElementById("pauseOverlay").style.display="none";
+  startTimer();renderQuestion();
 }
 
-function restartTest() {
-  current = 0; answers = {}; markedQuestions = new Set();
-  eliminatedChoices = {}; stemMarkup = {}; time = DEFAULT_TIME;
-  submitted = false; eliminateMode = false; highlightMode = false;
-  paused = false; keypadsVisible = {};
-  closeModal("resultsModal");
-  localStorage.removeItem(STORAGE_KEY);
-  resetCalculator();
-  resetGraphingCalculator();
-  pauseButton.innerHTML = `<svg class="inline-icon pause-icon"><use href="#icon-pause"></use></svg>Pause`;
-  document.getElementById("pauseOverlay").style.display = "none";
-  startTimer();
-  renderQuestion();
-}
+// ── TOOLS ─────────────────────────────────────────────────
+function resetCalculator(){ if(calculatorFrame){calculatorFrame.src="about:blank";setTimeout(()=>{calculatorFrame.src="https://www.desmos.com/scientific";},50);} }
+function resetGraphingCalculator(){ if(graphingCalculator){try{graphingCalculator.destroy();}catch(e){}graphingCalculator=null;} if(graphingContainer)graphingContainer.innerHTML=""; }
+function initGraphingCalculator(){ if(graphingCalculator||!window.Desmos||!graphingContainer)return; graphingCalculator=Desmos.GraphingCalculator(graphingContainer,{expressions:true,expressionsTopbar:false,settingsMenu:true,zoomButtons:true,keypad:true,border:false,lockViewport:false,links:false}); }
 
-function initGraphingCalculator() {
-  if (graphingCalculator || !window.Desmos || !graphingContainer) return;
-  graphingCalculator = Desmos.GraphingCalculator(graphingContainer, {
-    expressions: true,
-    expressionsTopbar: false,
-    settingsMenu: true,
-    zoomButtons: true,
-    keypad: true,
-    border: false,
-    expressionsCollapsed: false,
-    lockViewport: false,
-    pasteGraphLink: false,
-    links: false
+function setupDraggableWindows(){
+  document.querySelectorAll(".draggable-window").forEach(win=>{
+    const handle=win.querySelector(".drag-handle"); if(!handle)return;
+    let dragging=false,ox=0,oy=0;
+    handle.addEventListener("pointerdown",e=>{ if(e.target.closest("button"))return; dragging=true; const r=win.getBoundingClientRect(); ox=e.clientX-r.left;oy=e.clientY-r.top; win.style.left=`${r.left}px`;win.style.top=`${r.top}px`;win.style.transform="none"; handle.setPointerCapture(e.pointerId); });
+    handle.addEventListener("pointermove",e=>{ if(!dragging)return; win.style.left=`${e.clientX-ox}px`;win.style.top=`${e.clientY-oy}px`; });
+    const end=e=>{ if(!dragging)return;dragging=false;if(handle.hasPointerCapture(e.pointerId))handle.releasePointerCapture(e.pointerId); };
+    handle.addEventListener("pointerup",end);handle.addEventListener("pointercancel",end);
   });
 }
 
-function setupDraggableWindows() {
-  document.querySelectorAll(".draggable-window").forEach((windowEl) => {
-    const handle = windowEl.querySelector(".drag-handle");
-    if (!handle) return;
-    let dragging = false, offsetX = 0, offsetY = 0;
-    handle.addEventListener("pointerdown", (event) => {
-      if (event.target.closest("button")) return;
-      dragging = true;
-      const rect = windowEl.getBoundingClientRect();
-      offsetX = event.clientX - rect.left; offsetY = event.clientY - rect.top;
-      windowEl.style.left = `${rect.left}px`; windowEl.style.top = `${rect.top}px`;
-      windowEl.style.transform = "none";
-      handle.setPointerCapture(event.pointerId);
-    });
-    handle.addEventListener("pointermove", (event) => {
-      if (!dragging) return;
-      windowEl.style.left = `${event.clientX - offsetX}px`;
-      windowEl.style.top = `${event.clientY - offsetY}px`;
-    });
-    const endDrag = (event) => {
-      if (!dragging) return;
-      dragging = false;
-      if (handle.hasPointerCapture(event.pointerId)) handle.releasePointerCapture(event.pointerId);
-    };
-    handle.addEventListener("pointerup", endDrag);
-    handle.addEventListener("pointercancel", endDrag);
-  });
+async function loadQuestions(){
+  try{ const r=await fetch("./questions.json"); if(!r.ok)throw new Error(); questions=await r.json(); }
+  catch{ const fb=document.getElementById("questionsFallback"); questions=JSON.parse(fb.textContent); }
 }
 
-async function loadQuestions() {
-  try {
-    const response = await fetch("./questions.json");
-    if (!response.ok) throw new Error("Unable to load questions.json");
-    questions = await response.json();
-  } catch {
-    const fallback = document.getElementById("questionsFallback");
-    questions = JSON.parse(fallback.textContent);
-  }
-}
+// ── EVENT LISTENERS ───────────────────────────────────────
+window.addEventListener("load",()=>{ if(calculatorFrame)calculatorFrame.src="https://www.desmos.com/scientific"; });
+calculatorButton.addEventListener("click",()=>openModal("calculatorModal"));
+graphingButton.addEventListener("click",()=>{ initGraphingCalculator(); openModal("graphingModal"); });
+notesButton.addEventListener("click",()=>openModal("notesModal"));
+notesField.addEventListener("input",saveNotes);
+markToggle.addEventListener("click",toggleMarked);
+submitButton.addEventListener("click",()=>showSubmitModal(false));
+confirmSubmitButton.addEventListener("click",finalizeSubmission);
+restartButton.addEventListener("click",restartTest);
+eliminateModeButton.addEventListener("click",toggleEliminateMode);
+highlightModeButton.addEventListener("click",toggleHighlightMode);
+questionText.addEventListener("mouseup",applyHighlightFromSelection);
+pauseButton.addEventListener("click",togglePause);
 
-window.addEventListener("load", () => {
-  if (calculatorFrame) {
-    calculatorFrame.src = "https://www.desmos.com/scientific";
-  }
-});
+window.nextQuestion=nextQuestion; window.prevQuestion=prevQuestion;
+window.toggleSidebar=toggleSidebar; window.openModal=openModal;
+window.closeModal=closeModal; window.togglePause=togglePause;
 
-calculatorButton.addEventListener("click", () => openModal("calculatorModal"));
-graphingButton.addEventListener("click", () => {
-  initGraphingCalculator();
-  openModal("graphingModal");
-});
-notesButton.addEventListener("click", () => openModal("notesModal"));
-notesField.addEventListener("input", saveNotes);
-markToggle.addEventListener("click", toggleMarked);
-submitButton.addEventListener("click", () => showSubmitModal(false));
-confirmSubmitButton.addEventListener("click", finalizeSubmission);
-restartButton.addEventListener("click", restartTest);
-eliminateModeButton.addEventListener("click", toggleEliminateMode);
-highlightModeButton.addEventListener("click", toggleHighlightMode);
-questionText.addEventListener("mouseup", applyHighlightFromSelection);
-pauseButton.addEventListener("click", togglePause);
-
-window.nextQuestion = nextQuestion;
-window.prevQuestion = prevQuestion;
-window.toggleSidebar = toggleSidebar;
-window.openModal = openModal;
-window.closeModal = closeModal;
-window.togglePause = togglePause;
-
-async function init() {
-  loadNotes();
-  restoreState();
-  await loadQuestions();
-  setupDraggableWindows();
-  if (current > questions.length - 1) current = 0;
+// ── INIT ──────────────────────────────────────────────────
+async function init(){
+  loadNotes(); restoreState(); await loadQuestions(); setupDraggableWindows();
+  if(current>questions.length-1)current=0;
   startTimer();
-  if (window.MathJax && window.MathJax.startup && window.MathJax.startup.promise) {
-    await window.MathJax.startup.promise;
-  } else {
-    await new Promise(resolve => {
-      const check = setInterval(() => {
-        if (window.MathJax && window.MathJax.typesetPromise) {
-          clearInterval(check);
-          resolve();
-        }
-      }, 50);
-      setTimeout(() => { clearInterval(check); resolve(); }, 4000);
-    });
-  }
+  if(window.MathJax?.startup?.promise){ await MathJax.startup.promise; }
+  else { await new Promise(res=>{ const t=setInterval(()=>{ if(window.MathJax?.typesetPromise){clearInterval(t);res();} },50); setTimeout(()=>{clearInterval(t);res();},4000); }); }
   renderQuestion();
-  if (submitted) {
-    if (timerId) clearInterval(timerId);
-    renderResults();
-    openModal("resultsModal");
-  }
+  if(submitted){ if(timerId)clearInterval(timerId); renderResults(); openModal("resultsModal"); }
 }
-
-init().catch(() => {
-  questionText.textContent = "There was a problem loading the Algebra I question set.";
-});
+init().catch(()=>{ questionText.textContent="There was a problem loading the question set."; });
