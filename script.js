@@ -62,7 +62,6 @@ function escapeHtml(text) {
 }
 
 function getQuestionPromptMarkup(index) {
-  // stemMarkup stores highlighted HTML; otherwise use the raw prompt so LaTeX isn't escaped
   return stemMarkup[index] || questions[index].prompt;
 }
 
@@ -70,7 +69,6 @@ function normalizeText(value) {
   return String(value)
     .trim()
     .toLowerCase()
-    // strip LaTeX commands but keep their content
     .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, "($1)/($2)")
     .replace(/\\left\|([^|]+)\|/g, "|$1|")
     .replace(/\\sqrt\{([^}]+)\}/g, "sqrt($1)")
@@ -81,9 +79,9 @@ function normalizeText(value) {
     .replace(/\\le/g, "<=")
     .replace(/\\ge/g, ">=")
     .replace(/\\neq/g, "!=")
-    .replace(/\\/g, "")   // strip any remaining backslashes
-    .replace(/\{|\}/g, "") // strip braces
-    .replace(/\s+/g, "");  // strip all spaces
+    .replace(/\\/g, "")
+    .replace(/\{|\}/g, "")
+    .replace(/\s+/g, "");
 }
 
 function normalizeNumeric(value) {
@@ -110,7 +108,7 @@ function hasAnswer(index) {
   const answer = answers[index];
   if (question.type === "select_multiple") return Array.isArray(answer) && answer.length > 0;
   if (question.type === "numeric" || question.type === "short_response") return typeof answer === "string" && answer.trim().length > 0;
-  if (question.type === "graph_point") return typeof answer === "string" && answer.length > 0;
+  if (question.type === "graph_point" || question.type === "graph_line") return typeof answer === "string" && answer.length > 0;
   return Number.isInteger(answer);
 }
 
@@ -197,6 +195,23 @@ function toggleEliminatedChoice(questionIndex, choiceIndex) {
   eliminatedChoices[questionIndex] = [...list];
 }
 
+// ── INFO BOX ─────────────────────────────────────────────
+// Renders the gray context panel shown in the docx (like a system of equations, table, or step list)
+
+function renderInfoBox(lines) {
+  const box = document.createElement("div");
+  box.className = "info-box";
+  lines.forEach(line => {
+    const row = document.createElement("div");
+    row.className = "info-box-row";
+    row.innerHTML = line; // LaTeX inline — typeset later
+    box.appendChild(row);
+  });
+  return box;
+}
+
+// ── CHOICE BUTTONS ───────────────────────────────────────
+
 function renderChoiceButton(question, choice, index) {
   const button = document.createElement("button");
   button.className = "choice";
@@ -282,7 +297,6 @@ const KEYPAD_DEF = [
 ];
 
 let keypadsVisible = {};
-// map from questionIndex -> MathQuill MathField instance
 const mqFields = {};
 
 function buildKeypad(mqField) {
@@ -328,7 +342,6 @@ function renderTextResponse(question) {
   const wrapper = document.createElement("div");
   wrapper.className = "response-card math-response-card";
 
-  // ── MathQuill field wrapper ──
   const fieldRow = document.createElement("div");
   fieldRow.className = "math-input-row";
 
@@ -350,13 +363,11 @@ function renderTextResponse(question) {
   if (!submitted) fieldRow.appendChild(keypadToggle);
   wrapper.appendChild(fieldRow);
 
-  // ── Keypad ──
   const keypadWrap = document.createElement("div");
   keypadWrap.className = "keypad-wrap";
   keypadWrap.style.display = keypadsVisible[qIndex] ? "block" : "none";
   wrapper.appendChild(keypadWrap);
 
-  // ── Feedback ──
   if (submitted) {
     const feedback = document.createElement("div");
     feedback.className = isCorrect(current) ? "response-feedback review-good" : "response-feedback review-bad";
@@ -366,7 +377,6 @@ function renderTextResponse(question) {
 
   choicesDiv.appendChild(wrapper);
 
-  // ── Init MathQuill after DOM insertion ──
   if (window.MathQuill) {
     const MQ = window.MathQuill.getInterface(2);
     const config = {
@@ -375,7 +385,6 @@ function renderTextResponse(question) {
       restrictMismatchedBrackets: false,
       handlers: {
         edit: (field) => {
-          // Store the latex as the answer
           const latex = field.latex();
           answers[qIndex] = latex;
           saveState(); updateHeaderStats(); renderGrid();
@@ -385,16 +394,13 @@ function renderTextResponse(question) {
 
     let mf;
     if (submitted) {
-      // Read-only: use StaticMath
       mf = MQ.StaticMath(mqSpan);
       mf.latex(value);
     } else {
       mf = MQ.MathField(mqSpan, config);
-      // Restore saved value
       if (value) mf.latex(value);
       mqFields[qIndex] = mf;
 
-      // Build keypad now that we have the field
       const keypad = buildKeypad(mf);
       keypadWrap.appendChild(keypad);
 
@@ -407,11 +413,9 @@ function renderTextResponse(question) {
       });
 
       if (keypadsVisible[qIndex]) keypadToggle.classList.add("keypad-toggle-active");
-
       setTimeout(() => mf.focus(), 0);
     }
   } else {
-    // Fallback: plain input if MathQuill failed to load
     const input = document.createElement("input");
     input.className = "response-input";
     input.type = "text";
@@ -426,64 +430,180 @@ function renderTextResponse(question) {
   }
 }
 
+// ── GRAPH POINT ──────────────────────────────────────────
+
 function renderGraphQuestion(question) {
   choicesDiv.className = "graph-question-panel";
   const wrapper = document.createElement("div");
   wrapper.className = "graph-card";
+  const svg = buildGraphSVG(question, "graph_point");
+  wrapper.appendChild(svg);
+  choicesDiv.appendChild(wrapper);
+}
+
+// ── GRAPH LINE ───────────────────────────────────────────
+// Student sees the line drawn and must identify the correct labeled point (e.g. y-intercept)
+
+function renderGraphLine(question) {
+  choicesDiv.className = "graph-question-panel";
+  const wrapper = document.createElement("div");
+  wrapper.className = "graph-card";
+
+  const typeLabel = document.createElement("div");
+  typeLabel.className = "graph-type-label";
+  typeLabel.textContent = "Graph Question — Select the correct labeled point";
+  wrapper.appendChild(typeLabel);
+
+  const svg = buildGraphSVG(question, "graph_line");
+  wrapper.appendChild(svg);
+  choicesDiv.appendChild(wrapper);
+}
+
+function buildGraphSVG(question, mode) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("viewBox", "0 0 360 260");
+  svg.setAttribute("viewBox", "0 0 400 300");
   svg.setAttribute("class", "graph-plane");
 
   const { xMin, xMax, yMin, yMax, points } = question.graph;
-  const width = 360, height = 260, padding = 28;
-  const toSvgX = (x) => padding + ((x - xMin) / (xMax - xMin)) * (width - padding * 2);
-  const toSvgY = (y) => height - padding - ((y - yMin) / (yMax - yMin)) * (height - padding * 2);
+  const W = 400, H = 300, PAD = 36;
+  const toSvgX = x => PAD + ((x - xMin) / (xMax - xMin)) * (W - PAD * 2);
+  const toSvgY = y => H - PAD - ((y - yMin) / (yMax - yMin)) * (H - PAD * 2);
 
+  // Grid lines
   for (let x = xMin; x <= xMax; x++) {
     const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
     line.setAttribute("x1", toSvgX(x)); line.setAttribute("x2", toSvgX(x));
-    line.setAttribute("y1", padding); line.setAttribute("y2", height - padding);
+    line.setAttribute("y1", PAD); line.setAttribute("y2", H - PAD);
     line.setAttribute("class", x === 0 ? "axis-line" : "grid-line");
     svg.appendChild(line);
+    // x-axis tick labels
+    if (x !== 0) {
+      const lbl = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      lbl.setAttribute("x", toSvgX(x));
+      lbl.setAttribute("y", toSvgY(0) + 14);
+      lbl.setAttribute("class", "axis-label");
+      lbl.setAttribute("text-anchor", "middle");
+      lbl.textContent = x;
+      svg.appendChild(lbl);
+    }
   }
   for (let y = yMin; y <= yMax; y++) {
     const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    line.setAttribute("x1", padding); line.setAttribute("x2", width - padding);
+    line.setAttribute("x1", PAD); line.setAttribute("x2", W - PAD);
     line.setAttribute("y1", toSvgY(y)); line.setAttribute("y2", toSvgY(y));
     line.setAttribute("class", y === 0 ? "axis-line" : "grid-line");
     svg.appendChild(line);
+    // y-axis tick labels
+    if (y !== 0) {
+      const lbl = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      lbl.setAttribute("x", toSvgX(0) - 10);
+      lbl.setAttribute("y", toSvgY(y) + 4);
+      lbl.setAttribute("class", "axis-label");
+      lbl.setAttribute("text-anchor", "end");
+      lbl.textContent = y;
+      svg.appendChild(lbl);
+    }
   }
 
+  // Axis arrow heads
+  const arrowHead = (x1, y1, x2, y2) => {
+    const arr = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    arr.setAttribute("x1", x1); arr.setAttribute("y1", y1);
+    arr.setAttribute("x2", x2); arr.setAttribute("y2", y2);
+    arr.setAttribute("stroke", "#9ca3af"); arr.setAttribute("stroke-width", "1.5");
+    svg.appendChild(arr);
+  };
+
+  // For graph_line mode: draw the reference line
+  if (mode === "graph_line" && question.graph.line) {
+    const { slope, intercept } = question.graph.line;
+    // Clamp to graph bounds
+    const xL = xMin, xR = xMax;
+    const yL = slope * xL + intercept;
+    const yR = slope * xR + intercept;
+
+    const linePath = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    linePath.setAttribute("x1", toSvgX(xL));
+    linePath.setAttribute("y1", toSvgY(yL));
+    linePath.setAttribute("x2", toSvgX(xR));
+    linePath.setAttribute("y2", toSvgY(yR));
+    linePath.setAttribute("class", "graph-drawn-line");
+    svg.appendChild(linePath);
+  }
+
+  // Points
   points.forEach((point) => {
     const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
     group.setAttribute("class", "graph-point-group");
     const isSelected = answers[current] === point.id;
     const isCorrectPoint = submitted && point.id === question.correct;
     const isIncorrectPoint = submitted && isSelected && point.id !== question.correct;
+
     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    circle.setAttribute("cx", toSvgX(point.x)); circle.setAttribute("cy", toSvgY(point.y)); circle.setAttribute("r", 9);
+    circle.setAttribute("cx", toSvgX(point.x));
+    circle.setAttribute("cy", toSvgY(point.y));
+    circle.setAttribute("r", 9);
     circle.setAttribute("class", `graph-point${isSelected ? " selected" : ""}${isCorrectPoint ? " correct" : ""}${isIncorrectPoint ? " incorrect" : ""}`);
+
+    // Label — position smartly to avoid overlap
+    const lx = toSvgX(point.x);
+    const ly = toSvgY(point.y);
+    const labelOffsetX = lx > W - 60 ? -20 : 14;
+    const labelOffsetY = ly < PAD + 20 ? 18 : -12;
+
     const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    text.setAttribute("x", toSvgX(point.x) + 12); text.setAttribute("y", toSvgY(point.y) - 10);
+    text.setAttribute("x", lx + labelOffsetX);
+    text.setAttribute("y", ly + labelOffsetY);
     text.setAttribute("class", "graph-point-label");
     text.textContent = `${point.label} (${point.x}, ${point.y})`;
-    group.appendChild(circle); group.appendChild(text);
+
+    group.appendChild(circle);
+    group.appendChild(text);
+
     if (!submitted) {
       group.style.cursor = "pointer";
-      group.addEventListener("click", () => { answers[current] = point.id; saveState(); renderQuestion(); });
+      group.addEventListener("click", () => {
+        answers[current] = point.id;
+        saveState(); renderQuestion();
+      });
     }
     svg.appendChild(group);
   });
 
-  wrapper.appendChild(svg);
-  choicesDiv.appendChild(wrapper);
+  return svg;
 }
+
+// ── QUESTION DISPATCHER ───────────────────────────────────
 
 function renderQuestionInput(question) {
   choicesDiv.innerHTML = "";
-  if (question.type === "multiple_choice" || question.type === "select_multiple") { renderMultipleChoice(question); return; }
-  if (question.type === "numeric" || question.type === "short_response") { renderTextResponse(question); return; }
-  if (question.type === "graph_point") { renderGraphQuestion(question); }
+
+  // Render info_box if present (before choices)
+  if (question.info_box && question.info_box.length > 0) {
+    const box = renderInfoBox(question.info_box);
+    choicesDiv.classList.add("has-info-box");
+    choicesDiv.appendChild(box);
+  }
+
+  if (question.type === "multiple_choice" || question.type === "select_multiple") {
+    const choicesContainer = document.createElement("div");
+    choicesContainer.className = "choices";
+    question.choices.forEach((choice, index) => choicesContainer.appendChild(renderChoiceButton(question, choice, index)));
+    choicesDiv.appendChild(choicesContainer);
+    return;
+  }
+  if (question.type === "numeric" || question.type === "short_response") {
+    renderTextResponse(question);
+    return;
+  }
+  if (question.type === "graph_point") {
+    renderGraphQuestion(question);
+    return;
+  }
+  if (question.type === "graph_line") {
+    renderGraphLine(question);
+    return;
+  }
 }
 
 function typeset(...els) {
@@ -498,6 +618,7 @@ function renderQuestion() {
   const question = questions[current];
   questionNumberBadge.textContent = current + 1;
   questionText.innerHTML = getQuestionPromptMarkup(current);
+  choicesDiv.className = "";
   renderQuestionInput(question);
   typeset(questionText, choicesDiv);
   markToggle.classList.toggle("active", markedQuestions.has(current));
@@ -558,18 +679,12 @@ function togglePause() {
   paused = !paused;
   const pauseOverlay = document.getElementById("pauseOverlay");
   if (paused) {
-    // Stop the timer
     if (timerId) { clearInterval(timerId); timerId = null; }
-    // Show overlay
     pauseOverlay.style.display = "flex";
-    // Update button label
     pauseButton.innerHTML = `<svg class="inline-icon pause-icon"><use href="#icon-chevron-right"></use></svg>Resume`;
   } else {
-    // Hide overlay
     pauseOverlay.style.display = "none";
-    // Restart timer
     startTimer();
-    // Update button label
     pauseButton.innerHTML = `<svg class="inline-icon pause-icon"><use href="#icon-pause"></use></svg>Pause`;
   }
 }
@@ -581,7 +696,6 @@ function openModal(id) {
   const windowEl = modal.querySelector(".draggable-window");
   if (windowEl) { windowEl.style.left = ""; windowEl.style.top = ""; windowEl.style.transform = ""; }
   modal.style.display = "flex";
-  // Typeset math in modals
   typeset(modal);
 }
 
@@ -644,7 +758,7 @@ function isCorrect(index) {
     const normalizedAnswer = normalizeText(answer);
     return question.acceptedAnswers.some((accepted) => normalizeText(accepted) === normalizedAnswer);
   }
-  if (question.type === "graph_point") return answer === question.correct;
+  if (question.type === "graph_point" || question.type === "graph_line") return answer === question.correct;
   return false;
 }
 
@@ -654,7 +768,7 @@ function describeAnswer(index) {
   if (!hasAnswer(index)) return "Unanswered";
   if (question.type === "multiple_choice") return `${String.fromCharCode(65 + answer)}. ${question.choices[answer]}`;
   if (question.type === "select_multiple") return answer.map((i) => `${String.fromCharCode(65 + i)}. ${question.choices[i]}`).join(", ");
-  if (question.type === "graph_point") return `Point ${answer}`;
+  if (question.type === "graph_point" || question.type === "graph_line") return `Point ${answer}`;
   return String(answer);
 }
 
@@ -662,7 +776,7 @@ function describeCorrectAnswer(index) {
   const question = questions[index];
   if (question.type === "multiple_choice") return `${String.fromCharCode(65 + question.correct)}. ${question.choices[question.correct]}`;
   if (question.type === "select_multiple") return question.correct.map((i) => `${String.fromCharCode(65 + i)}. ${question.choices[i]}`).join(", ");
-  if (question.type === "graph_point") return `Point ${question.correct}`;
+  if (question.type === "graph_point" || question.type === "graph_line") return `Point ${question.correct}`;
   return question.acceptedAnswers.join(" or ");
 }
 
@@ -733,7 +847,6 @@ function restartTest() {
   localStorage.removeItem(STORAGE_KEY);
   resetCalculator();
   resetGraphingCalculator();
-  // Reset pause button label
   pauseButton.innerHTML = `<svg class="inline-icon pause-icon"><use href="#icon-pause"></use></svg>Pause`;
   document.getElementById("pauseOverlay").style.display = "none";
   startTimer();
@@ -832,11 +945,9 @@ async function init() {
   setupDraggableWindows();
   if (current > questions.length - 1) current = 0;
   startTimer();
-  // Wait for MathJax to finish loading before first render so math displays correctly
   if (window.MathJax && window.MathJax.startup && window.MathJax.startup.promise) {
     await window.MathJax.startup.promise;
   } else {
-    // MathJax not yet defined — wait for it
     await new Promise(resolve => {
       const check = setInterval(() => {
         if (window.MathJax && window.MathJax.typesetPromise) {
@@ -844,7 +955,6 @@ async function init() {
           resolve();
         }
       }, 50);
-      // Give up after 4 seconds and render anyway
       setTimeout(() => { clearInterval(check); resolve(); }, 4000);
     });
   }
