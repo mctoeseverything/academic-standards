@@ -145,19 +145,10 @@ function updateNavigationState() {
   highlightModeButton.classList.toggle("mode-active", highlightMode);
 }
 
-// ── QUESTION GRID (with section dividers) ─────────────────
+// ── QUESTION GRID ─────────────────────────────────────────
 function renderGrid() {
   questionGrid.innerHTML = "";
-  let lastSection = null;
-
   questions.forEach((q, i) => {
-    if (q.section !== lastSection) {
-      lastSection = q.section;
-      const header = document.createElement("div");
-      header.className = "section-nav-header";
-      header.textContent = `§${q.section} · ${q.sectionTitle}`;
-      questionGrid.appendChild(header);
-    }
     const btn = document.createElement("button");
     const state = i === current ? "current" : markedQuestions.has(i) ? "marked" : hasAnswer(i) ? "answered" : "";
     btn.className = `q-box${state ? " " + state : ""}`;
@@ -429,85 +420,146 @@ function renderOrdering(q) {
 // ── MATCHING ──────────────────────────────────────────────
 function renderMatching(q) {
   const qi = current;
+
+  // Init state: leftIdx -> rightIdx | null
   if (!matchState[qi]) {
     matchState[qi] = {};
-    q.pairs.forEach((_,i) => { matchState[qi][i] = null; });
+    q.pairs.forEach((_, i) => { matchState[qi][i] = null; });
   }
-  const card = document.createElement("div"); card.className = "matching-card";
-  const hint = document.createElement("p"); hint.className = "ordering-hint";
-  hint.textContent = submitted ? "" : "Select a left item then the right item it matches.";
-  card.appendChild(hint);
 
-  // Shuffle right-side display order (fixed per question via seeded index)
-  const rightOrder = q.pairs.map((_,i)=>i).sort((a,b)=> ((a*7+qi*3)%q.pairs.length) - ((b*7+qi*3)%q.pairs.length));
+  // Fixed shuffle of right column display order (deterministic per question index)
+  const n = q.pairs.length;
+  const rightDisplayOrder = q.pairs.map((_, i) => i).sort((a, b) => {
+    const ha = (a * 7 + qi * 13 + 3) % n;
+    const hb = (b * 7 + qi * 13 + 3) % n;
+    return ha - hb;
+  });
+  // Ensure shuffle is actually different from identity when n > 1
+  if (n > 1 && rightDisplayOrder.every((v, i) => v === i)) rightDisplayOrder.reverse();
 
   let selectedLeft = null;
 
-  const grid = document.createElement("div"); grid.className = "matching-grid";
+  const card = document.createElement("div");
+  card.className = "matching-card";
+
+  const hint = document.createElement("p");
+  hint.className = "matching-hint";
+  hint.textContent = submitted ? "" : "Click a left item to select it, then click the right item it matches.";
+  card.appendChild(hint);
+
+  // Two-column table: left items | right items, rendered as independent lists
+  // Each row: [left cell] [right cell at same visual row position]
+  // Layout: CSS grid with exactly 2 columns, left items fill rows 1..n, right items fill rows 1..n independently
+  const wrap = document.createElement("div");
+  wrap.className = "matching-wrap";
+
+  const leftCol  = document.createElement("div"); leftCol.className  = "matching-col matching-col-left";
+  const rightCol = document.createElement("div"); rightCol.className = "matching-col matching-col-right";
+
+  // Build reverse map: rightIdx -> leftIdx
+  const rightToLeft = {};
+  Object.entries(matchState[qi]).forEach(([li, ri]) => {
+    if (ri !== null) rightToLeft[ri] = Number(li);
+  });
 
   const rebuild = () => {
-    grid.innerHTML = "";
-    // Build reverse map: rightIdx -> leftIdx that selected it
-    const rightToLeft = {};
-    Object.entries(matchState[qi]).forEach(([li,ri]) => { if (ri!==null) rightToLeft[ri]=Number(li); });
+    leftCol.innerHTML  = "";
+    rightCol.innerHTML = "";
 
+    // Recompute reverse map each rebuild
+    const r2l = {};
+    Object.entries(matchState[qi]).forEach(([li, ri]) => { if (ri !== null) r2l[ri] = Number(li); });
+
+    // Left column
     q.pairs.forEach((pair, li) => {
-      const lBtn = document.createElement("button"); lBtn.type="button";
-      lBtn.className = "match-btn match-left";
-      lBtn.innerHTML = pair.left;
-      const matched = matchState[qi][li] !== null;
-      if (matched) lBtn.classList.add("match-selected");
-      if (selectedLeft === li) lBtn.classList.add("match-active");
-      if (submitted) {
-        const isCorr = matchState[qi][li] === q.correct[li];
-        lBtn.classList.add(isCorr ? "match-correct" : "match-incorrect");
-        lBtn.disabled = true;
-      } else {
-        lBtn.onclick = () => { selectedLeft = selectedLeft===li ? null : li; rebuild(); };
-      }
-      grid.appendChild(lBtn);
+      const cell = document.createElement("div");
+      cell.className = "match-cell";
 
-      // Placeholder right cell (filled below by right column)
-      const placeholder = document.createElement("div"); placeholder.className="match-connector";
-      const arrow = matched ? "→" : "·";
-      placeholder.textContent = arrow;
-      grid.appendChild(placeholder);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "match-btn match-left";
+      // Use textContent-safe span so MathJax can render, not raw innerHTML on the button itself
+      const inner = document.createElement("span");
+      inner.className = "match-btn-inner";
+      inner.innerHTML = pair.left;
+      btn.appendChild(inner);
+
+      const ri = matchState[qi][li];
+      if (ri !== null) btn.classList.add("match-selected");
+      if (selectedLeft === li) btn.classList.add("match-active");
+
+      if (submitted) {
+        btn.disabled = true;
+        btn.classList.add(ri === q.correct[li] ? "match-correct" : "match-incorrect");
+        // Show what it was matched to
+        if (ri !== null) {
+          const tag = document.createElement("span");
+          tag.className = "match-paired-label";
+          tag.innerHTML = " → " + q.pairs[ri].right;
+          btn.appendChild(tag);
+        }
+      } else {
+        btn.onclick = () => {
+          selectedLeft = (selectedLeft === li) ? null : li;
+          rebuild();
+          typeset(leftCol, rightCol);
+        };
+      }
+
+      cell.appendChild(btn);
+      leftCol.appendChild(cell);
     });
 
-    // Right column
-    rightOrder.forEach(ri => {
-      const rBtn = document.createElement("button"); rBtn.type="button";
-      rBtn.className = "match-btn match-right";
-      rBtn.innerHTML = q.pairs[ri].right;
-      const assignedTo = rightToLeft[ri];
-      if (assignedTo !== undefined) rBtn.classList.add("match-selected");
+    // Right column — displayed in shuffled order
+    rightDisplayOrder.forEach(ri => {
+      const cell = document.createElement("div");
+      cell.className = "match-cell";
+
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "match-btn match-right";
+      const inner = document.createElement("span");
+      inner.className = "match-btn-inner";
+      inner.innerHTML = q.pairs[ri].right;
+      btn.appendChild(inner);
+
+      const assignedLi = r2l[ri];
+      if (assignedLi !== undefined) btn.classList.add("match-selected");
+
       if (submitted) {
-        // Correct if the left item that selected this right item matches the correct pairing
-        const correctLi = q.correct.indexOf(ri); // pairs[correctLi].correct === ri
-        const isCorr = assignedTo === correctLi;
-        rBtn.classList.add(isCorr ? "match-correct" : "match-incorrect");
-        rBtn.disabled = true;
+        btn.disabled = true;
+        // Correct if whatever left item claimed this right is the correct left for it
+        const correctLi = q.correct.findIndex((correctRi, li) => correctRi === ri);
+        const isCorr = assignedLi === correctLi;
+        btn.classList.add(isCorr ? "match-correct" : "match-incorrect");
       } else {
-        rBtn.onclick = () => {
+        btn.onclick = () => {
           if (selectedLeft === null) return;
-          // Deselect if same right was already assigned to selectedLeft
           if (matchState[qi][selectedLeft] === ri) {
+            // Toggle off
             matchState[qi][selectedLeft] = null;
           } else {
-            // Un-assign from whoever had this right before
-            Object.keys(matchState[qi]).forEach(k => { if (matchState[qi][k]===ri) matchState[qi][k]=null; });
+            // Un-assign ri from whoever had it
+            Object.keys(matchState[qi]).forEach(k => {
+              if (matchState[qi][k] === ri) matchState[qi][k] = null;
+            });
             matchState[qi][selectedLeft] = ri;
           }
           selectedLeft = null;
-          saveState(); updateHeaderStats(); renderGrid(); rebuild(); typeset(grid);
+          saveState(); updateHeaderStats(); renderGrid();
+          rebuild();
+          typeset(leftCol, rightCol);
         };
       }
-      grid.appendChild(rBtn);
+
+      cell.appendChild(btn);
+      rightCol.appendChild(cell);
     });
   };
 
   rebuild();
-  card.appendChild(grid);
+  wrap.append(leftCol, rightCol);
+  card.appendChild(wrap);
   choicesDiv.appendChild(card);
 }
 
