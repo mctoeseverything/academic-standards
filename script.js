@@ -668,9 +668,6 @@ function renderQuestion() {
   questionText.innerHTML = getQuestionPromptMarkup(current);
 
   const metaLeft = document.querySelector(".question-meta-left");
-  const existingBadge = metaLeft.querySelector(".question-type-badge");
-  if (existingBadge) existingBadge.remove();
-  metaLeft.appendChild(typeBadge(q.type));
 
   const eyebrow = document.getElementById("sectionEyebrow");
   if (eyebrow && q.sectionTitle) eyebrow.textContent = `§${q.section} · ${q.sectionTitle}`;
