@@ -6,185 +6,48 @@
   <title>Academic Standards Board – Algebra I Assessment</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./style.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.css"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.js"></script>
   <script>
     window.MathJax = {
-      tex: {
-        inlineMath: [['$', '$'], ['\\(', '\\)']],
-        displayMath: [['$$', '$$'], ['\\[', '\\]']],
-        processEscapes: true
-      },
-      options: {
-        skipHtmlTags: ['script','noscript','style','textarea','pre']
-      },
-      startup: {
-        ready() { MathJax.startup.defaultReady(); },
-        typeset: false
-      }
+      tex: { inlineMath:[['$','$'],['\\(','\\)']], displayMath:[['$$','$$'],['\\[','\\]']], processEscapes:true },
+      options: { skipHtmlTags:['script','noscript','style','textarea','pre'] },
+      startup: { ready(){ MathJax.startup.defaultReady(); }, typeset:false }
     };
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
   <script src="https://www.desmos.com/api/v1.3/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
-
-  <style>
-    /* ── INFO BOX ───────────────────────────────────────────── */
-    .info-box {
-      margin: 0 0 22px;
-      max-width: 740px;
-      border: 1.5px solid var(--border-strong);
-      border-left: 4px solid var(--accent);
-      border-radius: var(--radius);
-      background: var(--accent-light);
-      overflow: hidden;
-    }
-
-    .info-box-inner {
-      padding: 14px 18px;
-      display: grid;
-      gap: 5px;
-    }
-
-    .info-box-line {
-      font-family: 'Source Serif 4', Georgia, serif;
-      font-size: 0.97rem;
-      color: var(--text);
-      line-height: 1.65;
-    }
-
-    /* ── GRAPH LINE QUESTION ──────────────────────────────── */
-    .graph-line-panel {
-      max-width: 740px;
-    }
-
-    .graph-line-card {
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      background: var(--surface);
-      overflow: hidden;
-    }
-
-    .graph-line-controls {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 16px;
-      background: var(--surface-soft);
-      border-bottom: 1px solid var(--border);
-      flex-wrap: wrap;
-    }
-
-    .graph-line-hint {
-      font-size: 0.82rem;
-      color: var(--muted);
-      font-family: 'DM Sans', sans-serif;
-      flex: 1;
-    }
-
-    .graph-line-status {
-      font-size: 0.82rem;
-      font-weight: 600;
-      font-family: 'DM Sans', sans-serif;
-      color: var(--accent);
-      min-width: 120px;
-      text-align: right;
-    }
-
-    .graph-clear-btn {
-      display: inline-flex;
-      align-items: center;
-      min-height: 28px;
-      padding: 0 12px;
-      border-radius: var(--radius-sm);
-      font-size: 0.78rem;
-      font-weight: 600;
-      border: 1.5px solid var(--border-strong) !important;
-      background: var(--surface);
-      color: var(--text-soft);
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-    }
-    .graph-clear-btn:hover { background: #fef2f2; border-color: #fca5a5 !important; color: #b91c1c; }
-
-    .graph-line-svg-wrap {
-      position: relative;
-      width: 100%;
-      line-height: 0;
-    }
-
-    .graph-line-svg {
-      display: block;
-      width: 100%;
-      height: auto;
-      cursor: crosshair;
-      user-select: none;
-    }
-
-    .graph-line-svg.submitted { cursor: default; }
-
-    /* SVG internals */
-    .gl-grid { stroke: #e8eaf0; stroke-width: 1; }
-    .gl-grid-major { stroke: #d0d4de; stroke-width: 1; }
-    .gl-axis { stroke: #8892a4; stroke-width: 2; }
-    .gl-axis-label { fill: #6b7280; font-family: 'DM Sans', sans-serif; font-size: 11px; }
-    .gl-tick-label { fill: #6b7280; font-family: 'DM Sans', sans-serif; font-size: 10px; }
-
-    .gl-student-line { stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; opacity: 0.85; }
-    .gl-correct-line { stroke: var(--correct-border); stroke-width: 2.5; stroke-dasharray: 6 4; opacity: 0.8; }
-
-    .gl-dot {
-      fill: #fff;
-      stroke: var(--accent);
-      stroke-width: 2;
-      cursor: crosshair;
-      transition: r 0.1s;
-    }
-    .gl-dot:hover { r: 7; }
-    .gl-dot.placed { fill: var(--accent); }
-    .gl-dot.correct-placed { fill: var(--correct-border); stroke: var(--correct-border); }
-    .gl-dot.incorrect-placed { fill: var(--incorrect-border); stroke: var(--incorrect-border); }
-
-    .gl-correct-dot { fill: var(--correct-border); stroke: var(--correct-border); opacity: 0.7; }
-
-    .graph-line-feedback {
-      padding: 10px 16px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      border-top: 1px solid var(--border);
-      font-family: 'DM Sans', sans-serif;
-    }
-    .graph-line-feedback.correct { color: #2d6a2d; background: var(--correct-bg); }
-    .graph-line-feedback.incorrect { color: #8b3333; background: var(--incorrect-bg); }
-  </style>
 </head>
 <body>
+
+  <!-- ── SVG icon sprite ─────────────────────────────────── -->
   <svg class="icon-sprite" aria-hidden="true" focusable="false">
-    <symbol id="icon-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"></path></symbol>
-    <symbol id="icon-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"></path></symbol>
-    <symbol id="icon-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></symbol>
-    <symbol id="icon-clock-3" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></symbol>
-    <symbol id="icon-bookmark" viewBox="0 0 24 24"><path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></symbol>
-    <symbol id="icon-pause" viewBox="0 0 24 24"><path d="M9 5h2v14H9z"></path><path d="M13 5h2v14h-2z"></path></symbol>
-    <symbol id="icon-calculator" viewBox="0 0 24 24"><rect x="5" y="2.5" width="14" height="19" rx="2"></rect><path d="M8 6.5h8"></path><path d="M8 11h2"></path><path d="M14 11h2"></path><path d="M8 15h2"></path><path d="M14 15h2"></path><path d="M8 19h2"></path><path d="M14 19h2"></path></symbol>
-    <symbol id="icon-file-text" viewBox="0 0 24 24"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path><path d="M14 2v5h5"></path><path d="M9 13h6"></path><path d="M9 17h6"></path><path d="M9 9h1"></path></symbol>
-    <symbol id="icon-function-square" viewBox="0 0 24 24"><path d="M20 20h-3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3"></path><path d="M4 20h3a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H4"></path><path d="m9 12 3-3 3 3"></path><path d="m15 15-3-3-3 3"></path></symbol>
-    <symbol id="icon-chart-no-axes" viewBox="0 0 24 24"><path d="M5 5v14h14"></path><path d="m8 15 3-3 2 2 4-6"></path></symbol>
-    <symbol id="icon-square-pen" viewBox="0 0 24 24"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M16 3h5v5"></path><path d="m21 3-9 9"></path></symbol>
+    <symbol id="icon-chevron-left"  viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+    <symbol id="icon-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="icon-chevron-up"    viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"/></symbol>
+    <symbol id="icon-chevron-down"  viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="icon-clock-3"       viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></symbol>
+    <symbol id="icon-bookmark"      viewBox="0 0 24 24"><path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="icon-pause"         viewBox="0 0 24 24"><path d="M9 5h2v14H9z"/><path d="M13 5h2v14h-2z"/></symbol>
   </svg>
 
-  <div id="pauseOverlay" style="display:none; position:fixed; inset:0; z-index:200; background:rgba(8,16,36,0.9); align-items:center; justify-content:center; flex-direction:column; gap:14px;">
+  <!-- ── Pause overlay ───────────────────────────────────── -->
+  <div id="pauseOverlay" style="display:none;">
     <div class="pause-title">Exam Paused</div>
     <div class="pause-sub">Your progress is saved. Click Resume to continue.</div>
     <button onclick="togglePause()" class="pause-resume-btn">Resume Test</button>
   </div>
 
+  <!-- ══════════════════════════════════════════════════════
+       HEADER
+       ══════════════════════════════════════════════════════ -->
   <header class="site-header">
     <div class="brand-block">
       <div class="brand-seal">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11">
           <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
         </svg>
       </div>
@@ -193,56 +56,61 @@
         <div class="brand-sub">Algebra I &middot; Form A</div>
       </div>
     </div>
+
     <div class="timer-block">
-      <svg class="clock-icon"><use href="#icon-clock-3"></use></svg>
+      <svg class="clock-icon"><use href="#icon-clock-3"/></svg>
       <div class="timer-value" id="time">01:30:00</div>
     </div>
+
     <div class="header-right">
-      <button class="pause-button" type="button">
-        <svg class="inline-icon pause-icon"><use href="#icon-pause"></use></svg>Pause
+      <button class="pause-button" type="button" onclick="togglePause()">
+        <svg class="pause-icon"><use href="#icon-pause"/></svg>Pause
       </button>
     </div>
   </header>
 
+  <!-- ══════════════════════════════════════════════════════
+       PAGE SHELL
+       ══════════════════════════════════════════════════════ -->
   <main class="page-shell">
     <section class="exam-shell">
 
-      <aside class="panel questions-panel" id="leftSidebar">
-        <div class="panel-head">
-          <h2>Questions</h2>
-          <button class="collapse-button" type="button" onclick="toggleSidebar('left')" aria-label="Collapse">
-            <svg class="inline-icon tiny-icon"><use href="#icon-chevron-left"></use></svg>
-          </button>
-        </div>
-        <div class="question-grid" id="questionGrid"></div>
-        <div class="legend">
-          <div class="legend-item"><span class="legend-swatch current"></span>Current</div>
-          <div class="legend-item"><span class="legend-swatch unanswered"></span>Not Answered</div>
-          <div class="legend-item"><span class="legend-swatch answered"></span>Answered</div>
-          <div class="legend-item"><span class="legend-swatch marked"></span>Marked for Review</div>
-        </div>
-      </aside>
+      <!-- No sidebars — they are hidden via CSS and replaced by
+           the bottom popup navigator + sub-header tools bar -->
 
       <section class="panel center-panel">
+
+        <!-- Sub-header: section label · stats · tools · submit -->
         <div class="exam-header">
           <div class="exam-header-left">
-            <p class="eyebrow">Algebra I &ndash; High-Rigor Assessment</p>
+            <p class="eyebrow" id="sectionEyebrow">Algebra I – High-Rigor Assessment</p>
             <div class="exam-header-stats">
-              <span class="status-chip">Items Answered: <strong id="answeredCount">0</strong>&nbsp;of&nbsp;<span id="totalQuestions">0</span></span>
-              <span class="status-chip">Marked for Review: <strong id="markedCount">0</strong></span>
+              <span class="status-chip">Answered: <strong id="answeredCount">0</strong>&thinsp;/&thinsp;<span id="totalQuestions">0</span></span>
+              <span class="status-chip">Marked: <strong id="markedCount">0</strong></span>
             </div>
           </div>
-          <button class="secondary-button" id="submitButton" type="button">Submit Test</button>
+
+          <!-- Tools — inline pill buttons -->
+          <div class="tools-bar">
+            <button class="tool-link" id="calculatorButton"  type="button">Calculator</button>
+            <button class="tool-link" type="button" onclick="openModal('referenceModal')">Reference</button>
+            <button class="tool-link" type="button" onclick="openModal('formulaModal')">Formulas</button>
+            <button class="tool-link" id="graphingButton"   type="button">Graphing</button>
+            <button class="tool-link" id="notesButton"      type="button">Notes</button>
+            <button class="secondary-button" id="submitButton" type="button" style="margin-left:6px;">Submit</button>
+          </div>
         </div>
 
+        <!-- ── Question body ──────────────────────────────── -->
         <div class="question-body">
           <div class="question-meta">
             <div class="question-meta-left">
               <div class="question-pill" id="questionNumberBadge">1</div>
               <button class="mark-toggle" id="markToggle" type="button">
-                <svg class="inline-icon"><use href="#icon-bookmark"></use></svg>
+                <svg class="inline-icon"><use href="#icon-bookmark"/></svg>
                 <span>Mark for Review</span>
               </button>
+              <!-- type badge injected here by JS -->
             </div>
             <div class="question-tools">
               <button class="utility-button" id="eliminateModeButton" type="button">Strikethrough</button>
@@ -255,38 +123,54 @@
           <div id="choices" class="choices"></div>
         </div>
 
+        <!-- ── Action bar ─────────────────────────────────── -->
         <div class="action-bar">
+          <!-- Previous -->
           <button class="secondary-button nav-button" id="prevButton" type="button" onclick="prevQuestion()">
-            <svg class="inline-icon tiny-icon"><use href="#icon-chevron-left"></use></svg>Previous
+            <svg class="tiny-icon"><use href="#icon-chevron-left"/></svg>Previous
           </button>
+
+          <!-- Bottom-center: question navigator trigger -->
           <div class="action-group">
-            <button class="primary-button nav-button" id="nextButton" type="button" onclick="nextQuestion()">
-              Next<svg class="inline-icon tiny-icon"><use href="#icon-chevron-right"></use></svg>
+            <button class="qnav-trigger" id="qnavTrigger" type="button">
+              <span id="qnavLabel">Question 1 of 0</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="10" height="10"><path d="m18 15-6-6-6 6"/></svg>
             </button>
           </div>
-        </div>
-      </section>
 
-      <aside class="panel tools-panel" id="rightSidebar">
-        <div class="panel-head">
-          <h2>Tools</h2>
-          <button class="collapse-button" type="button" onclick="toggleSidebar('right')" aria-label="Collapse">
-            <svg class="inline-icon tiny-icon"><use href="#icon-chevron-right"></use></svg>
+          <!-- Next -->
+          <button class="primary-button nav-button" id="nextButton" type="button" onclick="nextQuestion()">
+            Next<svg class="tiny-icon"><use href="#icon-chevron-right"/></svg>
           </button>
         </div>
-        <div class="tools-list">
-          <button class="tool-link" id="calculatorButton" type="button">Calculator</button>
-          <button class="tool-link" type="button" onclick="openModal('referenceModal')">Reference Sheet</button>
-          <button class="tool-link" type="button" onclick="openModal('formulaModal')">Formula Sheet</button>
-          <button class="tool-link" id="graphingButton" type="button">Graphing Tool</button>
-          <button class="tool-link" id="notesButton" type="button">Notes</button>
-        </div>
-      </aside>
 
-    </section>
+      </section><!-- /center-panel -->
+
+    </section><!-- /exam-shell -->
   </main>
 
-  <!-- Reference Sheet Modal -->
+  <!-- ══════════════════════════════════════════════════════
+       QUESTION NAVIGATOR POPUP
+       ══════════════════════════════════════════════════════ -->
+  <div class="qnav-popup" id="qnavPopup">
+    <div class="qnav-header">
+      <span class="qnav-title">Jump to Question</span>
+      <button class="qnav-close" id="qnavClose" type="button">✕</button>
+    </div>
+    <div class="qnav-grid" id="questionGrid"></div>
+    <div class="qnav-legend">
+      <div class="legend-item"><span class="legend-swatch current"></span>Current</div>
+      <div class="legend-item"><span class="legend-swatch unanswered"></span>Not Answered</div>
+      <div class="legend-item"><span class="legend-swatch answered"></span>Answered</div>
+      <div class="legend-item"><span class="legend-swatch marked"></span>Marked for Review</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       MODALS (unchanged content, slimmer markup)
+       ══════════════════════════════════════════════════════ -->
+
+  <!-- Reference Sheet -->
   <div class="modal" id="referenceModal" aria-hidden="true">
     <div class="modal-content">
       <div class="modal-sheet modal-sheet-scroll">
@@ -294,9 +178,9 @@
         <div class="sheet-section">
           <h4>Properties of Operations</h4>
           <div class="formula-list">
-            <div class="formula-row"><span class="formula-label">Commutative Property</span><span class="formula-expression">\(a + b = b + a\)</span></div>
-            <div class="formula-row"><span class="formula-label">Associative Property</span><span class="formula-expression">\((a + b) + c = a + (b + c)\)</span></div>
-            <div class="formula-row"><span class="formula-label">Distributive Property</span><span class="formula-expression">\(a(b + c) = ab + ac\)</span></div>
+            <div class="formula-row"><span class="formula-label">Commutative</span><span class="formula-expression">\(a + b = b + a\)</span></div>
+            <div class="formula-row"><span class="formula-label">Associative</span><span class="formula-expression">\((a + b) + c = a + (b + c)\)</span></div>
+            <div class="formula-row"><span class="formula-label">Distributive</span><span class="formula-expression">\(a(b + c) = ab + ac\)</span></div>
           </div>
         </div>
         <div class="sheet-section">
@@ -321,16 +205,14 @@
     </div>
   </div>
 
-  <!-- Formula Sheet Modal -->
+  <!-- Formula Sheet -->
   <div class="modal formula-modal" id="formulaModal" aria-hidden="true">
     <div class="modal-content">
       <div class="modal-sheet modal-sheet-scroll">
         <div class="sheet-header"><h3>Formula Sheet</h3><p>Algebra I — Authorized Testing Support Materials</p></div>
         <div class="sheet-section">
           <h4>Quadratic Formula</h4>
-          <div class="featured-formula">
-            <span class="formula-expression">\[x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}\]</span>
-          </div>
+          <div class="featured-formula"><span class="formula-expression">\[x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}\]</span></div>
         </div>
         <div class="sheet-section">
           <h4>Vertex of a Parabola</h4>
@@ -350,8 +232,8 @@
           <h4>Systems of Equations</h4>
           <div class="formula-list">
             <div class="formula-row"><span class="formula-label">Unique Solution</span><span class="formula-expression">Lines intersect at one point</span></div>
-            <div class="formula-row"><span class="formula-label">No Solution</span><span class="formula-expression">Lines are parallel (same slope, different intercepts)</span></div>
-            <div class="formula-row"><span class="formula-label">Infinite Solutions</span><span class="formula-expression">Lines are identical (same slope and intercept)</span></div>
+            <div class="formula-row"><span class="formula-label">No Solution</span><span class="formula-expression">Lines are parallel</span></div>
+            <div class="formula-row"><span class="formula-label">Infinite Solutions</span><span class="formula-expression">Lines are identical</span></div>
           </div>
         </div>
       </div>
@@ -359,11 +241,11 @@
     </div>
   </div>
 
-  <!-- Calculator Modal -->
+  <!-- Calculator -->
   <div class="modal tool-modal" id="calculatorModal" aria-hidden="true">
     <div class="modal-content modal-content-wide draggable-window">
       <div class="tool-modal-header drag-handle">
-        <div><h3>Scientific Calculator</h3><p>Authorized testing tool — powered by Desmos.</p></div>
+        <div><h3>Scientific Calculator</h3><p>Powered by Desmos.</p></div>
         <button class="secondary-button" type="button" onclick="closeModal('calculatorModal')">Close</button>
       </div>
       <div class="tool-frame-wrap">
@@ -372,11 +254,11 @@
     </div>
   </div>
 
-  <!-- Graphing Modal -->
+  <!-- Graphing -->
   <div class="modal tool-modal" id="graphingModal" aria-hidden="true">
     <div class="modal-content modal-content-wide draggable-window">
       <div class="tool-modal-header drag-handle">
-        <div><h3>Graphing Tool</h3><p>Authorized testing tool — powered by Desmos.</p></div>
+        <div><h3>Graphing Tool</h3><p>Powered by Desmos.</p></div>
         <button class="secondary-button" type="button" onclick="closeModal('graphingModal')">Close</button>
       </div>
       <div class="tool-frame-wrap">
@@ -385,31 +267,31 @@
     </div>
   </div>
 
-  <!-- Notes Modal -->
+  <!-- Notes -->
   <div class="modal" id="notesModal" aria-hidden="true">
     <div class="modal-content notes-modal-content draggable-window">
       <div class="tool-modal-header drag-handle">
-        <div><h3>Notes</h3><p>Notes are saved locally in this browser session only.</p></div>
+        <div><h3>Notes</h3><p>Notes are saved locally and not submitted.</p></div>
         <button class="secondary-button" type="button" onclick="closeModal('notesModal')">Close</button>
       </div>
-      <textarea id="notesField" class="notes-field" placeholder="Use this space for scratch work. Notes are not submitted with your test."></textarea>
+      <textarea id="notesField" class="notes-field" placeholder="Scratch work — not submitted with your test."></textarea>
     </div>
   </div>
 
-  <!-- Submit Modal -->
+  <!-- Submit -->
   <div class="modal" id="submitModal" aria-hidden="true">
     <div class="modal-content">
       <h3>Submit Test?</h3>
-      <p id="submitSummary" style="font-size:0.86rem;color:var(--muted);margin-top:6px;"></p>
+      <p id="submitSummary" style="font-size:0.82rem;color:var(--muted);margin-top:6px;"></p>
       <div class="submit-summary-list" id="submitChecklist"></div>
       <div class="modal-actions">
         <button class="secondary-button" type="button" onclick="closeModal('submitModal')">Return to Test</button>
-        <button class="primary-button" type="button" id="confirmSubmitButton">Confirm Submission</button>
+        <button class="primary-button"   type="button" id="confirmSubmitButton">Confirm Submission</button>
       </div>
     </div>
   </div>
 
-  <!-- Results Modal -->
+  <!-- Results -->
   <div class="modal results-modal" id="resultsModal" aria-hidden="true">
     <div class="modal-content modal-content-wide">
       <div class="tool-modal-header">
@@ -433,10 +315,55 @@
     </div>
   </div>
 
+  <!-- Fallback question data -->
   <script id="questionsFallback" type="application/json">
 [{"type":"multiple_choice","prompt":"Which expression is equivalent to $3(2x - 5) + 4x$?","choices":["$10x - 15$","$10x - 5$","$6x - 15$","$6x - 5$"],"correct":0}]
   </script>
 
   <script src="./script.js"></script>
+
+  <!-- ── Nav popup wiring (small patch on top of script.js) ── -->
+  <script>
+    // Patch renderGrid to target the popup grid instead of a sidebar grid
+    // (script.js already targets #questionGrid — this just handles open/close)
+    const qnavTrigger = document.getElementById('qnavTrigger');
+    const qnavPopup   = document.getElementById('qnavPopup');
+    const qnavClose   = document.getElementById('qnavClose');
+    const qnavLabel   = document.getElementById('qnavLabel');
+
+    function updateQnavLabel() {
+      if (typeof questions !== 'undefined' && questions.length) {
+        qnavLabel.textContent = `Question ${current + 1} of ${questions.length}`;
+      }
+    }
+
+    qnavTrigger.addEventListener('click', () => {
+      qnavPopup.classList.toggle('open');
+    });
+    qnavClose.addEventListener('click', () => {
+      qnavPopup.classList.remove('open');
+    });
+    // Close when clicking outside
+    document.addEventListener('click', e => {
+      if (!qnavPopup.contains(e.target) && e.target !== qnavTrigger && !qnavTrigger.contains(e.target)) {
+        qnavPopup.classList.remove('open');
+      }
+    });
+
+    // Patch renderQuestion to also update the pill label and close popup
+    const _origRenderQ = typeof renderQuestion !== 'undefined' ? renderQuestion : null;
+    document.addEventListener('DOMContentLoaded', () => {
+      // Wait for script.js init, then monkey-patch
+      const origRQ = window.renderQuestion;
+      if (origRQ) {
+        window.renderQuestion = function() {
+          origRQ.call(this);
+          updateQnavLabel();
+          qnavPopup.classList.remove('open');
+        };
+      }
+    });
+  </script>
+
 </body>
 </html>

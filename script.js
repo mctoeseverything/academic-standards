@@ -8,9 +8,9 @@ let answers   = {};
 let markedQuestions    = new Set();
 let eliminatedChoices  = {};
 let stemMarkup         = {};
-let dragOrder          = {};   // ordering question state  { qIndex: [permuted indices] }
-let matchState         = {};   // matching question state  { qIndex: { leftIdx: rightIdx|null } }
-let hotspotState       = {};   // hotspot state            { qIndex: {x,y}|null }
+let dragOrder          = {};
+let matchState         = {};
+let hotspotState       = {};
 let time      = DEFAULT_TIME;
 let timerId   = null;
 let submitted = false;
@@ -34,9 +34,6 @@ const nextButton          = document.getElementById("nextButton");
 const submitButton        = document.getElementById("submitButton");
 const eliminateModeButton = document.getElementById("eliminateModeButton");
 const highlightModeButton = document.getElementById("highlightModeButton");
-const examShell           = document.querySelector(".exam-shell");
-const leftSidebar         = document.getElementById("leftSidebar");
-const rightSidebar        = document.getElementById("rightSidebar");
 const calculatorButton    = document.getElementById("calculatorButton");
 const graphingButton      = document.getElementById("graphingButton");
 const notesButton         = document.getElementById("notesButton");
@@ -55,6 +52,7 @@ const resultsMarked       = document.getElementById("resultsMarked");
 const resultsTime         = document.getElementById("resultsTime");
 const resultsReview       = document.getElementById("resultsReview");
 const pauseButton         = document.querySelector(".pause-button");
+const qnavLabel           = document.getElementById("qnavLabel");
 
 // ── UTILITIES ─────────────────────────────────────────────
 function escapeHtml(t) {
@@ -130,6 +128,7 @@ function updateHeaderStats() {
   answeredCount.textContent  = getAnsweredCount();
   totalQuestions.textContent = questions.length;
   markedCount.textContent    = markedQuestions.size;
+  if (qnavLabel) qnavLabel.textContent = `Question ${current + 1} of ${questions.length}`;
 }
 function updateNavigationState() {
   const supportsElim = ["multiple_choice","select_multiple"].includes(questions[current]?.type);
@@ -147,6 +146,7 @@ function updateNavigationState() {
 
 // ── QUESTION GRID ─────────────────────────────────────────
 function renderGrid() {
+  if (!questionGrid) return;
   questionGrid.innerHTML = "";
   questions.forEach((q, i) => {
     const btn = document.createElement("button");
@@ -156,7 +156,12 @@ function renderGrid() {
     btn.textContent = i + 1;
     btn.disabled = submitted;
     btn.title = `Q${i+1}: ${q.type.replace(/_/g," ")}`;
-    btn.onclick = () => { current = i; saveState(); renderQuestion(); };
+    btn.onclick = () => {
+      current = i;
+      saveState();
+      renderQuestion();
+      document.getElementById('qnavPopup')?.classList.remove('open');
+    };
     questionGrid.appendChild(btn);
   });
 }
@@ -221,14 +226,20 @@ function renderChoiceButton(q, choice, ci) {
       else if (answers[current] === ci) btn.classList.add("incorrect");
     }
   }
-  const radio = document.createElement("span"); radio.className = "choice-letter";
-  const wrap  = document.createElement("span"); wrap.className  = "choice-text-wrapper";
-  const alpha = document.createElement("span"); alpha.className = "choice-alpha";
-  alpha.textContent = String.fromCharCode(65+ci);
-  const text = document.createElement("span"); text.className = "choice-text";
+
+  // Letter circle (contains the alpha letter visually)
+  const circle = document.createElement("span");
+  circle.className = "choice-letter";
+  circle.textContent = String.fromCharCode(65 + ci);
+
+  const wrap = document.createElement("span");
+  wrap.className = "choice-text-wrapper";
+  const text = document.createElement("span");
+  text.className = "choice-text";
   text.innerHTML = choice;
-  wrap.append(alpha, text);
-  btn.append(radio, wrap);
+  wrap.appendChild(text);
+
+  btn.append(circle, wrap);
   btn.onclick = () => {
     if (submitted) return;
     if (eliminateMode) { toggleEliminated(current,ci); saveState(); renderQuestion(); return; }
@@ -277,12 +288,12 @@ function buildKeypad(mf) {
 function renderTextResponse(q) {
   const qi = current;
   const value = typeof answers[qi]==="string" ? answers[qi] : "";
-  const wrapper = document.createElement("div"); wrapper.className="response-card math-response-card";
+  const wrapper = document.createElement("div"); wrapper.className="math-response-card";
   const row = document.createElement("div"); row.className="math-input-row";
   const lbl = document.createElement("span"); lbl.className="math-input-label"; lbl.textContent="Answer:";
   const mqSpan = document.createElement("span"); mqSpan.className="mq-field-wrap"+(submitted?" mq-disabled":"");
   const kbtn = document.createElement("button"); kbtn.type="button"; kbtn.className="keypad-toggle-btn"; kbtn.title="Toggle keypad";
-  kbtn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M7 8h2M11 8h2M15 8h2M7 12h2M11 12h2M15 12h2M7 16h10"/></svg>`;
+  kbtn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M7 8h2M11 8h2M15 8h2M7 12h2M11 12h2M15 12h2M7 16h10"/></svg>`;
   row.append(lbl, mqSpan); if(!submitted) row.append(kbtn);
   wrapper.appendChild(row);
   const kpWrap = document.createElement("div"); kpWrap.className="keypad-wrap";
@@ -325,14 +336,10 @@ function renderFillBlank(q) {
   const qi = current;
   if (!answers[qi] || typeof answers[qi] !== "object") answers[qi] = {};
   const card = document.createElement("div"); card.className = "fill-blank-card";
-
-  // Parse template: [label] becomes an input
   const tpl = q.template;
   const parts = tpl.split(/\[([^\]]+)\]/g);
   const templateRow = document.createElement("div"); templateRow.className = "fill-blank-template";
-
   q.blanks.forEach(b => { if (!answers[qi][b.id]) answers[qi][b.id] = ""; });
-
   parts.forEach((part, pi) => {
     if (pi % 2 === 0) {
       if (part) { const s = document.createElement("span"); s.className="fill-blank-text"; s.innerHTML=part; templateRow.appendChild(s); }
@@ -348,10 +355,7 @@ function renderFillBlank(q) {
         inp.classList.add(correct ? "fill-input-correct" : "fill-input-incorrect");
       }
       if (blankDef) {
-        inp.addEventListener("input", e => {
-          answers[qi][blankDef.id] = e.target.value;
-          saveState(); updateHeaderStats(); renderGrid();
-        });
+        inp.addEventListener("input", e => { answers[qi][blankDef.id] = e.target.value; saveState(); updateHeaderStats(); renderGrid(); });
       }
       templateRow.appendChild(inp);
     }
@@ -360,20 +364,18 @@ function renderFillBlank(q) {
   choicesDiv.appendChild(card);
 }
 
-// ── ORDERING (drag to reorder) ────────────────────────────
+// ── ORDERING ──────────────────────────────────────────────
 function renderOrdering(q) {
   const qi = current;
   if (!Array.isArray(dragOrder[qi]) || dragOrder[qi].length !== q.items.length) {
-    dragOrder[qi] = q.items.map((_,i)=>i); // initial order: 0,1,2,3
+    dragOrder[qi] = q.items.map((_,i)=>i);
   }
   const card = document.createElement("div"); card.className = "ordering-card";
   const hint = document.createElement("p"); hint.className = "ordering-hint";
   hint.textContent = submitted ? "" : "Drag items into the correct order ↕";
   card.appendChild(hint);
-
   const list = document.createElement("div"); list.className = "ordering-list";
   let dragSrc = null;
-
   const renderItems = () => {
     list.innerHTML = "";
     dragOrder[qi].forEach((origIdx, pos) => {
@@ -381,19 +383,14 @@ function renderOrdering(q) {
       item.className = "ordering-item";
       item.draggable = !submitted;
       item.dataset.pos = pos;
-
       if (submitted) {
-        const correct = q.correct[pos] === origIdx;
-        item.classList.add(correct ? "ordering-correct" : "ordering-incorrect");
+        item.classList.add(q.correct[pos] === origIdx ? "ordering-correct" : "ordering-incorrect");
       }
-
       const handle = document.createElement("span"); handle.className = "ordering-handle";
-      handle.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><circle cx="9" cy="5" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="5" r="1" fill="currentColor" stroke="none"/><circle cx="9" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="9" cy="19" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="19" r="1" fill="currentColor" stroke="none"/></svg>`;
-
+      handle.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><circle cx="9" cy="5" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="5" r="1" fill="currentColor" stroke="none"/><circle cx="9" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="9" cy="19" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="19" r="1" fill="currentColor" stroke="none"/></svg>`;
       const num = document.createElement("span"); num.className = "ordering-num"; num.textContent = pos+1;
       const text = document.createElement("span"); text.className = "ordering-text"; text.innerHTML = q.items[origIdx];
       item.append(handle, num, text);
-
       if (!submitted) {
         item.addEventListener("dragstart", e => { dragSrc = pos; item.classList.add("dragging"); e.dataTransfer.effectAllowed="move"; });
         item.addEventListener("dragend",   () => { item.classList.remove("dragging"); dragSrc=null; });
@@ -420,143 +417,71 @@ function renderOrdering(q) {
 // ── MATCHING ──────────────────────────────────────────────
 function renderMatching(q) {
   const qi = current;
-
-  // Init state: leftIdx -> rightIdx | null
   if (!matchState[qi]) {
     matchState[qi] = {};
     q.pairs.forEach((_, i) => { matchState[qi][i] = null; });
   }
-
-  // Fixed shuffle of right column display order (deterministic per question index)
   const n = q.pairs.length;
   const rightDisplayOrder = q.pairs.map((_, i) => i).sort((a, b) => {
     const ha = (a * 7 + qi * 13 + 3) % n;
     const hb = (b * 7 + qi * 13 + 3) % n;
     return ha - hb;
   });
-  // Ensure shuffle is actually different from identity when n > 1
   if (n > 1 && rightDisplayOrder.every((v, i) => v === i)) rightDisplayOrder.reverse();
-
   let selectedLeft = null;
-
-  const card = document.createElement("div");
-  card.className = "matching-card";
-
-  const hint = document.createElement("p");
-  hint.className = "matching-hint";
+  const card = document.createElement("div"); card.className = "matching-card";
+  const hint = document.createElement("p"); hint.className = "matching-hint";
   hint.textContent = submitted ? "" : "Click a left item to select it, then click the right item it matches.";
   card.appendChild(hint);
-
-  // Two-column table: left items | right items, rendered as independent lists
-  // Each row: [left cell] [right cell at same visual row position]
-  // Layout: CSS grid with exactly 2 columns, left items fill rows 1..n, right items fill rows 1..n independently
-  const wrap = document.createElement("div");
-  wrap.className = "matching-wrap";
-
+  const wrap = document.createElement("div"); wrap.className = "matching-wrap";
   const leftCol  = document.createElement("div"); leftCol.className  = "matching-col matching-col-left";
   const rightCol = document.createElement("div"); rightCol.className = "matching-col matching-col-right";
-
-  // Build reverse map: rightIdx -> leftIdx
-  const rightToLeft = {};
-  Object.entries(matchState[qi]).forEach(([li, ri]) => {
-    if (ri !== null) rightToLeft[ri] = Number(li);
-  });
-
   const rebuild = () => {
-    leftCol.innerHTML  = "";
-    rightCol.innerHTML = "";
-
-    // Recompute reverse map each rebuild
+    leftCol.innerHTML = ""; rightCol.innerHTML = "";
     const r2l = {};
     Object.entries(matchState[qi]).forEach(([li, ri]) => { if (ri !== null) r2l[ri] = Number(li); });
-
-    // Left column
     q.pairs.forEach((pair, li) => {
-      const cell = document.createElement("div");
-      cell.className = "match-cell";
-
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "match-btn match-left";
-      // Use textContent-safe span so MathJax can render, not raw innerHTML on the button itself
-      const inner = document.createElement("span");
-      inner.className = "match-btn-inner";
-      inner.innerHTML = pair.left;
+      const cell = document.createElement("div"); cell.className = "match-cell";
+      const btn = document.createElement("button"); btn.type = "button"; btn.className = "match-btn match-left";
+      const inner = document.createElement("span"); inner.className = "match-btn-inner"; inner.innerHTML = pair.left;
       btn.appendChild(inner);
-
       const ri = matchState[qi][li];
       if (ri !== null) btn.classList.add("match-selected");
       if (selectedLeft === li) btn.classList.add("match-active");
-
       if (submitted) {
         btn.disabled = true;
         btn.classList.add(ri === q.correct[li] ? "match-correct" : "match-incorrect");
-        // Show what it was matched to
-        if (ri !== null) {
-          const tag = document.createElement("span");
-          tag.className = "match-paired-label";
-          tag.innerHTML = " → " + q.pairs[ri].right;
-          btn.appendChild(tag);
-        }
+        if (ri !== null) { const tag = document.createElement("span"); tag.className = "match-paired-label"; tag.innerHTML = " → " + q.pairs[ri].right; btn.appendChild(tag); }
       } else {
-        btn.onclick = () => {
-          selectedLeft = (selectedLeft === li) ? null : li;
-          rebuild();
-          typeset(leftCol, rightCol);
-        };
+        btn.onclick = () => { selectedLeft = (selectedLeft === li) ? null : li; rebuild(); typeset(leftCol, rightCol); };
       }
-
-      cell.appendChild(btn);
-      leftCol.appendChild(cell);
+      cell.appendChild(btn); leftCol.appendChild(cell);
     });
-
-    // Right column — displayed in shuffled order
     rightDisplayOrder.forEach(ri => {
-      const cell = document.createElement("div");
-      cell.className = "match-cell";
-
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "match-btn match-right";
-      const inner = document.createElement("span");
-      inner.className = "match-btn-inner";
-      inner.innerHTML = q.pairs[ri].right;
+      const cell = document.createElement("div"); cell.className = "match-cell";
+      const btn = document.createElement("button"); btn.type = "button"; btn.className = "match-btn match-right";
+      const inner = document.createElement("span"); inner.className = "match-btn-inner"; inner.innerHTML = q.pairs[ri].right;
       btn.appendChild(inner);
-
       const assignedLi = r2l[ri];
       if (assignedLi !== undefined) btn.classList.add("match-selected");
-
       if (submitted) {
         btn.disabled = true;
-        // Correct if whatever left item claimed this right is the correct left for it
         const correctLi = q.correct.findIndex((correctRi, li) => correctRi === ri);
-        const isCorr = assignedLi === correctLi;
-        btn.classList.add(isCorr ? "match-correct" : "match-incorrect");
+        btn.classList.add(assignedLi === correctLi ? "match-correct" : "match-incorrect");
       } else {
         btn.onclick = () => {
           if (selectedLeft === null) return;
-          if (matchState[qi][selectedLeft] === ri) {
-            // Toggle off
-            matchState[qi][selectedLeft] = null;
-          } else {
-            // Un-assign ri from whoever had it
-            Object.keys(matchState[qi]).forEach(k => {
-              if (matchState[qi][k] === ri) matchState[qi][k] = null;
-            });
+          if (matchState[qi][selectedLeft] === ri) { matchState[qi][selectedLeft] = null; }
+          else {
+            Object.keys(matchState[qi]).forEach(k => { if (matchState[qi][k] === ri) matchState[qi][k] = null; });
             matchState[qi][selectedLeft] = ri;
           }
-          selectedLeft = null;
-          saveState(); updateHeaderStats(); renderGrid();
-          rebuild();
-          typeset(leftCol, rightCol);
+          selectedLeft = null; saveState(); updateHeaderStats(); renderGrid(); rebuild(); typeset(leftCol, rightCol);
         };
       }
-
-      cell.appendChild(btn);
-      rightCol.appendChild(cell);
+      cell.appendChild(btn); rightCol.appendChild(cell);
     });
   };
-
   rebuild();
   wrap.append(leftCol, rightCol);
   card.appendChild(wrap);
@@ -572,8 +497,6 @@ function buildGraphSVG(q, mode) {
   const { xMin,xMax,yMin,yMax } = q.graph;
   const toX = x => PAD + (x-xMin)/(xMax-xMin)*(W-PAD*2);
   const toY = y => H-PAD - (y-yMin)/(yMax-yMin)*(H-PAD*2);
-
-  // Grid
   for(let x=xMin;x<=xMax;x++){
     const l=document.createElementNS("http://www.w3.org/2000/svg","line");
     l.setAttribute("x1",toX(x));l.setAttribute("x2",toX(x));l.setAttribute("y1",PAD);l.setAttribute("y2",H-PAD);
@@ -586,8 +509,6 @@ function buildGraphSVG(q, mode) {
     l.setAttribute("class",y===0?"axis-line":"grid-line"); svg.appendChild(l);
     if(y!==0){const t=document.createElementNS("http://www.w3.org/2000/svg","text");t.setAttribute("x",toX(0)-8);t.setAttribute("y",toY(y)+4);t.setAttribute("class","axis-label");t.setAttribute("text-anchor","end");t.textContent=y;svg.appendChild(t);}
   }
-
-  // Drawn line (graph_line / hotspot)
   if (q.graph.line) {
     const {slope:m, intercept:b} = q.graph.line;
     const x0=xMin, x1=xMax, y0=m*x0+b, y1=m*x1+b;
@@ -595,22 +516,17 @@ function buildGraphSVG(q, mode) {
     ln.setAttribute("x1",toX(x0));ln.setAttribute("y1",toY(y0));ln.setAttribute("x2",toX(x1));ln.setAttribute("y2",toY(y1));
     ln.setAttribute("class","graph-drawn-line"); svg.appendChild(ln);
   }
-
-  // Parabola (hotspot)
   if (q.graph.parabola) {
     const {a,h,k} = q.graph.parabola;
     const pts=[]; const step=(xMax-xMin)/80;
     for(let x=xMin;x<=xMax;x+=step){ const y=a*(x-h)**2+k; if(y>=yMin&&y<=yMax) pts.push(`${toX(x)},${toY(y)}`); }
     if(pts.length>1){const poly=document.createElementNS("http://www.w3.org/2000/svg","polyline");poly.setAttribute("points",pts.join(" "));poly.setAttribute("class","graph-drawn-line");poly.setAttribute("fill","none");svg.appendChild(poly);}
   }
-
-  // Shading polygon (hotspot feasible region)
   if (q.graph.shading) {
     const pts = q.graph.shading.vertices.map(([x,y])=>`${toX(x)},${toY(y)}`).join(" ");
     const poly=document.createElementNS("http://www.w3.org/2000/svg","polygon");
     poly.setAttribute("points",pts); poly.setAttribute("class","graph-shading"); svg.appendChild(poly);
   }
-
   return { svg, toX, toY };
 }
 
@@ -668,11 +584,8 @@ function renderHotspot(q) {
   const W=420,H=320,PAD=40;
   const fromSvgX = sx => xMin + (sx-PAD)/(W-PAD*2)*(xMax-xMin);
   const fromSvgY = sy => yMin + (H-PAD-sy)/(H-PAD*2)*(yMax-yMin);
-
   const snap = q.graph.snapGrid || 1;
   const doSnap = v => Math.round(v/snap)*snap;
-
-  // Crosshair for placed point
   if (hotspotState[qi]) {
     const {x,y} = hotspotState[qi];
     const cx = toX(x), cy = toY(y);
@@ -685,19 +598,15 @@ function renderHotspot(q) {
     lbl.setAttribute("x",cx+14);lbl.setAttribute("y",cy-12);lbl.setAttribute("class","graph-point-label");
     lbl.textContent=`(${x}, ${y})`; svg.appendChild(lbl);
   }
-
   if (!submitted) {
-    // Preview ghost on hover
     const ghost = document.createElementNS("http://www.w3.org/2000/svg","circle");
     ghost.setAttribute("r",8); ghost.setAttribute("class","hotspot-ghost"); ghost.style.display="none";
     svg.appendChild(ghost);
-
     const rect = document.createElementNS("http://www.w3.org/2000/svg","rect");
     rect.setAttribute("x",PAD);rect.setAttribute("y",PAD);
     rect.setAttribute("width",W-PAD*2);rect.setAttribute("height",H-PAD*2);
     rect.setAttribute("fill","transparent");rect.style.cursor="crosshair";
     svg.appendChild(rect);
-
     rect.addEventListener("mousemove", e => {
       const bbox = svg.getBoundingClientRect();
       const scaleX = W/bbox.width, scaleY = H/bbox.height;
@@ -715,7 +624,6 @@ function renderHotspot(q) {
       saveState(); renderQuestion();
     });
   }
-
   const wrap=document.createElement("div");wrap.className="graph-card";wrap.appendChild(svg);
   if (!submitted && hotspotState[qi]) {
     const clr=document.createElement("button");clr.type="button";clr.className="secondary-button hotspot-clear-btn";
@@ -729,10 +637,7 @@ function renderHotspot(q) {
 // ── QUESTION DISPATCHER ───────────────────────────────────
 function renderQuestionInput(q) {
   choicesDiv.innerHTML="";
-
-  // Info box before question content
   if (q.info_box?.length) choicesDiv.appendChild(renderInfoBox(q.info_box));
-
   switch(q.type) {
     case "multiple_choice":
     case "select_multiple":  renderMultipleChoice(q); break;
@@ -762,20 +667,18 @@ function renderQuestion() {
   questionNumberBadge.textContent = current+1;
   questionText.innerHTML = getQuestionPromptMarkup(current);
 
-  // Replace type badge in meta-left
   const metaLeft = document.querySelector(".question-meta-left");
   const existingBadge = metaLeft.querySelector(".question-type-badge");
   if (existingBadge) existingBadge.remove();
   metaLeft.appendChild(typeBadge(q.type));
 
-  // Section label in exam header eyebrow
-  const eyebrow = document.querySelector(".eyebrow");
+  const eyebrow = document.getElementById("sectionEyebrow");
   if (eyebrow && q.sectionTitle) eyebrow.textContent = `§${q.section} · ${q.sectionTitle}`;
 
   renderQuestionInput(q);
   typeset(questionText, choicesDiv);
   markToggle.classList.toggle("active", markedQuestions.has(current));
-  markToggleLabel.textContent = markedQuestions.has(current) ? "Marked for Review" : "Mark for Review";
+  markToggleLabel.textContent = markedQuestions.has(current) ? "Marked" : "Mark for Review";
   renderGrid(); updateHeaderStats(); updateNavigationState();
 }
 
@@ -799,23 +702,19 @@ function togglePause() {
   if(paused){
     if(timerId){clearInterval(timerId);timerId=null;}
     overlay.style.display="flex";
-    pauseButton.innerHTML=`<svg class="inline-icon pause-icon"><use href="#icon-chevron-right"></use></svg>Resume`;
   } else {
     overlay.style.display="none"; startTimer();
-    pauseButton.innerHTML=`<svg class="inline-icon pause-icon"><use href="#icon-pause"></use></svg>Pause`;
   }
 }
 
 // ── MODALS ────────────────────────────────────────────────
-function openModal(id){ const m=document.getElementById(id); const w=m.querySelector(".draggable-window"); if(w){w.style.left="";w.style.top="";w.style.transform="";} m.style.display="flex"; typeset(m); }
-function closeModal(id){ document.getElementById(id).style.display="none"; }
-function toggleSidebar(side){
-  const isL=side==="left"; const sb=isL?leftSidebar:rightSidebar;
-  const vn=isL?"--left-sidebar-width":"--right-sidebar-width";
-  const exp=isL?"248px":"210px";
-  sb.classList.toggle("collapsed");
-  examShell.style.setProperty(vn, sb.classList.contains("collapsed")?"56px":exp);
+function openModal(id){
+  const m=document.getElementById(id);
+  const w=m.querySelector(".draggable-window");
+  if(w){w.style.left="";w.style.top="";w.style.transform="";}
+  m.style.display="flex"; typeset(m);
 }
+function closeModal(id){ document.getElementById(id).style.display="none"; }
 
 // ── TIMER ─────────────────────────────────────────────────
 function updateTimer() {
@@ -848,7 +747,7 @@ function isCorrect(i) {
   switch(q.type){
     case "multiple_choice": return answers[i]===q.correct;
     case "select_multiple": {
-      const ac=[...( answers[i]||[])].sort((a,b)=>a-b);
+      const ac=[...(answers[i]||[])].sort((a,b)=>a-b);
       const ec=[...q.correct].sort((a,b)=>a-b);
       return JSON.stringify(ac)===JSON.stringify(ec);
     }
@@ -912,12 +811,12 @@ function renderResults(){
     if(isCorrect(i))correct++;
     const row=document.createElement("div");row.className="review-row";
     row.innerHTML=`
-      <div class="review-row-top"><strong>Q${i+1} · ${q.sectionTitle}</strong>
+      <div class="review-row-top"><strong>Q${i+1} · ${q.sectionTitle||""}</strong>
         <span class="${isCorrect(i)?"review-good":"review-bad"}">${isCorrect(i)?"Correct":"Incorrect"}</span></div>
       <p>${escapeHtml(q.prompt)}</p>
       <div class="review-meta">
         <span>Your answer: ${escapeHtml(describeAnswer(i))}</span>
-        <span>Correct answer: ${escapeHtml(describeCorrect(i))}</span>
+        <span>Correct: ${escapeHtml(describeCorrect(i))}</span>
       </div>`;
     resultsReview.appendChild(row);
   });
@@ -935,7 +834,6 @@ function restartTest(){
   time=DEFAULT_TIME;submitted=false;eliminateMode=false;highlightMode=false;paused=false;keypadsVisible={};
   closeModal("resultsModal");localStorage.removeItem(STORAGE_KEY);
   resetCalculator();resetGraphingCalculator();
-  pauseButton.innerHTML=`<svg class="inline-icon pause-icon"><use href="#icon-pause"></use></svg>Pause`;
   document.getElementById("pauseOverlay").style.display="none";
   startTimer();renderQuestion();
 }
@@ -974,11 +872,14 @@ restartButton.addEventListener("click",restartTest);
 eliminateModeButton.addEventListener("click",toggleEliminateMode);
 highlightModeButton.addEventListener("click",toggleHighlightMode);
 questionText.addEventListener("mouseup",applyHighlightFromSelection);
-pauseButton.addEventListener("click",togglePause);
 
-window.nextQuestion=nextQuestion; window.prevQuestion=prevQuestion;
-window.toggleSidebar=toggleSidebar; window.openModal=openModal;
-window.closeModal=closeModal; window.togglePause=togglePause;
+window.nextQuestion=nextQuestion;
+window.prevQuestion=prevQuestion;
+window.openModal=openModal;
+window.closeModal=closeModal;
+window.togglePause=togglePause;
+// stub for removed sidebar toggle
+window.toggleSidebar=()=>{};
 
 // ── INIT ──────────────────────────────────────────────────
 async function init(){
