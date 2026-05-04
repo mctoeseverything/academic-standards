@@ -873,6 +873,24 @@ eliminateModeButton.addEventListener("click",toggleEliminateMode);
 highlightModeButton.addEventListener("click",toggleHighlightMode);
 questionText.addEventListener("mouseup",applyHighlightFromSelection);
 
+// ── QNAV POPUP ────────────────────────────────────────────
+const qnavTrigger = document.getElementById("qnavTrigger");
+const qnavPopup   = document.getElementById("qnavPopup");
+const qnavClose   = document.getElementById("qnavClose");
+
+qnavTrigger.addEventListener("click", e => {
+  e.stopPropagation();
+  qnavPopup.classList.toggle("open");
+});
+qnavClose.addEventListener("click", () => {
+  qnavPopup.classList.remove("open");
+});
+document.addEventListener("click", e => {
+  if (!qnavPopup.contains(e.target) && e.target !== qnavTrigger && !qnavTrigger.contains(e.target)) {
+    qnavPopup.classList.remove("open");
+  }
+});
+
 window.nextQuestion=nextQuestion;
 window.prevQuestion=prevQuestion;
 window.openModal=openModal;

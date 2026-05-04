@@ -322,48 +322,7 @@
 
   <script src="./script.js"></script>
 
-  <!-- ── Nav popup wiring (small patch on top of script.js) ── -->
-  <script>
-    // Patch renderGrid to target the popup grid instead of a sidebar grid
-    // (script.js already targets #questionGrid — this just handles open/close)
-    const qnavTrigger = document.getElementById('qnavTrigger');
-    const qnavPopup   = document.getElementById('qnavPopup');
-    const qnavClose   = document.getElementById('qnavClose');
-    const qnavLabel   = document.getElementById('qnavLabel');
 
-    function updateQnavLabel() {
-      if (typeof questions !== 'undefined' && questions.length) {
-        qnavLabel.textContent = `Question ${current + 1} of ${questions.length}`;
-      }
-    }
-
-    qnavTrigger.addEventListener('click', () => {
-      qnavPopup.classList.toggle('open');
-    });
-    qnavClose.addEventListener('click', () => {
-      qnavPopup.classList.remove('open');
-    });
-    // Close when clicking outside
-    document.addEventListener('click', e => {
-      if (!qnavPopup.contains(e.target) && e.target !== qnavTrigger && !qnavTrigger.contains(e.target)) {
-        qnavPopup.classList.remove('open');
-      }
-    });
-
-    // Patch renderQuestion to also update the pill label and close popup
-    const _origRenderQ = typeof renderQuestion !== 'undefined' ? renderQuestion : null;
-    document.addEventListener('DOMContentLoaded', () => {
-      // Wait for script.js init, then monkey-patch
-      const origRQ = window.renderQuestion;
-      if (origRQ) {
-        window.renderQuestion = function() {
-          origRQ.call(this);
-          updateQnavLabel();
-          qnavPopup.classList.remove('open');
-        };
-      }
-    });
-  </script>
 
 </body>
 </html>
