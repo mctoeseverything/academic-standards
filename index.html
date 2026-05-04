@@ -34,11 +34,35 @@
     <symbol id="icon-pause"         viewBox="0 0 24 24"><path d="M9 5h2v14H9z"/><path d="M13 5h2v14h-2z"/></symbol>
   </svg>
 
-  <!-- ── Pause overlay ───────────────────────────────────── -->
+  <!-- ── Pause overlay — fully opaque, no exam content visible ── -->
   <div id="pauseOverlay" style="display:none;">
-    <div class="pause-title">Exam Paused</div>
-    <div class="pause-sub">Your progress is saved. Click Resume to continue.</div>
-    <button onclick="togglePause()" class="pause-resume-btn">Resume Test</button>
+    <div class="pause-card">
+      <div class="pause-org">Academic Standards Board</div>
+      <div class="pause-title">Exam Paused</div>
+      <div class="pause-timer-wrap">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.55"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        <span id="pauseTimerDisplay">01:30:00</span>
+      </div>
+      <div class="pause-sub">Time is still running. Resume when you're ready to continue.</div>
+      <button onclick="togglePause()" class="pause-resume-btn">Resume Exam</button>
+    </div>
+  </div>
+
+  <!-- ── Pause confirmation modal ────────────────────────── -->
+  <div class="modal" id="pauseConfirmModal" aria-hidden="true">
+    <div class="modal-content" style="max-width:400px;">
+      <h3>Pause Exam?</h3>
+      <p style="font-size:0.84rem;color:var(--text-soft);margin-top:10px;line-height:1.6;">
+        Your exam timer will <strong>continue counting down</strong> while the exam is paused. Your answers are saved automatically.
+      </p>
+      <p style="font-size:0.84rem;color:var(--muted);margin-top:8px;line-height:1.6;">
+        The exam content will be hidden while paused to protect test integrity.
+      </p>
+      <div class="modal-actions">
+        <button class="secondary-button" type="button" onclick="closeModal('pauseConfirmModal')">Cancel</button>
+        <button class="primary-button"   type="button" onclick="confirmPause()">Pause Anyway</button>
+      </div>
+    </div>
   </div>
 
   <!-- ══════════════════════════════════════════════════════

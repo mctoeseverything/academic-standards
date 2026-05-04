@@ -459,20 +459,50 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round
 .hotspot-clear-btn { margin-top: 8px; font-size: 0.72rem; min-height: 28px; padding: 0 12px; }
 
 /* ═══════════════════════════════════════════════════════════
-   PAUSE OVERLAY
+   PAUSE OVERLAY — fully opaque, nothing underneath visible
    ═══════════════════════════════════════════════════════════ */
 #pauseOverlay {
-  position: fixed; inset: 0; z-index: 200; background: rgba(8,16,50,0.88);
-  display: none; align-items: center; justify-content: center; flex-direction: column; gap: 14px;
+  position: fixed; inset: 0; z-index: 200;
+  background: var(--header-bg); /* solid, no transparency */
+  display: none; align-items: center; justify-content: center;
 }
-.pause-title { color: #fff; font-size: 1.15rem; font-weight: 800; }
-.pause-sub   { color: rgba(255,255,255,0.48); font-size: 0.78rem; }
+.pause-card {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 40px 48px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius);
+  text-align: center;
+  max-width: 360px; width: 100%;
+}
+.pause-org {
+  font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: rgba(255,255,255,0.35);
+  margin-bottom: 4px;
+}
+.pause-title { color: #fff; font-size: 1.3rem; font-weight: 800; letter-spacing: -0.01em; }
+.pause-timer-wrap {
+  display: flex; align-items: center; gap: 7px;
+  margin: 4px 0 2px;
+  color: rgba(255,255,255,0.9);
+}
+#pauseTimerDisplay {
+  font-size: 1.6rem; font-weight: 700;
+  letter-spacing: 0.12em; font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+.pause-sub {
+  color: rgba(255,255,255,0.45); font-size: 0.76rem; line-height: 1.5;
+  max-width: 280px; margin-top: 2px;
+}
 .pause-resume-btn {
-  margin-top: 6px; padding: 8px 28px; background: var(--accent); color: #fff;
-  border: none; border-radius: var(--radius-pill); font-size: 0.76rem; font-weight: 700;
-  letter-spacing: 0.03em; text-transform: uppercase; cursor: pointer;
+  margin-top: 14px; padding: 9px 32px;
+  background: #fff; color: var(--accent);
+  border: none; border-radius: var(--radius-pill);
+  font-size: 0.78rem; font-weight: 700;
+  letter-spacing: 0.03em; cursor: pointer;
 }
-.pause-resume-btn:hover { background: var(--accent-hover); }
+.pause-resume-btn:hover { background: #eef0fb; }
 
 /* ═══════════════════════════════════════════════════════════
    MODALS

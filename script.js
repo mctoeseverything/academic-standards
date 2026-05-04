@@ -697,14 +697,30 @@ function applyHighlightFromSelection() {
 
 // ── PAUSE ─────────────────────────────────────────────────
 function togglePause() {
-  if(submitted)return; paused=!paused;
-  const overlay=document.getElementById("pauseOverlay");
-  if(paused){
-    if(timerId){clearInterval(timerId);timerId=null;}
-    overlay.style.display="flex";
-  } else {
-    overlay.style.display="none"; startTimer();
+  if(submitted)return;
+  if(!paused){
+    // Show acknowledgment first — don't pause yet
+    openModal("pauseConfirmModal");
+    return;
   }
+  // Resuming
+  paused=false;
+  document.getElementById("pauseOverlay").style.display="none";
+}
+
+function confirmPause(){
+  closeModal("pauseConfirmModal");
+  paused=true;
+  // Timer intentionally keeps running during pause
+  const overlay=document.getElementById("pauseOverlay");
+  overlay.style.display="flex";
+  // Tick the pause-screen clock independently
+  (function tickPauseClock(){
+    if(!paused)return;
+    const el=document.getElementById("pauseTimerDisplay");
+    if(el) el.textContent=formatTime(time);
+    setTimeout(tickPauseClock,500);
+  })();
 }
 
 // ── MODALS ────────────────────────────────────────────────
@@ -718,9 +734,18 @@ function closeModal(id){ document.getElementById(id).style.display="none"; }
 
 // ── TIMER ─────────────────────────────────────────────────
 function updateTimer() {
-  if(submitted||paused)return;
-  if(time>0){time--;document.getElementById("time").textContent=formatTime(time);saveState();}
-  else showSubmitModal(true);
+  if(submitted)return;
+  if(time>0){
+    time--;
+    const fmt=formatTime(time);
+    document.getElementById("time").textContent=fmt;
+    const pel=document.getElementById("pauseTimerDisplay");
+    if(pel) pel.textContent=fmt;
+    saveState();
+  } else {
+    if(paused){ paused=false; document.getElementById("pauseOverlay").style.display="none"; }
+    showSubmitModal(true);
+  }
 }
 function startTimer() {
   if(timerId)clearInterval(timerId);
@@ -896,6 +921,7 @@ window.prevQuestion=prevQuestion;
 window.openModal=openModal;
 window.closeModal=closeModal;
 window.togglePause=togglePause;
+window.confirmPause=confirmPause;
 // stub for removed sidebar toggle
 window.toggleSidebar=()=>{};
 
