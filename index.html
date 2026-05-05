@@ -125,8 +125,26 @@
           </div>
         </div>
 
+
+        <!-- ── Review screen (shown after last question Next click) ── -->
+        <div class="review-screen" id="reviewScreen">
+          <div class="review-screen-header">
+            <div class="review-screen-title">Review Your Responses</div>
+            <div class="review-screen-sub">Check your answers before submitting. Click any question to go back to it.</div>
+          </div>
+          <div class="review-summary-chips" id="reviewSummaryChips"></div>
+          <div class="review-q-grid" id="reviewQGrid"></div>
+          <div class="review-actions">
+            <span class="review-actions-left" id="reviewActionsNote"></span>
+            <div style="display:flex;gap:8px;">
+              <button class="secondary-button" type="button" id="reviewBackButton">Back to Exam</button>
+              <button class="primary-button"   type="button" id="reviewSubmitButton">Submit Test</button>
+            </div>
+          </div>
+        </div>
+
         <!-- ── Question body ──────────────────────────────── -->
-        <div class="question-body">
+        <div class="question-body" id="questionBody">
           <div class="question-meta">
             <div class="question-meta-left">
               <div class="question-pill" id="questionNumberBadge">1</div>
@@ -339,7 +357,24 @@
     </div>
   </div>
 
-  <!-- Fallback question data -->
+
+
+  <!-- Submit Warning Modal -->
+  <div class="modal warning-modal" id="submitWarningModal" aria-hidden="true">
+    <div class="modal-content" style="max-width:420px;">
+      <div class="warning-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <h3 id="submitWarningTitle">Before you submit</h3>
+      <p style="font-size:0.84rem;color:var(--muted);margin-top:6px;line-height:1.6;" id="submitWarningDesc"></p>
+      <div class="warning-list" id="submitWarningList"></div>
+      <div class="modal-actions">
+        <button class="secondary-button" type="button" onclick="closeModal('submitWarningModal')">Go Back</button>
+        <button class="primary-button"   type="button" id="submitWarningConfirm">Submit Anyway</button>
+      </div>
+    </div>
+  </div>
+
   <script id="questionsFallback" type="application/json">
 [{"type":"multiple_choice","prompt":"Which expression is equivalent to $3(2x - 5) + 4x$?","choices":["$10x - 15$","$10x - 5$","$6x - 15$","$6x - 5$"],"correct":0}]
   </script>

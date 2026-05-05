@@ -133,10 +133,17 @@ function updateHeaderStats() {
 function updateNavigationState() {
   const supportsElim = ["multiple_choice","select_multiple"].includes(questions[current]?.type);
   if (!supportsElim) eliminateMode = false;
+  const isLast = current === questions.length - 1;
   prevButton.disabled = current === 0 || submitted;
-  nextButton.disabled = current === questions.length-1 || submitted;
+  nextButton.disabled = submitted;
+  nextButton.textContent = "";
+  if (isLast && !submitted) {
+    nextButton.innerHTML = `Review &amp; Submit<svg class="tiny-icon" style="margin-left:4px;"><use href="#icon-chevron-right"/></svg>`;
+  } else {
+    nextButton.innerHTML = `Next<svg class="tiny-icon" style="margin-left:4px;"><use href="#icon-chevron-right"/></svg>`;
+  }
   submitButton.disabled = submitted;
-  submitButton.hidden   = current !== questions.length-1 || submitted;
+  submitButton.hidden   = true; // always hidden now — submit lives on review screen
   markToggle.disabled   = submitted;
   eliminateModeButton.disabled = submitted || !supportsElim;
   highlightModeButton.disabled = submitted;
@@ -679,8 +686,22 @@ function renderQuestion() {
   renderGrid(); updateHeaderStats(); updateNavigationState();
 }
 
-function nextQuestion() { if(current<questions.length-1){current++;saveState();renderQuestion();} }
-function prevQuestion() { if(current>0){current--;saveState();renderQuestion();} }
+function nextQuestion() {
+  if (current < questions.length - 1) {
+    current++; saveState(); renderQuestion();
+  } else {
+    // Last question — go to review screen
+    showReviewScreen();
+  }
+}
+function prevQuestion() {
+  if (onReviewScreen) {
+    hideReviewScreen();
+    renderQuestion();
+    return;
+  }
+  if (current > 0) { current--; saveState(); renderQuestion(); }
+}
 function toggleMarked() { if(submitted)return; markedQuestions.has(current)?markedQuestions.delete(current):markedQuestions.add(current); saveState();renderQuestion(); }
 function toggleEliminateMode() { if(submitted)return; eliminateMode=!eliminateMode; if(eliminateMode)highlightMode=false; updateNavigationState(); }
 function toggleHighlightMode() { if(submitted)return; highlightMode=!highlightMode; if(highlightMode)eliminateMode=false; updateNavigationState(); }
@@ -894,6 +915,119 @@ restartButton.addEventListener("click",restartTest);
 eliminateModeButton.addEventListener("click",toggleEliminateMode);
 highlightModeButton.addEventListener("click",toggleHighlightMode);
 questionText.addEventListener("mouseup",applyHighlightFromSelection);
+
+// Review screen buttons
+document.getElementById("reviewBackButton").addEventListener("click", () => {
+  hideReviewScreen(); renderQuestion();
+});
+document.getElementById("reviewSubmitButton").addEventListener("click", submitWithWarning);
+
+// ── REVIEW SCREEN ─────────────────────────────────────────
+let onReviewScreen = false;
+
+function showReviewScreen() {
+  onReviewScreen = true;
+  document.getElementById("questionBody").style.display = "none";
+  document.getElementById("reviewScreen").classList.add("visible");
+
+  // Update action bar
+  prevButton.disabled = false;
+  nextButton.disabled = true;
+  document.getElementById("qnavTrigger").style.display = "none";
+
+  renderReviewScreen();
+  updateHeaderStats();
+}
+
+function hideReviewScreen() {
+  onReviewScreen = false;
+  document.getElementById("questionBody").style.display = "";
+  document.getElementById("reviewScreen").classList.remove("visible");
+  document.getElementById("qnavTrigger").style.display = "";
+}
+
+function renderReviewScreen() {
+  const answered   = questions.filter((_,i) => hasAnswer(i) && !markedQuestions.has(i)).length;
+  const unanswered = questions.filter((_,i) => !hasAnswer(i)).length;
+  const marked     = markedQuestions.size;
+
+  // Summary chips
+  const chips = document.getElementById("reviewSummaryChips");
+  chips.innerHTML = `
+    <div class="review-chip"><span class="review-chip-dot answered"></span><strong>${answered}</strong> answered</div>
+    <div class="review-chip"><span class="review-chip-dot unanswered"></span><strong>${unanswered}</strong> unanswered</div>
+    <div class="review-chip"><span class="review-chip-dot marked"></span><strong>${marked}</strong> marked for review</div>
+  `;
+
+  // Question cards
+  const grid = document.getElementById("reviewQGrid");
+  grid.innerHTML = "";
+  questions.forEach((q, i) => {
+    const isAnswered = hasAnswer(i);
+    const isMarked   = markedQuestions.has(i);
+    const stateClass = isMarked ? "marked" : isAnswered ? "answered" : "unanswered";
+    const statusText = isMarked ? "Marked for Review" : isAnswered ? "Answered" : "Not answered";
+
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = `review-q-card is-${stateClass}`;
+    card.innerHTML = `
+      <div class="review-q-num ${stateClass}">${i + 1}</div>
+      <div class="review-q-info">
+        <div class="review-q-section">${q.sectionTitle || ""}</div>
+        <div class="review-q-status ${stateClass}">${statusText}</div>
+      </div>
+      ${isMarked ? `<svg class="review-q-bookmark" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>` : ""}
+    `;
+    card.onclick = () => {
+      current = i;
+      hideReviewScreen();
+      saveState();
+      renderQuestion();
+    };
+    grid.appendChild(card);
+  });
+
+  // Bottom note
+  const note = document.getElementById("reviewActionsNote");
+  if (unanswered > 0 || marked > 0) {
+    const parts = [];
+    if (unanswered > 0) parts.push(`${unanswered} unanswered`);
+    if (marked > 0)     parts.push(`${marked} marked for review`);
+    note.textContent = `You have ${parts.join(" and ")}.`;
+  } else {
+    note.textContent = "All questions answered. Ready to submit.";
+  }
+}
+
+function submitWithWarning() {
+  const unanswered = questions.filter((_,i) => !hasAnswer(i)).length;
+  const marked     = markedQuestions.size;
+
+  if (unanswered === 0 && marked === 0) {
+    // Clean — go straight to confirm
+    showSubmitModal(false);
+    return;
+  }
+
+  // Build warning
+  const list = document.getElementById("submitWarningList");
+  list.innerHTML = "";
+  if (unanswered > 0) {
+    list.innerHTML += `<div class="warning-item"><span class="warning-item-dot unanswered"></span>${unanswered} question${unanswered > 1 ? "s" : ""} left unanswered</div>`;
+  }
+  if (marked > 0) {
+    list.innerHTML += `<div class="warning-item"><span class="warning-item-dot marked"></span>${marked} question${marked > 1 ? "s" : ""} marked for review</div>`;
+  }
+
+  document.getElementById("submitWarningDesc").textContent =
+    "The following items may need your attention before you submit.";
+  document.getElementById("submitWarningConfirm").onclick = () => {
+    closeModal("submitWarningModal");
+    finalizeSubmission();
+  };
+  openModal("submitWarningModal");
+}
 
 // ── QNAV POPUP ────────────────────────────────────────────
 const qnavTrigger = document.getElementById("qnavTrigger");
