@@ -4,6 +4,7 @@ const DEFAULT_TIME = 5400;
 const AUTH_VIEW_CHOICE = "choice";
 const AUTH_VIEW_CREATE = "create";
 const AUTH_VIEW_SIGN_IN = "sign-in";
+const TEST_CONTEXT = window.ASB_TEST_CONTEXT || null;
 
 let questions = [];
 let current   = 0;
@@ -24,6 +25,10 @@ let graphingCalculator = null;
 let paused = false;
 let currentStudent = null;
 let examBooted = false;
+let currentAttemptId = TEST_CONTEXT?.attempt?.id || null;
+let remoteSaveTimer = null;
+let remoteSaveInFlight = false;
+let remotePendingSave = false;
 
 // ── DOM refs ──────────────────────────────────────────────
 const authShell           = document.getElementById("authShell");
@@ -144,19 +149,65 @@ function getSummaryKey() {
   return `${APP_NAMESPACE}:${EXAM_ID}:summary:${getStudentScope()}`;
 }
 
+function isRemoteExamMode() {
+  return Boolean(TEST_CONTEXT?.apiBase && TEST_CONTEXT?.test);
+}
+
+function buildStateSnapshot() {
+  return {
+    current, answers, markedQuestions:[...markedQuestions],
+    eliminatedChoices, stemMarkup, dragOrder, matchState, hotspotState, time, submitted
+  };
+}
+
+async function persistRemoteAttempt() {
+  if (!isRemoteExamMode() || !currentAttemptId) return;
+  if (remoteSaveInFlight) {
+    remotePendingSave = true;
+    return;
+  }
+  remoteSaveInFlight = true;
+  remotePendingSave = false;
+  try {
+    await fetch(`${TEST_CONTEXT.apiBase}/attempts/${currentAttemptId}`, {
+      method: "PUT",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        state: buildStateSnapshot(),
+        notes: notesField?.value || "",
+      }),
+    });
+  } catch (error) {
+    console.warn("Remote attempt save failed", error);
+  } finally {
+    remoteSaveInFlight = false;
+    if (remotePendingSave) persistRemoteAttempt();
+  }
+}
+
+function scheduleRemoteAttemptSave() {
+  if (!isRemoteExamMode()) return;
+  if (remoteSaveTimer) clearTimeout(remoteSaveTimer);
+  remoteSaveTimer = setTimeout(() => {
+    remoteSaveTimer = null;
+    persistRemoteAttempt();
+  }, 250);
+}
+
 // ── PERSIST ───────────────────────────────────────────────
 function saveState() {
   if (!currentStudent) return;
-  localStorage.setItem(getStateKey(), JSON.stringify({
-    current, answers, markedQuestions:[...markedQuestions],
-    eliminatedChoices, stemMarkup, dragOrder, matchState, hotspotState, time, submitted
-  }));
+  localStorage.setItem(getStateKey(), JSON.stringify(buildStateSnapshot()));
+  scheduleRemoteAttemptSave();
 }
 function restoreState() {
   if (!currentStudent) return;
-  const raw = localStorage.getItem(getStateKey());
-  if (!raw) return;
   try {
+    const raw = isRemoteExamMode() && TEST_CONTEXT?.attempt?.state
+      ? JSON.stringify(TEST_CONTEXT.attempt.state)
+      : localStorage.getItem(getStateKey());
+    if (!raw) return;
     const s = JSON.parse(raw);
     current          = Number.isInteger(s.current) ? s.current : 0;
     answers          = s.answers          || {};
@@ -170,8 +221,22 @@ function restoreState() {
     submitted        = Boolean(s.submitted);
   } catch { current=0; answers={}; markedQuestions=new Set(); time=DEFAULT_TIME; submitted=false; reviewingSubmitted=false; }
 }
-function loadNotes()  { notesField.value = currentStudent ? (localStorage.getItem(getNotesKey()) || "") : ""; }
-function saveNotes()  { if (currentStudent) localStorage.setItem(getNotesKey(), notesField.value); }
+function loadNotes()  {
+  if (!currentStudent) {
+    notesField.value = "";
+    return;
+  }
+  if (isRemoteExamMode() && TEST_CONTEXT?.attempt?.notes) {
+    notesField.value = TEST_CONTEXT.attempt.notes;
+    return;
+  }
+  notesField.value = localStorage.getItem(getNotesKey()) || "";
+}
+function saveNotes()  {
+  if (!currentStudent) return;
+  localStorage.setItem(getNotesKey(), notesField.value);
+  scheduleRemoteAttemptSave();
+}
 
 function getSavedExamStateForStudent() {
   if (!currentStudent) return null;
@@ -1016,7 +1081,7 @@ function describeCorrect(i){
 }
 
 // ── RESULTS ───────────────────────────────────────────────
-function finalizeSubmission(){
+async function finalizeSubmission(){
   submitted=true; reviewingSubmitted=false; saveState(); closeModal("submitModal");
   if(timerId)clearInterval(timerId);
   localStorage.setItem(getSummaryKey(), JSON.stringify({
@@ -1025,6 +1090,18 @@ function finalizeSubmission(){
     correct: questions.filter((_, i) => isCorrect(i)).length,
     total: questions.length,
   }));
+  if (isRemoteExamMode() && currentAttemptId) {
+    try {
+      await persistRemoteAttempt();
+      await fetch(`${TEST_CONTEXT.apiBase}/attempts/${currentAttemptId}/submit`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error) {
+      console.warn("Remote submission failed", error);
+    }
+  }
   resetCalculator(); resetGraphingCalculator();
   renderQuestion(); renderResults(); openModal("resultsModal");
 }
@@ -1061,7 +1138,21 @@ function renderResults(){
   resultsMarked.textContent=markedQuestions.size;
   resultsTime.textContent=formatTime(time);
 }
-function restartTest(){
+async function restartTest(){
+  if (isRemoteExamMode()) {
+    try {
+      await fetch(`${TEST_CONTEXT.apiBase}/attempts`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ testId: TEST_CONTEXT.testId }),
+      });
+      window.location.reload();
+      return;
+    } catch (error) {
+      console.warn("Unable to restart remote attempt", error);
+    }
+  }
   resetExamMemory();
   localStorage.removeItem(getStateKey());
   resetCalculator();resetGraphingCalculator();
@@ -1100,6 +1191,10 @@ function setupDraggableWindows(){
 }
 
 async function loadQuestions(){
+  if (TEST_CONTEXT?.test?.questions?.length) {
+    questions = TEST_CONTEXT.test.questions;
+    return;
+  }
   try{ const r=await fetch("./questions.json"); if(!r.ok)throw new Error(); questions=await r.json(); }
   catch{ const fb=document.getElementById("questionsFallback"); questions=JSON.parse(fb.textContent); }
 }
@@ -1537,6 +1632,11 @@ async function init(){
   setupDraggableWindows();
   if(window.MathJax?.startup?.promise){ await MathJax.startup.promise; }
   else { await new Promise(res=>{ const t=setInterval(()=>{ if(window.MathJax?.typesetPromise){clearInterval(t);res();} },50); setTimeout(()=>{clearInterval(t);res();},4000); }); }
-  signOutStudent();
+  if (isRemoteExamMode()) {
+    currentStudent = TEST_CONTEXT.student;
+    startExamForCurrentStudent();
+  } else {
+    signOutStudent();
+  }
 }
 init().catch(()=>{ questionText.textContent="There was a problem loading the question set."; });

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Results | ASB</title>
+  <link rel="stylesheet" href="/pages/shared.css">
+</head>
+<body data-page="teacher-test-results" data-role="teacher">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/teacher/tests"><div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="8" height="8" rx="1.5"></rect><rect x="12" y="12" width="8" height="8" rx="1.5"></rect><path d="M12 8h4v4"></path></svg></div><div><div class="brand-title">Academic Standards Board</div><div class="brand-subtitle">Teacher portal</div></div></a>
+      <nav class="topnav"><a class="topnav-link" href="/teacher/tests">Back to Tests</a><button class="topnav-link" data-action="logout" type="button">Sign Out</button></nav>
+    </div>
+  </header>
+  <main class="page-main">
+    <div class="page-inner">
+      <div class="message" id="teacherPageMessage" hidden></div>
+      <div class="page-header"><div><div class="eyebrow">Aggregate results</div><h1 class="page-title" id="testResultsTitle">Test Results</h1><p class="page-copy">Score distribution, question difficulty, and sortable student outcomes.</p></div></div>
+      <section class="two-column">
+        <div class="panel">
+          <h3>Score distribution</h3>
+          <div id="scoreDistributionChart"></div>
+        </div>
+        <div class="panel">
+          <h3>Per-question performance</h3>
+          <div class="table-wrap">
+            <table data-sortable>
+              <thead><tr><th data-key="question_position" data-type="number"><button type="button">Question</button></th><th data-key="correct_rate" data-type="number"><button type="button">% Correct</button></th></tr></thead>
+              <tbody id="questionDifficultyRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+      <section class="panel" style="margin-top:24px;">
+        <h3>Individual student scores</h3>
+        <div class="table-wrap">
+          <table data-sortable>
+            <thead><tr><th data-key="student_name"><button type="button">Student</button></th><th data-key="email"><button type="button">Email</button></th><th data-key="score_percent" data-type="number"><button type="button">Score</button></th><th data-key="submitted_at"><button type="button">Submitted</button></th></tr></thead>
+            <tbody id="studentScoresRows"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+  <script src="/pages/shared.js"></script>
+</body>
+</html>

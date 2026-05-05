@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Results | ASB</title>
+  <link rel="stylesheet" href="/pages/shared.css">
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$','$'],['\\(','\\)']] },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+</head>
+<body data-page="student-results" data-role="student">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/student/dashboard"><div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="8" height="8" rx="1.5"></rect><rect x="12" y="12" width="8" height="8" rx="1.5"></rect><path d="M12 8h4v4"></path></svg></div><div><div class="brand-title">Academic Standards Board</div><div class="brand-subtitle">Student portal</div></div></a>
+      <nav class="topnav"><a class="topnav-link" href="/student/history">Back to History</a><button class="topnav-link" data-action="logout" type="button">Sign Out</button></nav>
+    </div>
+  </header>
+  <main class="page-main">
+    <div class="page-inner">
+      <div class="message" id="studentPageMessage" hidden></div>
+      <div class="page-header">
+        <div>
+          <div class="eyebrow">Score report</div>
+          <h1 class="page-title" id="resultTitle">Assessment Results</h1>
+          <p class="page-copy" id="resultBreakdown"></p>
+        </div>
+        <div class="metric" style="min-width:220px;">
+          <h3>Score percentage</h3>
+          <p class="metric-value" id="resultScore">0%</p>
+        </div>
+      </div>
+      <section class="metric-grid" id="resultMeta"></section>
+      <section class="panel" style="margin-top:24px;">
+        <h3>Question-by-question review</h3>
+        <div class="question-review" id="questionReviewList"></div>
+      </section>
+    </div>
+  </main>
+  <script src="/pages/shared.js"></script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Course Detail | ASB</title>
+  <link rel="stylesheet" href="/pages/shared.css">
+</head>
+<body data-page="teacher-course-detail" data-role="teacher">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/teacher/courses"><div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="8" height="8" rx="1.5"></rect><rect x="12" y="12" width="8" height="8" rx="1.5"></rect><path d="M12 8h4v4"></path></svg></div><div><div class="brand-title">Academic Standards Board</div><div class="brand-subtitle">Teacher portal</div></div></a>
+      <nav class="topnav"><a class="topnav-link" href="/teacher/courses">Back to Courses</a><button class="topnav-link" data-action="logout" type="button">Sign Out</button></nav>
+    </div>
+  </header>
+  <main class="page-main">
+    <div class="page-inner">
+      <div class="message" id="teacherPageMessage" hidden></div>
+      <div class="message" id="courseDetailMessage" hidden></div>
+      <div class="page-header"><div><div class="eyebrow">Course detail</div><h1 class="page-title" id="courseDetailTitle">Course</h1><p class="page-copy" id="courseDetailCopy"></p></div></div>
+      <section class="two-column">
+        <div class="panel">
+          <h3>Student roster</h3>
+          <div class="table-wrap">
+            <table data-sortable>
+              <thead><tr><th data-key="name"><button type="button">Student</button></th><th data-key="email"><button type="button">Email</button></th><th data-key="student_id"><button type="button">Student ID</button></th><th data-key="average_score" data-type="number"><button type="button">Average Score</button></th></tr></thead>
+              <tbody id="courseRosterRows"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Enrollment management</h3>
+          <form id="enrollForm" class="form-grid">
+            <div class="field-row"><label for="enrollEmail">Student email</label><input id="enrollEmail" type="email" required></div>
+            <button class="primary-button" type="submit">Enroll Student</button>
+          </form>
+          <h3 style="margin-top:22px;">Assigned tests</h3>
+          <div class="list" id="courseAssignedTests"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+  <script src="/pages/shared.js"></script>
+</body>
+</html>

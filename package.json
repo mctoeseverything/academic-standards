@@ -2,11 +2,13 @@
 {
   "name": "asb-secure-exam",
   "version": "1.0.0",
-  "description": "ASB Secure Exam Browser",
+  "description": "Academic Standards Board full-stack assessment platform",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
-    "dev": "set KIOSK=false && electron .",
+    "start": "node server/app.js",
+    "dev": "node --watch server/app.js",
+    "electron": "electron .",
+    "dev:electron": "set KIOSK=false && electron .",
     "build:win": "electron-builder --win --x64"
   },
   "build": {
@@ -35,6 +37,14 @@
       "createDesktopShortcut": true,
       "runAfterFinish": false
     }
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.15.6"
   },
   "devDependencies": {
     "electron": "^29.0.0",

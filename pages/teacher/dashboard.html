@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Dashboard | ASB</title>
+  <link rel="stylesheet" href="/pages/shared.css">
+</head>
+<body data-page="teacher-dashboard" data-role="teacher">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/teacher/dashboard"><div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="8" height="8" rx="1.5"></rect><rect x="12" y="12" width="8" height="8" rx="1.5"></rect><path d="M12 8h4v4"></path></svg></div><div><div class="brand-title">Academic Standards Board</div><div class="brand-subtitle">Teacher portal</div></div></a>
+      <nav class="topnav">
+        <a class="topnav-link" href="/teacher/courses">Courses</a>
+        <a class="topnav-link" href="/teacher/question-bank">Question Bank</a>
+        <a class="topnav-link" href="/teacher/tests">Tests</a>
+        <a class="topnav-link" href="/teacher/students">Students</a>
+        <button class="topnav-link" data-action="logout" type="button">Sign Out</button>
+      </nav>
+    </div>
+  </header>
+  <main class="page-main">
+    <div class="page-inner">
+      <div class="message" id="teacherPageMessage" hidden></div>
+      <div class="page-header">
+        <div>
+          <div class="eyebrow">Teacher dashboard</div>
+          <h1 class="page-title">Overview</h1>
+          <p class="page-copy">Monitor active courses, student totals, test assignments, and recent submission activity.</p>
+        </div>
+        <div class="button-row">
+          <a class="outline-button" href="/teacher/tests">Create Test</a>
+          <a class="outline-button" href="/teacher/courses">Create Course</a>
+          <a class="outline-button" href="/teacher/students">View Students</a>
+        </div>
+      </div>
+      <section class="metric-grid" style="margin-bottom:24px;">
+        <div class="metric"><h3>Active courses</h3><p class="metric-value" id="activeCourses">0</p></div>
+        <div class="metric"><h3>Total students</h3><p class="metric-value" id="totalStudents">0</p></div>
+        <div class="metric"><h3>Tests assigned</h3><p class="metric-value" id="testsAssigned">0</p></div>
+      </section>
+      <section class="panel">
+        <h3>Recent activity</h3>
+        <div class="list" id="teacherActivity"></div>
+      </section>
+    </div>
+  </main>
+  <script src="/pages/shared.js"></script>
+</body>
+</html>

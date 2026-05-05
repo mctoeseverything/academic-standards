@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Tests | ASB</title>
+  <link rel="stylesheet" href="/pages/shared.css">
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$','$'],['\\(','\\)']] },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+</head>
+<body data-page="teacher-tests" data-role="teacher">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/teacher/dashboard"><div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="8" height="8" rx="1.5"></rect><rect x="12" y="12" width="8" height="8" rx="1.5"></rect><path d="M12 8h4v4"></path></svg></div><div><div class="brand-title">Academic Standards Board</div><div class="brand-subtitle">Teacher portal</div></div></a>
+      <nav class="topnav"><a class="topnav-link" href="/teacher/question-bank">Question Bank</a><a class="topnav-link" href="/teacher/courses">Courses</a><button class="topnav-link" data-action="logout" type="button">Sign Out</button></nav>
+    </div>
+  </header>
+  <main class="page-main">
+    <div class="page-inner">
+      <div class="message" id="teacherPageMessage" hidden></div>
+      <div class="message" id="testsMessage" hidden></div>
+      <div class="split-panel">
+        <section class="panel">
+          <div class="eyebrow">Tests</div>
+          <h1 class="page-title" style="font-size:1.8rem;">Assessment library</h1>
+          <div class="card-grid" id="teacherTestsList"></div>
+        </section>
+        <section class="panel">
+          <div class="eyebrow">Create test</div>
+          <h3>Build a new test</h3>
+          <form id="testCreateForm" class="form-grid">
+            <div class="field-row"><label for="testName">Test name</label><input id="testName" type="text" required></div>
+            <div class="field-row"><label for="testCourse">Course</label><select id="testCourse" required></select></div>
+            <div class="field-row"><label for="testDescription">Description</label><textarea id="testDescription"></textarea></div>
+            <div class="field-row"><label for="testTimeLimit">Time limit (minutes)</label><input id="testTimeLimit" type="number" min="1" value="90" required></div>
+            <div class="field-row"><label for="testDueDate">Due date</label><input id="testDueDate" type="date"></div>
+            <div class="field-row"><label>Question bank</label><div id="testBuilderBank" class="drag-list"></div></div>
+            <div class="field-row"><label>Selected questions</label><div id="selectedQuestions" class="drag-list"></div></div>
+            <button class="primary-button" type="submit">Create Test</button>
+          </form>
+        </section>
+      </div>
+    </div>
+  </main>
+  <script src="/pages/shared.js"></script>
+</body>
+</html>

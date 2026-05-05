@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Courses | ASB</title>
+  <link rel="stylesheet" href="/pages/shared.css">
+</head>
+<body data-page="teacher-courses" data-role="teacher">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/teacher/dashboard"><div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="8" height="8" rx="1.5"></rect><rect x="12" y="12" width="8" height="8" rx="1.5"></rect><path d="M12 8h4v4"></path></svg></div><div><div class="brand-title">Academic Standards Board</div><div class="brand-subtitle">Teacher portal</div></div></a>
+      <nav class="topnav"><a class="topnav-link" href="/teacher/question-bank">Question Bank</a><a class="topnav-link" href="/teacher/tests">Tests</a><button class="topnav-link" data-action="logout" type="button">Sign Out</button></nav>
+    </div>
+  </header>
+  <main class="page-main">
+    <div class="page-inner">
+      <div class="message" id="teacherPageMessage" hidden></div>
+      <div class="two-column">
+        <section class="panel">
+          <div class="page-header" style="margin-bottom:18px;"><div><div class="eyebrow">Courses</div><h1 class="page-title" style="font-size:1.8rem;">Your courses</h1></div></div>
+          <div class="card-grid" id="teacherCourseGrid"></div>
+        </section>
+        <section class="panel">
+          <div class="eyebrow">Create course</div>
+          <h3>New course</h3>
+          <div class="message" id="courseMessage" hidden></div>
+          <form id="createCourseForm" class="form-grid">
+            <div class="field-row"><label for="courseName">Course name</label><input id="courseName" type="text" required></div>
+            <div class="field-row"><label for="courseSubject">Subject area</label><input id="courseSubject" type="text" required></div>
+            <div class="field-row"><label for="courseDescription">Description</label><textarea id="courseDescription"></textarea></div>
+            <button class="primary-button" type="submit">Create Course</button>
+          </form>
+        </section>
+      </div>
+    </div>
+  </main>
+  <script src="/pages/shared.js"></script>
+</body>
+</html>

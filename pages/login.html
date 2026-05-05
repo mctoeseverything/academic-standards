@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In | ASB</title>
+  <link rel="stylesheet" href="/pages/shared.css">
+</head>
+<body data-page="login">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/">
+        <div class="brand-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="4" y="4" width="8" height="8" rx="1.5"></rect>
+            <rect x="12" y="12" width="8" height="8" rx="1.5"></rect>
+            <path d="M12 8h4v4"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">Academic Standards Board</div>
+          <div class="brand-subtitle">Assessment platform</div>
+        </div>
+      </a>
+    </div>
+  </header>
+  <main class="page-main">
+    <div class="auth-shell">
+      <div class="auth-card">
+        <div class="eyebrow">Account access</div>
+        <h1 class="page-title" style="font-size:2rem;margin-bottom:8px;">Sign in</h1>
+        <p class="page-copy">Choose a role, enter your email first, then continue to password entry.</p>
+        <div class="tab-row" style="margin:18px 0;">
+          <button class="tab-button is-active" data-role-tab="student" type="button">Student</button>
+          <button class="tab-button" data-role-tab="teacher" type="button">Teacher</button>
+        </div>
+        <div class="message" id="loginMessage" hidden></div>
+        <form id="loginForm" class="form-grid" style="margin-top:14px;">
+          <div id="emailStep">
+            <div class="field-row">
+              <label for="loginEmail">Email address</label>
+              <input id="loginEmail" type="email" autocomplete="email" required>
+            </div>
+            <div class="button-row" style="margin-top:14px;">
+              <button class="primary-button" id="continueLogin" type="button">Continue</button>
+            </div>
+          </div>
+          <div id="passwordStep" hidden>
+            <div class="field-row">
+              <label for="loginPassword">Password</label>
+              <input id="loginPassword" type="password" autocomplete="current-password" required>
+            </div>
+            <div class="button-row" style="margin-top:14px;">
+              <button class="secondary-button" id="backToEmail" type="button">Back</button>
+              <button class="primary-button" type="submit">Sign In</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+  <script src="/pages/shared.js"></script>
+</body>
+</html>

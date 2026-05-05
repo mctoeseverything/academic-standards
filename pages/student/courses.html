@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Courses | ASB</title>
+  <link rel="stylesheet" href="/pages/shared.css">
+</head>
+<body data-page="student-courses" data-role="student">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/student/dashboard"><div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="8" height="8" rx="1.5"></rect><rect x="12" y="12" width="8" height="8" rx="1.5"></rect><path d="M12 8h4v4"></path></svg></div><div><div class="brand-title">Academic Standards Board</div><div class="brand-subtitle">Student portal</div></div></a>
+      <nav class="topnav"><a class="topnav-link" href="/student/dashboard">Dashboard</a><a class="topnav-link" href="/student/history">History</a><button class="topnav-link" data-action="logout" type="button">Sign Out</button></nav>
+    </div>
+  </header>
+  <main class="page-main">
+    <div class="page-inner">
+      <div class="message" id="studentPageMessage" hidden></div>
+      <div class="page-header"><div><div class="eyebrow">Courses</div><h1 class="page-title">Your courses</h1><p class="page-copy">Track where you are enrolled and how many assigned assessments you have completed.</p></div></div>
+      <div class="card-grid" id="studentCourseGrid"></div>
+    </div>
+  </main>
+  <script src="/pages/shared.js"></script>
+</body>
+</html>

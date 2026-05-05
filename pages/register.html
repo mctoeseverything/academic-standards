@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register | ASB</title>
+  <link rel="stylesheet" href="/pages/shared.css">
+</head>
+<body data-page="register">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/">
+        <div class="brand-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="4" y="4" width="8" height="8" rx="1.5"></rect>
+            <rect x="12" y="12" width="8" height="8" rx="1.5"></rect>
+            <path d="M12 8h4v4"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">Academic Standards Board</div>
+          <div class="brand-subtitle">Assessment platform</div>
+        </div>
+      </a>
+    </div>
+  </header>
+  <main class="page-main">
+    <div class="auth-shell">
+      <div class="auth-card">
+        <div class="eyebrow">Account creation</div>
+        <h1 class="page-title" style="font-size:2rem;margin-bottom:8px;">Create an account</h1>
+        <p class="page-copy">Register as a student or teacher using the ASB platform.</p>
+        <div class="tab-row" style="margin:18px 0;">
+          <button class="tab-button is-active" data-register-tab="student" type="button">Student</button>
+          <button class="tab-button" data-register-tab="teacher" type="button">Teacher</button>
+        </div>
+        <div class="message" id="registerMessage" hidden></div>
+        <form id="registerForm" class="form-grid" style="margin-top:14px;">
+          <div class="field-row">
+            <label for="registerName">Full name</label>
+            <input id="registerName" type="text" required>
+          </div>
+          <div class="field-row">
+            <label for="registerEmail">Email address</label>
+            <input id="registerEmail" type="email" required>
+          </div>
+          <div class="field-row">
+            <label for="registerPassword">Password</label>
+            <input id="registerPassword" type="password" required minlength="8">
+          </div>
+          <div id="studentFields" class="form-grid">
+            <div class="field-row">
+              <label for="registerDob">Date of birth</label>
+              <input id="registerDob" type="date">
+            </div>
+            <div class="field-row">
+              <label for="registerStudentId">Student ID (optional)</label>
+              <input id="registerStudentId" type="text">
+            </div>
+          </div>
+          <div id="teacherFields" class="form-grid" hidden>
+            <div class="field-row">
+              <label for="registerInstitution">School or institution</label>
+              <input id="registerInstitution" type="text">
+            </div>
+            <div class="field-row">
+              <label for="registerSubjectArea">Subject area</label>
+              <input id="registerSubjectArea" type="text">
+            </div>
+          </div>
+          <div class="button-row">
+            <button class="primary-button" type="submit">Create Account</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+  <script src="/pages/shared.js"></script>
+</body>
+</html>

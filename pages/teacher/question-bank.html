@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Question Bank | ASB</title>
+  <link rel="stylesheet" href="/pages/shared.css">
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$','$'],['\\(','\\)']] },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+</head>
+<body data-page="teacher-question-bank" data-role="teacher">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/teacher/dashboard"><div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="8" height="8" rx="1.5"></rect><rect x="12" y="12" width="8" height="8" rx="1.5"></rect><path d="M12 8h4v4"></path></svg></div><div><div class="brand-title">Academic Standards Board</div><div class="brand-subtitle">Teacher portal</div></div></a>
+      <nav class="topnav"><a class="topnav-link" href="/teacher/tests">Tests</a><a class="topnav-link" href="/teacher/courses">Courses</a><button class="topnav-link" data-action="logout" type="button">Sign Out</button></nav>
+    </div>
+  </header>
+  <main class="page-main">
+    <div class="page-inner">
+      <div class="message" id="teacherPageMessage" hidden></div>
+      <div class="message" id="questionBankMessage" hidden></div>
+      <div class="split-panel">
+        <section class="panel">
+          <div class="eyebrow">Question bank</div>
+          <h1 class="page-title" style="font-size:1.8rem;">Browse and filter</h1>
+          <form id="questionFilterForm" class="form-grid" style="margin-bottom:18px;">
+            <div class="field-row"><label for="qbSearch">Search</label><input id="qbSearch" type="text"></div>
+            <div class="field-row"><label for="qbSubject">Subject</label><input id="qbSubject" type="text"></div>
+            <div class="field-row"><label for="qbType">Question type</label><select id="qbType"><option value="">Any</option><option value="multiple_choice">Multiple choice</option><option value="select_multiple">Select multiple</option><option value="numeric">Numeric</option><option value="fill_blank">Fill in the blank</option><option value="ordering">Ordering</option><option value="matching">Matching</option><option value="hotspot">Hotspot</option></select></div>
+            <div class="field-row"><label for="qbDifficulty">Difficulty</label><select id="qbDifficulty"><option value="">Any</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+            <button class="outline-button" type="submit">Apply Filters</button>
+          </form>
+          <div class="drag-list" id="questionBankList"></div>
+        </section>
+        <section class="panel">
+          <div class="eyebrow">Create question</div>
+          <h3>New question entry</h3>
+          <form id="questionCreateForm" class="form-grid">
+            <div class="field-row"><label for="questionType">Type</label><select id="questionType" required><option value="multiple_choice">Multiple choice</option><option value="select_multiple">Select multiple</option><option value="numeric">Numeric</option></select></div>
+            <div class="field-row"><label for="questionPrompt">Prompt</label><textarea id="questionPrompt" required></textarea></div>
+            <div class="field-row"><label for="questionChoices">Choices (one per line, when applicable)</label><textarea id="questionChoices"></textarea></div>
+            <div class="field-row"><label for="questionCorrect">Correct answer JSON</label><textarea id="questionCorrect" required>0</textarea></div>
+            <div class="field-row"><label for="questionExplanation">Explanation</label><textarea id="questionExplanation"></textarea></div>
+            <div class="field-row"><label for="questionSubject">Subject</label><input id="questionSubject" type="text" required></div>
+            <div class="field-row"><label for="questionTopic">Topic</label><input id="questionTopic" type="text" required></div>
+            <div class="field-row"><label for="questionDifficulty">Difficulty</label><select id="questionDifficulty"><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5</option></select></div>
+            <div class="field-row"><label for="questionTags">Tags (comma-separated)</label><input id="questionTags" type="text"></div>
+            <button class="primary-button" type="submit">Save Question</button>
+          </form>
+        </section>
+      </div>
+    </div>
+  </main>
+  <script src="/pages/shared.js"></script>
+</body>
+</html>

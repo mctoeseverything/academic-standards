@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student History | ASB</title>
+  <link rel="stylesheet" href="/pages/shared.css">
+</head>
+<body data-page="student-history" data-role="student">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/student/dashboard"><div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="8" height="8" rx="1.5"></rect><rect x="12" y="12" width="8" height="8" rx="1.5"></rect><path d="M12 8h4v4"></path></svg></div><div><div class="brand-title">Academic Standards Board</div><div class="brand-subtitle">Student portal</div></div></a>
+      <nav class="topnav"><a class="topnav-link" href="/student/dashboard">Dashboard</a><a class="topnav-link" href="/student/courses">Courses</a><button class="topnav-link" data-action="logout" type="button">Sign Out</button></nav>
+    </div>
+  </header>
+  <main class="page-main">
+    <div class="page-inner">
+      <div class="message" id="studentPageMessage" hidden></div>
+      <div class="page-header"><div><div class="eyebrow">Attempt history</div><h1 class="page-title">Past attempts</h1><p class="page-copy">Open any completed attempt to review its full score report and answer breakdown.</p></div></div>
+      <div class="table-wrap">
+        <table data-sortable>
+          <thead>
+            <tr>
+              <th data-key="test_name"><button type="button">Test</button></th>
+              <th data-key="course_name"><button type="button">Course</button></th>
+              <th data-key="submitted_at"><button type="button">Date</button></th>
+              <th data-key="score_percent" data-type="number"><button type="button">Score</button></th>
+              <th data-key="time_taken" data-type="number"><button type="button">Time Taken</button></th>
+            </tr>
+          </thead>
+          <tbody id="studentHistoryRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+  <script src="/pages/shared.js"></script>
+</body>
+</html>
