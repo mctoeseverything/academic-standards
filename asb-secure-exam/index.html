@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Academic Standards Board – Algebra I Assessment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.js"></script>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath:[['$','$'],['\\(','\\)']], displayMath:[['$$','$$'],['\\[','\\]']], processEscapes:true },
+      options: { skipHtmlTags:['script','noscript','style','textarea','pre'] },
+      startup: { ready(){ MathJax.startup.defaultReady(); }, typeset:false }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+  <script src="https://www.desmos.com/api/v1.3/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+</head>
+<body>
+
+  <!-- ── SVG icon sprite ─────────────────────────────────── -->
+  <svg class="icon-sprite" aria-hidden="true" focusable="false">
+    <symbol id="icon-chevron-left"  viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+    <symbol id="icon-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="icon-chevron-up"    viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"/></symbol>
+    <symbol id="icon-chevron-down"  viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="icon-clock-3"       viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></symbol>
+    <symbol id="icon-bookmark"      viewBox="0 0 24 24"><path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="icon-pause"         viewBox="0 0 24 24"><path d="M9 5h2v14H9z"/><path d="M13 5h2v14h-2z"/></symbol>
+  </svg>
+
+  <!-- ── Pause overlay — fully opaque, no exam content visible ── -->
+  <div id="pauseOverlay" style="display:none;">
+    <div class="pause-card">
+      <div class="pause-org">Academic Standards Board</div>
+      <div class="pause-title">Exam Paused</div>
+      <div class="pause-timer-wrap">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.55"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        <span id="pauseTimerDisplay">01:30:00</span>
+      </div>
+      <div class="pause-sub">Time is still running. Resume when you're ready to continue.</div>
+      <button onclick="togglePause()" class="pause-resume-btn">Resume Exam</button>
+    </div>
+  </div>
+
+  <!-- ── Pause confirmation modal ────────────────────────── -->
+  <div class="modal" id="pauseConfirmModal" aria-hidden="true">
+    <div class="modal-content" style="max-width:400px;">
+      <h3>Pause Exam?</h3>
+      <p style="font-size:0.84rem;color:var(--text-soft);margin-top:10px;line-height:1.6;">
+        Your exam timer will <strong>continue counting down</strong> while the exam is paused. Your answers are saved automatically.
+      </p>
+      <p style="font-size:0.84rem;color:var(--muted);margin-top:8px;line-height:1.6;">
+        The exam content will be hidden while paused to protect test integrity.
+      </p>
+      <div class="modal-actions">
+        <button class="secondary-button" type="button" onclick="closeModal('pauseConfirmModal')">Cancel</button>
+        <button class="primary-button"   type="button" onclick="confirmPause()">Pause Anyway</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       HEADER
+       ══════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <div class="brand-block">
+      <div class="brand-seal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">Academic Standards Board</div>
+        <div class="brand-sub">Algebra I &middot; Form A</div>
+      </div>
+    </div>
+
+    <div class="timer-block">
+      <svg class="clock-icon"><use href="#icon-clock-3"/></svg>
+      <div class="timer-value" id="time">01:30:00</div>
+    </div>
+
+    <div class="header-right">
+      <button class="pause-button" type="button" onclick="togglePause()">
+        <svg class="pause-icon"><use href="#icon-pause"/></svg>Pause
+      </button>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════
+       PAGE SHELL
+       ══════════════════════════════════════════════════════ -->
+  <main class="page-shell">
+    <section class="exam-shell">
+
+      <!-- No sidebars — they are hidden via CSS and replaced by
+           the bottom popup navigator + sub-header tools bar -->
+
+      <section class="panel center-panel">
+
+        <!-- Sub-header: section label · stats · tools · submit -->
+        <div class="exam-header">
+          <div class="exam-header-left">
+            <p class="eyebrow" id="sectionEyebrow">Algebra I – High-Rigor Assessment</p>
+            <div class="exam-header-stats">
+              <span class="status-chip">Answered: <strong id="answeredCount">0</strong>&thinsp;/&thinsp;<span id="totalQuestions">0</span></span>
+              <span class="status-chip">Marked: <strong id="markedCount">0</strong></span>
+            </div>
+          </div>
+
+          <!-- Tools — inline pill buttons -->
+          <div class="tools-bar">
+            <button class="tool-link" id="calculatorButton"  type="button">Calculator</button>
+            <button class="tool-link" type="button" onclick="openModal('referenceModal')">Reference</button>
+            <button class="tool-link" type="button" onclick="openModal('formulaModal')">Formulas</button>
+            <button class="tool-link" id="graphingButton"   type="button">Graphing</button>
+            <button class="tool-link" id="notesButton"      type="button">Notes</button>
+            <button class="secondary-button" id="submitButton" type="button" style="margin-left:6px;">Submit</button>
+          </div>
+        </div>
+
+
+        <!-- ── Review screen (shown after last question Next click) ── -->
+        <div class="review-screen" id="reviewScreen">
+          <div class="review-screen-header">
+            <div class="review-screen-title">Review Your Responses</div>
+            <div class="review-screen-sub">Check your answers before submitting. Click any question to go back to it.</div>
+          </div>
+          <div class="review-summary-chips" id="reviewSummaryChips"></div>
+          <div class="review-q-grid" id="reviewQGrid"></div>
+          <div class="review-actions">
+            <span class="review-actions-left" id="reviewActionsNote"></span>
+            <div style="display:flex;gap:8px;">
+              <button class="secondary-button" type="button" id="reviewBackButton">Back to Exam</button>
+              <button class="primary-button"   type="button" id="reviewSubmitButton">Submit Test</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Question body ──────────────────────────────── -->
+        <div class="question-body" id="questionBody">
+          <div class="question-meta">
+            <div class="question-meta-left">
+              <div class="question-pill" id="questionNumberBadge">1</div>
+              <button class="mark-toggle" id="markToggle" type="button">
+                <svg class="inline-icon"><use href="#icon-bookmark"/></svg>
+                <span>Mark for Review</span>
+              </button>
+              <!-- type badge injected here by JS -->
+            </div>
+            <div class="question-tools">
+              <button class="utility-button" id="eliminateModeButton" type="button">Strikethrough</button>
+              <button class="utility-button" id="highlightModeButton" type="button">Highlight</button>
+            </div>
+          </div>
+
+          <div id="questionText" class="question-stem"></div>
+          <div id="infoBoxContainer"></div>
+          <div id="choices" class="choices"></div>
+        </div>
+
+        <!-- ── Action bar ─────────────────────────────────── -->
+        <div class="action-bar">
+          <!-- Previous -->
+          <button class="secondary-button nav-button" id="prevButton" type="button" onclick="prevQuestion()">
+            <svg class="tiny-icon"><use href="#icon-chevron-left"/></svg>Previous
+          </button>
+
+          <!-- Bottom-center: question navigator trigger -->
+          <div class="action-group">
+            <button class="qnav-trigger" id="qnavTrigger" type="button">
+              <span id="qnavLabel">Question 1 of 0</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="10" height="10"><path d="m18 15-6-6-6 6"/></svg>
+            </button>
+          </div>
+
+          <!-- Next -->
+          <button class="primary-button nav-button" id="nextButton" type="button" onclick="nextQuestion()">
+            Next<svg class="tiny-icon"><use href="#icon-chevron-right"/></svg>
+          </button>
+        </div>
+
+      </section><!-- /center-panel -->
+
+    </section><!-- /exam-shell -->
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════
+       QUESTION NAVIGATOR POPUP
+       ══════════════════════════════════════════════════════ -->
+  <div class="qnav-popup" id="qnavPopup">
+    <div class="qnav-header">
+      <span class="qnav-title">Jump to Question</span>
+      <button class="qnav-close" id="qnavClose" type="button">✕</button>
+    </div>
+    <div class="qnav-grid" id="questionGrid"></div>
+    <div class="qnav-legend">
+      <div class="legend-item"><span class="legend-swatch current"></span>Current</div>
+      <div class="legend-item"><span class="legend-swatch unanswered"></span>Not Answered</div>
+      <div class="legend-item"><span class="legend-swatch answered"></span>Answered</div>
+      <div class="legend-item"><span class="legend-swatch marked"></span>Marked for Review</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       MODALS (unchanged content, slimmer markup)
+       ══════════════════════════════════════════════════════ -->
+
+  <!-- Reference Sheet -->
+  <div class="modal" id="referenceModal" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-sheet modal-sheet-scroll">
+        <div class="sheet-header"><h3>Reference Sheet</h3><p>Algebra I — Authorized Testing Support Materials</p></div>
+        <div class="sheet-section">
+          <h4>Properties of Operations</h4>
+          <div class="formula-list">
+            <div class="formula-row"><span class="formula-label">Commutative</span><span class="formula-expression">\(a + b = b + a\)</span></div>
+            <div class="formula-row"><span class="formula-label">Associative</span><span class="formula-expression">\((a + b) + c = a + (b + c)\)</span></div>
+            <div class="formula-row"><span class="formula-label">Distributive</span><span class="formula-expression">\(a(b + c) = ab + ac\)</span></div>
+          </div>
+        </div>
+        <div class="sheet-section">
+          <h4>Exponent Rules</h4>
+          <div class="formula-list">
+            <div class="formula-row"><span class="formula-label">Product of Powers</span><span class="formula-expression">\(x^m \cdot x^n = x^{m+n}\)</span></div>
+            <div class="formula-row"><span class="formula-label">Power of a Power</span><span class="formula-expression">\((x^m)^n = x^{mn}\)</span></div>
+            <div class="formula-row"><span class="formula-label">Negative Exponent</span><span class="formula-expression">\(x^{-n} = \dfrac{1}{x^n}\)</span></div>
+            <div class="formula-row"><span class="formula-label">Zero Exponent</span><span class="formula-expression">\(x^0 = 1,\ x \neq 0\)</span></div>
+          </div>
+        </div>
+        <div class="sheet-section">
+          <h4>Slope &amp; Lines</h4>
+          <div class="formula-list">
+            <div class="formula-row"><span class="formula-label">Slope Formula</span><span class="formula-expression">\(m = \dfrac{y_2 - y_1}{x_2 - x_1}\)</span></div>
+            <div class="formula-row"><span class="formula-label">Slope-Intercept</span><span class="formula-expression">\(y = mx + b\)</span></div>
+            <div class="formula-row"><span class="formula-label">Point-Slope</span><span class="formula-expression">\(y - y_1 = m(x - x_1)\)</span></div>
+          </div>
+        </div>
+      </div>
+      <button class="primary-button" type="button" onclick="closeModal('referenceModal')">Close</button>
+    </div>
+  </div>
+
+  <!-- Formula Sheet -->
+  <div class="modal formula-modal" id="formulaModal" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-sheet modal-sheet-scroll">
+        <div class="sheet-header"><h3>Formula Sheet</h3><p>Algebra I — Authorized Testing Support Materials</p></div>
+        <div class="sheet-section">
+          <h4>Quadratic Formula</h4>
+          <div class="featured-formula"><span class="formula-expression">\[x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}\]</span></div>
+        </div>
+        <div class="sheet-section">
+          <h4>Vertex of a Parabola</h4>
+          <div class="formula-list">
+            <div class="formula-row"><span class="formula-label">Axis of Symmetry</span><span class="formula-expression">\(x = -\dfrac{b}{2a}\)</span></div>
+            <div class="formula-row"><span class="formula-label">Vertex Form</span><span class="formula-expression">\(f(x) = a(x - h)^2 + k\)</span></div>
+          </div>
+        </div>
+        <div class="sheet-section">
+          <h4>Factoring Identities</h4>
+          <div class="formula-list">
+            <div class="formula-row"><span class="formula-label">Difference of Squares</span><span class="formula-expression">\(a^2 - b^2 = (a+b)(a-b)\)</span></div>
+            <div class="formula-row"><span class="formula-label">Perfect Square</span><span class="formula-expression">\((a \pm b)^2 = a^2 \pm 2ab + b^2\)</span></div>
+          </div>
+        </div>
+        <div class="sheet-section">
+          <h4>Systems of Equations</h4>
+          <div class="formula-list">
+            <div class="formula-row"><span class="formula-label">Unique Solution</span><span class="formula-expression">Lines intersect at one point</span></div>
+            <div class="formula-row"><span class="formula-label">No Solution</span><span class="formula-expression">Lines are parallel</span></div>
+            <div class="formula-row"><span class="formula-label">Infinite Solutions</span><span class="formula-expression">Lines are identical</span></div>
+          </div>
+        </div>
+      </div>
+      <button class="primary-button" type="button" onclick="closeModal('formulaModal')">Close</button>
+    </div>
+  </div>
+
+  <!-- Calculator -->
+  <div class="modal tool-modal" id="calculatorModal" aria-hidden="true">
+    <div class="modal-content modal-content-wide draggable-window">
+      <div class="tool-modal-header drag-handle">
+        <div><h3>Scientific Calculator</h3><p>Powered by Desmos.</p></div>
+        <button class="secondary-button" type="button" onclick="closeModal('calculatorModal')">Close</button>
+      </div>
+      <div class="tool-frame-wrap">
+        <iframe class="tool-frame" id="calculatorFrame" src="about:blank" title="Desmos Scientific Calculator" loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphing -->
+  <div class="modal tool-modal" id="graphingModal" aria-hidden="true">
+    <div class="modal-content modal-content-wide draggable-window">
+      <div class="tool-modal-header drag-handle">
+        <div><h3>Graphing Tool</h3><p>Powered by Desmos.</p></div>
+        <button class="secondary-button" type="button" onclick="closeModal('graphingModal')">Close</button>
+      </div>
+      <div class="tool-frame-wrap">
+        <div id="desmosGraphingCalculator" class="tool-frame desmos-embed"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notes -->
+  <div class="modal" id="notesModal" aria-hidden="true">
+    <div class="modal-content notes-modal-content draggable-window">
+      <div class="tool-modal-header drag-handle">
+        <div><h3>Notes</h3><p>Notes are saved locally and not submitted.</p></div>
+        <button class="secondary-button" type="button" onclick="closeModal('notesModal')">Close</button>
+      </div>
+      <textarea id="notesField" class="notes-field" placeholder="Scratch work — not submitted with your test."></textarea>
+    </div>
+  </div>
+
+  <!-- Submit -->
+  <div class="modal" id="submitModal" aria-hidden="true">
+    <div class="modal-content">
+      <h3>Submit Test?</h3>
+      <p id="submitSummary" style="font-size:0.82rem;color:var(--muted);margin-top:6px;"></p>
+      <div class="submit-summary-list" id="submitChecklist"></div>
+      <div class="modal-actions">
+        <button class="secondary-button" type="button" onclick="closeModal('submitModal')">Return to Test</button>
+        <button class="primary-button"   type="button" id="confirmSubmitButton">Confirm Submission</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="modal results-modal" id="resultsModal" aria-hidden="true">
+    <div class="modal-content modal-content-wide">
+      <div class="tool-modal-header">
+        <div><h3>Score Report</h3><p>Algebra I High-Rigor Assessment — Practice Attempt Complete</p></div>
+        <button class="secondary-button" type="button" id="restartButton">Restart Test</button>
+      </div>
+      <div class="results-grid">
+        <div class="results-hero">
+          <span class="results-label">Final Score</span>
+          <div class="results-score" id="resultsScore">0%</div>
+          <p id="resultsBreakdown"></p>
+        </div>
+        <div class="results-stats">
+          <div class="result-stat"><span>Items Answered</span><strong id="resultsAnswered">0</strong></div>
+          <div class="result-stat"><span>Items Correct</span><strong id="resultsCorrect">0</strong></div>
+          <div class="result-stat"><span>Flagged for Review</span><strong id="resultsMarked">0</strong></div>
+          <div class="result-stat"><span>Time Remaining</span><strong id="resultsTime">00:00:00</strong></div>
+        </div>
+      </div>
+      <div class="results-review" id="resultsReview"></div>
+    </div>
+  </div>
+
+
+
+  <!-- Submit Warning Modal -->
+  <div class="modal warning-modal" id="submitWarningModal" aria-hidden="true">
+    <div class="modal-content" style="max-width:420px;">
+      <div class="warning-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <h3 id="submitWarningTitle">Before you submit</h3>
+      <p style="font-size:0.84rem;color:var(--muted);margin-top:6px;line-height:1.6;" id="submitWarningDesc"></p>
+      <div class="warning-list" id="submitWarningList"></div>
+      <div class="modal-actions">
+        <button class="secondary-button" type="button" onclick="closeModal('submitWarningModal')">Go Back</button>
+        <button class="primary-button"   type="button" id="submitWarningConfirm">Submit Anyway</button>
+      </div>
+    </div>
+  </div>
+
+  <script id="questionsFallback" type="application/json">
+[{"type":"multiple_choice","prompt":"Which expression is equivalent to $3(2x - 5) + 4x$?","choices":["$10x - 15$","$10x - 5$","$6x - 15$","$6x - 5$"],"correct":0}]
+  </script>
+
+  <script src="./script.js"></script>
+
+
+
+</body>
+</html>

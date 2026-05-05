@@ -1,0 +1,514 @@
+[
+  {
+    "section": 1, "sectionTitle": "Foundations & Calibration",
+    "type": "multiple_choice",
+    "prompt": "A linear function $f$ satisfies $f(-3) = 11$ and $f(5) = -5$. Which equation correctly defines $f(x)$?",
+    "choices": ["$f(x) = -2x + 5$","$f(x) = 2x - 5$","$f(x) = -2x - 5$","$f(x) = -2x + 4$"],
+    "correct": 0
+  },
+  {
+    "section": 1, "sectionTitle": "Foundations & Calibration",
+    "type": "multiple_choice",
+    "prompt": "The equation $4(2x - 3) = 3(x + 1) + 5x$ is solved below. Identify the step that contains the first error.",
+    "info_box": ["Step 1: $8x - 12 = 3x + 3 + 5x$","Step 2: $8x - 12 = 8x + 3$","Step 3: $-12 = 3$","Step 4: No solution"],
+    "choices": ["Step 1 — the distributive property was applied incorrectly","Step 2 — like terms on the right were combined incorrectly","Step 3 — the subtraction of $8x$ was applied incorrectly","There is no error; the conclusion is correct"],
+    "correct": 3
+  },
+  {
+    "section": 1, "sectionTitle": "Foundations & Calibration",
+    "type": "ordering",
+    "prompt": "The steps below solve $3(x - 2) + 4 = 2x + 7$, but they are out of order. Drag them into the correct sequence from first to last.",
+    "items": [
+      "Distribute: $3x - 6 + 4 = 2x + 7$",
+      "Combine like terms on the left: $3x - 2 = 2x + 7$",
+      "Subtract $2x$ from both sides: $x - 2 = 7$",
+      "Add $2$ to both sides: $x = 9$"
+    ],
+    "correct": [0, 1, 2, 3]
+  },
+  {
+    "section": 1, "sectionTitle": "Foundations & Calibration",
+    "type": "multiple_choice",
+    "prompt": "A function $g$ is defined by $g(x) = |2x - 6| - 4$. For which value(s) of $x$ does $g(x) = 0$?",
+    "choices": ["$x = 1$ only","$x = 5$ only","$x = 1$ and $x = 5$","$x = -1$ and $x = 7$"],
+    "correct": 2
+  },
+  {
+    "section": 1, "sectionTitle": "Foundations & Calibration",
+    "type": "fill_blank",
+    "prompt": "A line has slope $-\\dfrac{3}{4}$ and passes through the point $(4, 1)$. Complete the slope-intercept equation of the line.",
+    "template": "$y =$ [slope] $x +$ [y-intercept]",
+    "blanks": [
+      { "id": "slope", "label": "slope", "acceptedAnswers": ["-3/4", "-0.75"] },
+      { "id": "intercept", "label": "y-intercept", "acceptedAnswers": ["4"] }
+    ]
+  },
+  {
+    "section": 1, "sectionTitle": "Foundations & Calibration",
+    "type": "numeric",
+    "prompt": "The sum of three consecutive even integers is $78$. What is the largest of the three integers?",
+    "placeholder": "Enter an integer",
+    "acceptedAnswers": ["28"]
+  },
+  {
+    "section": 1, "sectionTitle": "Foundations & Calibration",
+    "type": "multiple_choice",
+    "prompt": "Line $\\ell$ passes through $(-1, 4)$ and is perpendicular to the line $3x - y = 7$. What is the $y$-intercept of line $\\ell$?",
+    "choices": ["$\\dfrac{11}{3}$","$3$","$11$","$-\\dfrac{7}{3}$"],
+    "correct": 0
+  },
+  {
+    "section": 1, "sectionTitle": "Foundations & Calibration",
+    "type": "select_multiple",
+    "prompt": "Select ALL expressions equivalent to $(3x^2 y^{-1})^2 \\cdot (x^{-3} y^2)^3$.",
+    "choices": ["$9x^{-5}y^{4}$","$9 \\cdot x^{-5} \\cdot y^{4}$","$\\dfrac{9}{x^5 y^{-4}}$","$\\dfrac{9y^4}{x^5}$"],
+    "correct": [0, 1, 3]
+  },
+  {
+    "section": 2, "sectionTitle": "Linear Modeling & Systems",
+    "type": "multiple_choice",
+    "prompt": "A rideshare company charges a flat booking fee plus a per-mile rate. A 4-mile trip costs $\\$8.60$ and an 11-mile trip costs $\\$15.25$. What is the per-mile rate?",
+    "choices": ["$\\$0.85$","$\\$0.95$","$\\$1.05$","$\\$1.25$"],
+    "correct": 1
+  },
+  {
+    "section": 2, "sectionTitle": "Linear Modeling & Systems",
+    "type": "numeric",
+    "prompt": "Two cars depart from the same point in opposite directions. Car A travels at $55$ mph and Car B travels at $70$ mph. After how many minutes will the cars be exactly $62.5$ miles apart?",
+    "placeholder": "Enter minutes",
+    "acceptedAnswers": ["30"]
+  },
+  {
+    "section": 2, "sectionTitle": "Linear Modeling & Systems",
+    "type": "multiple_choice",
+    "prompt": "A manufacturer models profit $P(x) = 12x - (180 + 4x)$. The break-even occurs when $P(x) = 0$. How many additional units beyond break-even must be produced to earn at least $\\$200$ profit?",
+    "choices": ["$22$","$25$","$47$","$50$"],
+    "correct": 1
+  },
+  {
+    "section": 2, "sectionTitle": "Linear Modeling & Systems",
+    "type": "multiple_choice",
+    "prompt": "The system below models a real-world scenario. Which statement correctly interprets the solution?",
+    "info_box": ["$x + y = 120$","$3x + 5y = 440$","where $x$ = adult tickets and $y$ = child tickets sold."],
+    "choices": ["$40$ adult and $80$ child tickets were sold","$80$ adult and $40$ child tickets were sold","$60$ adult and $60$ child tickets were sold","$70$ adult and $50$ child tickets were sold"],
+    "correct": 0
+  },
+  {
+    "section": 2, "sectionTitle": "Linear Modeling & Systems",
+    "type": "matching",
+    "prompt": "Match each system of equations to the correct description of its solution type.",
+    "pairs": [
+      { "left": "$y = 2x + 1$ and $y = 2x - 3$",      "right": "No solution (parallel lines)" },
+      { "left": "$y = 3x - 1$ and $2y = 6x - 2$",      "right": "Infinitely many solutions" },
+      { "left": "$y = x + 2$ and $y = -x + 4$",         "right": "Unique solution at $(1, 3)$" },
+      { "left": "$2x + y = 5$ and $x - y = 1$",         "right": "Unique solution at $(2, 1)$" }
+    ],
+    "correct": [0, 1, 2, 3]
+  },
+  {
+    "section": 2, "sectionTitle": "Linear Modeling & Systems",
+    "type": "numeric",
+    "prompt": "A tank drains at a constant rate. At $t = 0$ it holds $480$ gallons; at $t = 12$ minutes it holds $336$ gallons. At what time (minutes) will it reach exactly $60$ gallons?",
+    "placeholder": "Enter minutes",
+    "acceptedAnswers": ["35"]
+  },
+  {
+    "section": 2, "sectionTitle": "Linear Modeling & Systems",
+    "type": "multiple_choice",
+    "prompt": "A contractor charges $\\$45$/hr for labor plus $\\$320$ in materials. A client's budget is at most $\\$1{,}010$. Which inequality models the maximum labor hours $h$?",
+    "choices": ["$45h + 320 \\leq 1010;\\quad h \\leq 15$","$45h \\leq 690;\\quad h \\leq 14$","$45h + 320 < 1010;\\quad h < 15.3$","$45(h+320) \\leq 1010;\\quad h \\leq -297.5$"],
+    "correct": 0
+  },
+  {
+    "section": 2, "sectionTitle": "Linear Modeling & Systems",
+    "type": "multiple_choice",
+    "prompt": "A savings account balance after $w$ weeks is modeled by $B = 1{,}240 - 65w$. Which statement BEST interprets the slope?",
+    "choices": ["The account begins with $\\$65$ and increases by $\\$1{,}240$ each week","The account loses $\\$65$ in value every week","After $1{,}240$ weeks the account will be empty","The account decreases by $\\$1{,}240$ for every $\\$65$ withdrawn"],
+    "correct": 1
+  },
+  {
+    "section": 2, "sectionTitle": "Linear Modeling & Systems",
+    "type": "multiple_choice",
+    "prompt": "The system $6x - 9y = 15$ and $2x - 3y = k$ has infinitely many solutions. What must $k$ equal?",
+    "choices": ["$3$","$5$","$15$","$45$"],
+    "correct": 1
+  },
+  {
+    "section": 2, "sectionTitle": "Linear Modeling & Systems",
+    "type": "select_multiple",
+    "prompt": "A system of two linear equations is graphed and intersects at exactly one point. Select ALL statements that MUST be true.",
+    "choices": ["The system has a unique solution","The lines have different slopes","The lines have different $y$-intercepts","Neither line passes through the origin"],
+    "correct": [0, 1]
+  },
+  {
+    "section": 2, "sectionTitle": "Linear Modeling & Systems",
+    "type": "multiple_choice",
+    "prompt": "A linear function decreases by $9$ when $x$ increases by $4$, and $f(2) = 3$. What is the $y$-intercept?",
+    "choices": ["$7.5$","$7$","$7.25$","$6$"],
+    "correct": 0
+  },
+  {
+    "section": 2, "sectionTitle": "Linear Modeling & Systems",
+    "type": "numeric",
+    "prompt": "Solve the system: $\\dfrac{2}{3}x + \\dfrac{1}{4}y = 5$ and $\\dfrac{1}{2}x - \\dfrac{3}{4}y = -1$. What is $x + y$?",
+    "placeholder": "Enter a number",
+    "acceptedAnswers": ["12"]
+  },
+  {
+    "section": 2, "sectionTitle": "Linear Modeling & Systems",
+    "type": "multiple_choice",
+    "prompt": "A meal plan uses Food A ($8\\text{g}$ protein, $200$ cal/serving) and Food B ($5\\text{g}$ protein, $150$ cal/serving). The plan needs at least $40\\text{g}$ protein and under $1{,}050$ calories. Which system models all constraints?",
+    "choices": ["$8x+5y \\geq 40$ and $200x+150y \\leq 1050$","$8x+5y \\leq 40$ and $200x+150y \\geq 1050$","$8x+5y \\geq 40$ and $200x+150y < 1050$, $x,y>0$","$5x+8y \\geq 40$ and $150x+200y \\leq 1050$"],
+    "correct": 0
+  },
+  {
+    "section": 2, "sectionTitle": "Linear Modeling & Systems",
+    "type": "multiple_choice",
+    "prompt": "The table shows selected values of a linear function $h$. What is $h(-15)$?",
+    "info_box": ["$\\begin{array}{c|cccc} x & -3 & 0 & 6 & 9 \\\\ \\hline h(x) & 7 & 1 & -11 & -17 \\end{array}$"],
+    "choices": ["$h(x)=-2x+1;\\quad h(-15)=31$","$h(x)=-2x-1;\\quad h(-15)=29$","$h(x)=2x-1;\\quad h(-15)=-31$","$h(x)=-\\frac{2}{3}x+1;\\quad h(-15)=11$"],
+    "correct": 0
+  },
+  {
+    "section": 2, "sectionTitle": "Linear Modeling & Systems",
+    "type": "numeric",
+    "prompt": "A store: $6$ pens + $4$ notebooks = $\\$18.80$; $9$ pens + $2$ notebooks = $\\$17.20$. What does $1$ pen + $1$ notebook cost?",
+    "placeholder": "Enter dollar amount",
+    "acceptedAnswers": ["4.60","4.6"]
+  },
+  {
+    "section": 2, "sectionTitle": "Linear Modeling & Systems",
+    "type": "fill_blank",
+    "prompt": "Two plans: Plan A costs $\\$25 + \\$0.10m$; Plan B costs $\\$15 + \\$0.14m$. Set costs equal to find the break-even point.",
+    "info_box": ["Plan A: $C_A = 25 + 0.10m$","Plan B: $C_B = 15 + 0.14m$"],
+    "template": "Break-even at [minutes] minutes. For more minutes, Plan [plan] costs less.",
+    "blanks": [
+      { "id": "breakeven", "label": "break-even minutes", "acceptedAnswers": ["250"] },
+      { "id": "cheaperplan", "label": "cheaper plan letter", "acceptedAnswers": ["A"] }
+    ]
+  },
+  {
+    "section": 2, "sectionTitle": "Linear Modeling & Systems",
+    "type": "multiple_choice",
+    "prompt": "The solution to $-3 < 2 - x \\leq 7$ is graphed on a number line. Which description is correct?",
+    "choices": ["Open circle at $-5$, closed circle at $5$; shaded between","Closed circle at $-5$, open circle at $5$; shaded between","Open circle at $-5$, closed at $5$; shaded outside","Closed circle at $5$, open at $-5$; shaded between"],
+    "correct": 1
+  },
+  {
+    "section": 3, "sectionTitle": "Functions, Graphs & Transformations",
+    "type": "multiple_choice",
+    "prompt": "$f(x) = 3x - 2$ is transformed to $g(x) = 3(x-4)-2$. Which transformation maps $f$ to $g$?",
+    "choices": ["Vertical shift up $4$","Horizontal shift right $4$","Horizontal shift left $4$","Vertical shift down $4$"],
+    "correct": 1
+  },
+  {
+    "section": 3, "sectionTitle": "Functions, Graphs & Transformations",
+    "type": "multiple_choice",
+    "prompt": "A piecewise function is defined as shown. What is $f(-1) + f(1) + f(4)$?",
+    "info_box": ["$f(x) = \\begin{cases} 2x+1 & x < -1 \\\\ x^2-3 & -1 \\leq x < 2 \\\\ 5 & x \\geq 2 \\end{cases}$"],
+    "choices": ["$6$","$7$","$9$","$3$"],
+    "correct": 1
+  },
+  {
+    "section": 3, "sectionTitle": "Functions, Graphs & Transformations",
+    "type": "ordering",
+    "prompt": "$g(x) = -2(x+3)^2 + 5$ is built from $f(x) = x^2$. Arrange the four transformations in correct order of application.",
+    "items": [
+      "Shift left $3$ units",
+      "Reflect across the $x$-axis",
+      "Vertically stretch by factor $2$",
+      "Shift up $5$ units"
+    ],
+    "correct": [0, 1, 2, 3]
+  },
+  {
+    "section": 3, "sectionTitle": "Functions, Graphs & Transformations",
+    "type": "select_multiple",
+    "prompt": "A function $f$ has $f(0)=3$, decreasing on $(-\\infty,2)$, increasing on $(2,\\infty)$, $f(2)=-1$. Select ALL necessarily true statements.",
+    "choices": ["Minimum value of $f$ is $-1$","$f(4) > f(2)$","$f(-1) < f(0)$","$f(1) > f(2)$"],
+    "correct": [0, 1, 3]
+  },
+  {
+    "section": 3, "sectionTitle": "Functions, Graphs & Transformations",
+    "type": "numeric",
+    "prompt": "Using the table, what is the average rate of change of $f$ from $x=3$ to $x=7$?",
+    "info_box": ["$\\begin{array}{c|ccccc} x & 1 & 3 & 5 & 7 & 9 \\\\ \\hline f(x) & 4 & 10 & 22 & 40 & 64 \\end{array}$"],
+    "placeholder": "Enter a number",
+    "acceptedAnswers": ["7.5"]
+  },
+  {
+    "section": 3, "sectionTitle": "Functions, Graphs & Transformations",
+    "type": "matching",
+    "prompt": "Match each function description to its correct equation.",
+    "pairs": [
+      { "left": "Slope $2$, passes through the origin",                  "right": "$y = 2x$" },
+      { "left": "Slope $-\\frac{1}{2}$, $y$-intercept $4$",             "right": "$y = -\\frac{1}{2}x + 4$" },
+      { "left": "Horizontal line through $(0,-3)$",                      "right": "$y = -3$" },
+      { "left": "Perpendicular to $y=3x+1$, passes through origin",      "right": "$y = -\\frac{1}{3}x$" }
+    ],
+    "correct": [0, 1, 2, 3]
+  },
+  {
+    "section": 3, "sectionTitle": "Functions, Graphs & Transformations",
+    "type": "multiple_choice",
+    "prompt": "A linear function passes through the 2nd and 4th quadrants but NOT the 3rd. Which slope/intercept pair is possible?",
+    "choices": ["$m=-2, b=-3$","$m=2, b=-4$","$m=-\\frac{1}{2}, b=3$","$m=3, b=0$"],
+    "correct": 2
+  },
+  {
+    "section": 3, "sectionTitle": "Functions, Graphs & Transformations",
+    "type": "multiple_choice",
+    "prompt": "Starting with $f(x)=x$, three transformations are applied in order (see box). Which equation represents $g$?",
+    "info_box": ["1. Multiply output by $-2$ (stretch + reflection)","2. Add $3$ to the input (shift left)","3. Subtract $5$ from output (shift down)"],
+    "choices": ["$g(x)=-2(x+3)-5$","$g(x)=-2(x-3)-5$","$g(x)=2(x-3)+5$","$g(x)=-2x-1$"],
+    "correct": 0
+  },
+  {
+    "section": 3, "sectionTitle": "Functions, Graphs & Transformations",
+    "type": "hotspot",
+    "prompt": "The line $y = 2x - 3$ is graphed below. Click the point on the grid that represents the $x$-intercept of this line.",
+    "graph": {
+      "xMin": -4, "xMax": 6, "yMin": -5, "yMax": 5,
+      "line": { "slope": 2, "intercept": -3 },
+      "correctX": 1.5, "correctY": 0,
+      "snapGrid": 0.5, "tolerance": 0.6
+    }
+  },
+  {
+    "section": 3, "sectionTitle": "Functions, Graphs & Transformations",
+    "type": "select_multiple",
+    "prompt": "Select ALL representations that define $y$ as a function of $x$.",
+    "choices": ["$\\{(-1,3),(0,3),(2,5),(4,7)\\}$","$\\{(1,2),(3,4),(1,6),(5,8)\\}$","$x=y^2$","$y=2x-7$"],
+    "correct": [0, 3]
+  },
+  {
+    "section": 3, "sectionTitle": "Functions, Graphs & Transformations",
+    "type": "multiple_choice",
+    "prompt": "Revenue $R(t)=8t+30$ and cost $C(t)=5t+60$ (thousands). At what month $t$ does revenue first exceed cost?",
+    "choices": ["$t=10$; company first profitable after $10$ months","$t=11$; revenue exceeds cost in month $11$","$t=30$; always profitable after month $30$","$t=6$; costs and revenues equal at month $6$"],
+    "correct": 0
+  },
+  {
+    "section": 3, "sectionTitle": "Functions, Graphs & Transformations",
+    "type": "numeric",
+    "prompt": "For $f(x)=\\dfrac{3x-6}{x^2-4}$, how many integer values of $x$ in $[-5, 5]$ make $f(x)$ undefined?",
+    "placeholder": "Enter a whole number",
+    "acceptedAnswers": ["2"]
+  },
+  {
+    "section": 3, "sectionTitle": "Functions, Graphs & Transformations",
+    "type": "multiple_choice",
+    "prompt": "Which statement correctly compares the rates of change of functions $P$, $Q$, and $R$?",
+    "info_box": ["$P$: $y=3x+1$","$Q$: through $(0,2)$ and $(4,10)$","$R$: table — $x$: $0,2,4,6$ | $y$: $5,9,13,17$"],
+    "choices": ["$P$ has the greatest rate","$Q$ has the greatest rate","$R$ has the greatest rate","$Q$ and $R$ have equal rates"],
+    "correct": 1
+  },
+  {
+    "section": 3, "sectionTitle": "Functions, Graphs & Transformations",
+    "type": "graph_line",
+    "prompt": "Line $\\ell$ passes through $(-2,1)$ with slope $\\dfrac{3}{2}$. Which labeled point is the $y$-intercept of $\\ell$?",
+    "info_box": ["Use the slope and given point to find where the line crosses the $y$-axis."],
+    "graph": {
+      "xMin": -5, "xMax": 7, "yMin": -3, "yMax": 9,
+      "line": { "slope": 1.5, "intercept": 4 },
+      "points": [
+        { "id": "A", "x": 0, "y": 4,  "label": "A" },
+        { "id": "B", "x": 0, "y": 1,  "label": "B" },
+        { "id": "C", "x": 2, "y": 7,  "label": "C" },
+        { "id": "D", "x": -2,"y": 1,  "label": "D" },
+        { "id": "E", "x": 4, "y": 5,  "label": "E" }
+      ]
+    },
+    "correct": "A"
+  },
+  {
+    "section": 4, "sectionTitle": "Exponents, Polynomials & Quadratics",
+    "type": "multiple_choice",
+    "prompt": "Simplify: $(4x^3-9)\\div(2x-3)$. Assume $2x-3\\neq 0$.",
+    "choices": ["$2x^2-3$","$2x^2+3$","$2x+3$","$2x^2+3x-1$"],
+    "correct": 1
+  },
+  {
+    "section": 4, "sectionTitle": "Exponents, Polynomials & Quadratics",
+    "type": "numeric",
+    "prompt": "$(2x+5)(3x-4)-(x-3)^2$ written as $ax^2+bx+c$. What is $a+b+c$?",
+    "placeholder": "Enter an integer",
+    "acceptedAnswers": ["14"]
+  },
+  {
+    "section": 4, "sectionTitle": "Exponents, Polynomials & Quadratics",
+    "type": "multiple_choice",
+    "prompt": "Area of a rectangle is $6x^2+11x-10$; width is $(2x+5)$. What is the length?",
+    "choices": ["$3x-2$","$3x+2$","$3x-5$","$4x-2$"],
+    "correct": 0
+  },
+  {
+    "section": 4, "sectionTitle": "Exponents, Polynomials & Quadratics",
+    "type": "matching",
+    "prompt": "Match each quadratic expression to its correct factored form.",
+    "pairs": [
+      { "left": "$x^2+7x+12$",   "right": "$(x+3)(x+4)$" },
+      { "left": "$x^2-9$",        "right": "$(x+3)(x-3)$" },
+      { "left": "$x^2-6x+9$",    "right": "$(x-3)^2$" },
+      { "left": "$2x^2+x-3$",    "right": "$(2x+3)(x-1)$" }
+    ],
+    "correct": [0, 1, 2, 3]
+  },
+  {
+    "section": 4, "sectionTitle": "Exponents, Polynomials & Quadratics",
+    "type": "select_multiple",
+    "prompt": "Select ALL expressions equal to $\\dfrac{(2^3)^4}{4^2 \\cdot 2^{-1}}$.",
+    "choices": ["$2^8$","$2^5$","$256$","$\\dfrac{2^7}{4}$"],
+    "correct": [0, 2]
+  },
+  {
+    "section": 4, "sectionTitle": "Exponents, Polynomials & Quadratics",
+    "type": "multiple_choice",
+    "prompt": "$x^2-14x+49-4y^2$ written as a product of two binomials. What are those factors?",
+    "choices": ["$(x-7+2y)(x-7-2y)$","$(x+7+2y)(x+7-2y)$","$(x-7)^2-(2y)^2$","$(x-7-2y)^2$"],
+    "correct": 0
+  },
+  {
+    "section": 4, "sectionTitle": "Exponents, Polynomials & Quadratics",
+    "type": "fill_blank",
+    "prompt": "$f(x)=-2x^2+12x-7$ has vertex form $f(x)=a(x-h)^2+k$. Identify the vertex and maximum value.",
+    "template": "$h =$ [h-value] , $k =$ [k-value]",
+    "blanks": [
+      { "id": "h", "label": "h", "acceptedAnswers": ["3"] },
+      { "id": "k", "label": "k (max value)", "acceptedAnswers": ["11"] }
+    ]
+  },
+  {
+    "section": 4, "sectionTitle": "Exponents, Polynomials & Quadratics",
+    "type": "multiple_choice",
+    "prompt": "For which values of $x$ is $x^2-x-12<0$?",
+    "choices": ["$-3<x<4$","$x<-3$ or $x>4$","$-4<x<3$","$x<-4$ or $x>3$"],
+    "correct": 0
+  },
+  {
+    "section": 4, "sectionTitle": "Exponents, Polynomials & Quadratics",
+    "type": "hotspot",
+    "prompt": "The parabola $f(x) = -(x-2)^2 + 4$ is graphed below. Click the vertex of the parabola.",
+    "graph": {
+      "xMin": -2, "xMax": 6, "yMin": -3, "yMax": 6,
+      "parabola": { "a": -1, "h": 2, "k": 4 },
+      "correctX": 2, "correctY": 4,
+      "snapGrid": 1, "tolerance": 0.7
+    }
+  },
+  {
+    "section": 4, "sectionTitle": "Exponents, Polynomials & Quadratics",
+    "type": "multiple_choice",
+    "prompt": "A quadratic has zeros $x=-1$ and $x=5$, leading coefficient $-3$. Which equation defines it?",
+    "choices": ["$f(x)=-3(x-1)(x+5)$","$f(x)=-3(x+1)(x-5)$","$f(x)=3(x+1)(x-5)$","$f(x)=-3(x-1)(x-5)$"],
+    "correct": 1
+  },
+  {
+    "section": 4, "sectionTitle": "Exponents, Polynomials & Quadratics",
+    "type": "select_multiple",
+    "prompt": "$x^2+bx+36=0$ has exactly two real solutions. Select ALL integer values of $b$ for which this is true.",
+    "choices": ["$b=12$","$b=-13$","$b=-15$","$b=20$"],
+    "correct": [2, 3]
+  },
+  {
+    "section": 4, "sectionTitle": "Exponents, Polynomials & Quadratics",
+    "type": "numeric",
+    "prompt": "If $4^{x+1}=8^{x-1}$, what is $x$?",
+    "placeholder": "Enter a number",
+    "acceptedAnswers": ["5"]
+  },
+  {
+    "section": 5, "sectionTitle": "Advanced Reasoning & Multi-Step",
+    "type": "multiple_choice",
+    "prompt": "Find $3x-2y$ where $(x,y)$ is the solution to the system below.",
+    "info_box": ["$5x+3y=29$","$2x-6y=-4$"],
+    "choices": ["$10$","$14$","$8$","$16$"],
+    "correct": 0
+  },
+  {
+    "section": 5, "sectionTitle": "Advanced Reasoning & Multi-Step",
+    "type": "numeric",
+    "prompt": "A pump fills at $r_1$ gal/hr; a drain removes at $r_2$ gal/hr. After $3$ hr: $270$ net gallons added. After $7$ hr: $490$ net gallons. What is the net rate $r_1-r_2$?",
+    "placeholder": "Enter gallons per hour",
+    "acceptedAnswers": ["55"]
+  },
+  {
+    "section": 5, "sectionTitle": "Advanced Reasoning & Multi-Step",
+    "type": "ordering",
+    "prompt": "To solve $5x+3y=29$ and $2x-6y=-4$ by elimination, arrange the steps in the correct order.",
+    "items": [
+      "Multiply the first equation by $2$: $10x+6y=58$",
+      "Add the equations to eliminate $y$: $12x=54$",
+      "Solve for $x$: $x=4.5$",
+      "Substitute into the first equation to find $y$"
+    ],
+    "correct": [0, 1, 2, 3]
+  },
+  {
+    "section": 5, "sectionTitle": "Advanced Reasoning & Multi-Step",
+    "type": "select_multiple",
+    "prompt": "Model $T(d)$: $T(100)=68$; temperature increases $1.5°$F per $10$ ft depth. Select ALL true statements.",
+    "choices": ["$T(0)=53$","Rate of change is $0.15$ °F per foot","$T(d)=0.15d+53$","At $d=200$ ft, $T=83$ °F"],
+    "correct": [0, 1, 2, 3]
+  },
+  {
+    "section": 5, "sectionTitle": "Advanced Reasoning & Multi-Step",
+    "type": "hotspot",
+    "prompt": "The feasible region for $y \\geq \\frac{1}{2}x+1$, $y \\leq -x+7$, $x \\geq 0$ is shaded. Click any point that lies strictly INSIDE the region (not on a boundary).",
+    "graph": {
+      "xMin": -1, "xMax": 8, "yMin": -1, "yMax": 9,
+      "shading": { "vertices": [[0,1],[4,3],[0,7]] },
+      "correctX": 2, "correctY": 4,
+      "snapGrid": 1, "tolerance": 1.2,
+      "checkFn": "feasible_region"
+    }
+  },
+  {
+    "section": 5, "sectionTitle": "Advanced Reasoning & Multi-Step",
+    "type": "numeric",
+    "prompt": "$f(x)=x^2-8x+c$ has a vertex with $y$-coordinate $-7$. What is $c$?",
+    "placeholder": "Enter a number",
+    "acceptedAnswers": ["9"]
+  },
+  {
+    "section": 5, "sectionTitle": "Advanced Reasoning & Multi-Step",
+    "type": "multiple_choice",
+    "prompt": "For what value(s) of $k$ does $(k-3)x=2k-6$ have infinitely many solutions?",
+    "choices": ["$k=3$ only","All real $k$ except $k=3$","$k=0$ only","No value of $k$"],
+    "correct": 0
+  },
+  {
+    "section": 5, "sectionTitle": "Advanced Reasoning & Multi-Step",
+    "type": "matching",
+    "prompt": "Match each real-world scenario to the algebraic model that best represents it.",
+    "pairs": [
+      { "left": "Phone plan: $\\$20$ flat + $\\$0.05$/text",           "right": "$C = 20 + 0.05t$" },
+      { "left": "Savings: starts $\\$500$, grows $3\\%$/year",         "right": "$A = 500(1.03)^t$" },
+      { "left": "Taxi: $\\$2.50$/mile, no base fee",                  "right": "$C = 2.50m$" },
+      { "left": "Temperature drops $4°$ every hour from $80°$",       "right": "$T = 80 - 4h$" }
+    ],
+    "correct": [0, 1, 2, 3]
+  },
+  {
+    "section": 5, "sectionTitle": "Advanced Reasoning & Multi-Step",
+    "type": "select_multiple",
+    "prompt": "Feasible region: $y \\geq \\frac{1}{2}x+1$, $y \\leq -x+7$, $x \\geq 0$. Select ALL points inside or on the boundary.",
+    "info_box": ["$y \\geq \\dfrac{1}{2}x+1$","$y \\leq -x+7$","$x \\geq 0$"],
+    "choices": ["$(2, 4)$","$(4, 3)$","$(0, 1)$","$(6, 1)$"],
+    "correct": [0, 1, 2]
+  },
+  {
+    "section": 5, "sectionTitle": "Advanced Reasoning & Multi-Step",
+    "type": "numeric",
+    "prompt": "January: $3$ Model X + $7$ Model Y = $\\$1{,}670$. February: $5$ Model X + $2$ Model Y = $\\$1{,}180$. March: $4$ of each. What is March revenue?",
+    "placeholder": "Enter dollar amount",
+    "acceptedAnswers": ["1480"]
+  },
+  {
+    "section": 5, "sectionTitle": "Advanced Reasoning & Multi-Step",
+    "type": "multiple_choice",
+    "prompt": "A student concludes $\\dfrac{x^2-4}{x-2}=x+2$ holds for all real $x$. Which statement is correct?",
+    "choices": ["Correct; every real number satisfies it","Incorrect; $x=2$ is extraneous — it makes the denominator zero","Incorrect; only $x>2$ satisfies it","Incorrect; $x=2$ and $x=-2$ are both excluded"],
+    "correct": 1
+  }
+]

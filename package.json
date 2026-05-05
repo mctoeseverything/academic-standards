@@ -1,0 +1,43 @@
+
+{
+  "name": "asb-secure-exam",
+  "version": "1.0.0",
+  "description": "ASB Secure Exam Browser",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "set KIOSK=false && electron .",
+    "build:win": "electron-builder --win --x64"
+  },
+  "build": {
+    "appId": "com.asb.secureexam",
+    "productName": "ASB Secure Exam",
+    "directories": {
+      "buildResources": "assets",
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "style.css",
+      "script.js",
+      "questions.json",
+      "assets/**"
+    ],
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "requestedExecutionLevel": "requireAdministrator"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "runAfterFinish": false
+    }
+  },
+  "devDependencies": {
+    "electron": "^29.0.0",
+    "electron-builder": "^24.0.0"
+  }
+}
