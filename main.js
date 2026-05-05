@@ -71,15 +71,17 @@ function writeStudentsStore(store) {
   fs.writeFileSync(CONFIG.STUDENTS_FILE, JSON.stringify(store, null, 2));
 }
 
-function normalizeUsername(username) {
-  return String(username || '').trim().toLowerCase();
+function normalizeEmail(email) {
+  return String(email || '').trim().toLowerCase();
 }
 
 function sanitizeStudent(student) {
   return {
     id: student.id,
-    fullName: student.fullName,
-    username: student.username,
+    legalFirstName: student.legalFirstName,
+    legalLastName: student.legalLastName,
+    fullName: `${student.legalFirstName} ${student.legalLastName}`.trim(),
+    email: student.email,
     createdAt: student.createdAt,
   };
 }
@@ -369,24 +371,26 @@ ipcMain.on('request-exit', () => {
 });
 
 ipcMain.handle('students:create', async (_event, payload) => {
-  const fullName = String(payload?.fullName || '').trim();
-  const username = normalizeUsername(payload?.username);
+  const legalFirstName = String(payload?.legalFirstName || '').trim();
+  const legalLastName = String(payload?.legalLastName || '').trim();
+  const email = normalizeEmail(payload?.email);
   const password = String(payload?.password || '');
 
-  if (!fullName || !username || !password) {
-    throw new Error('Full name, username, and password are required.');
+  if (!legalFirstName || !legalLastName || !email || !password) {
+    throw new Error('Legal first name, legal last name, email, and password are required.');
   }
 
   const store = readStudentsStore();
-  if (store.students.some(student => student.username === username)) {
-    throw new Error('That username is already in use.');
+  if (store.students.some(student => student.email === email)) {
+    throw new Error('That email is already in use.');
   }
 
   const passwordParts = hashPassword(password);
   const student = {
     id: crypto.randomUUID(),
-    fullName,
-    username,
+    legalFirstName,
+    legalLastName,
+    email,
     passwordSalt: passwordParts.salt,
     passwordHash: passwordParts.hash,
     createdAt: new Date().toISOString(),
@@ -394,24 +398,24 @@ ipcMain.handle('students:create', async (_event, payload) => {
 
   store.students.push(student);
   writeStudentsStore(store);
-  log('STUDENT_CREATED', username);
+  log('STUDENT_CREATED', email);
   return sanitizeStudent(student);
 });
 
 ipcMain.handle('students:sign-in', async (_event, payload) => {
-  const username = normalizeUsername(payload?.username);
+  const email = normalizeEmail(payload?.email);
   const password = String(payload?.password || '');
 
-  if (!username || !password) {
-    throw new Error('Username and password are required.');
+  if (!email || !password) {
+    throw new Error('Email and password are required.');
   }
 
   const store = readStudentsStore();
-  const student = store.students.find(entry => entry.username === username);
+  const student = store.students.find(entry => entry.email === email);
   if (!student || !verifyPassword(password, student)) {
-    throw new Error('Invalid username or password.');
+    throw new Error('Invalid email or password.');
   }
 
-  log('STUDENT_SIGNED_IN', username);
+  log('STUDENT_SIGNED_IN', email);
   return sanitizeStudent(student);
 });

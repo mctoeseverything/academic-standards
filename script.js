@@ -1,6 +1,9 @@
 const APP_NAMESPACE = "standards-institute";
 const EXAM_ID = "algebra-1-practice";
 const DEFAULT_TIME = 5400;
+const AUTH_VIEW_CHOICE = "choice";
+const AUTH_VIEW_CREATE = "create";
+const AUTH_VIEW_SIGN_IN = "sign-in";
 
 let questions = [];
 let current   = 0;
@@ -24,15 +27,22 @@ let examBooted = false;
 
 // ── DOM refs ──────────────────────────────────────────────
 const authShell           = document.getElementById("authShell");
-const authLayout          = document.getElementById("authLayout");
+const authChoiceView      = document.getElementById("authChoiceView");
+const authFormView        = document.getElementById("authFormView");
 const studentHome         = document.getElementById("studentHome");
 const authMessage         = document.getElementById("authMessage");
 const signInForm          = document.getElementById("signInForm");
 const createAccountForm   = document.getElementById("createAccountForm");
-const signInUsername      = document.getElementById("signInUsername");
+const showCreateAccountButton = document.getElementById("showCreateAccountButton");
+const showSignInButton    = document.getElementById("showSignInButton");
+const backToChoiceButton  = document.getElementById("backToChoiceButton");
+const authFormTitle       = document.getElementById("authFormTitle");
+const authFormSubtitle    = document.getElementById("authFormSubtitle");
+const signInEmail         = document.getElementById("signInEmail");
 const signInPassword      = document.getElementById("signInPassword");
-const createFullName      = document.getElementById("createFullName");
-const createUsername      = document.getElementById("createUsername");
+const createLegalFirstName = document.getElementById("createLegalFirstName");
+const createLegalLastName = document.getElementById("createLegalLastName");
+const createEmail         = document.getElementById("createEmail");
 const createPassword      = document.getElementById("createPassword");
 const studentWelcome      = document.getElementById("studentWelcome");
 const studentSubline      = document.getElementById("studentSubline");
@@ -119,7 +129,7 @@ function formatTime(s) {
 }
 
 function getStudentScope() {
-  return currentStudent?.username || "guest";
+  return currentStudent?.email || "guest";
 }
 
 function getStateKey() {
@@ -195,6 +205,26 @@ function clearAuthMessage() {
   authMessage.hidden = true;
   authMessage.textContent = "";
   authMessage.className = "auth-message";
+}
+
+function setAuthView(view) {
+  const showingCreate = view === AUTH_VIEW_CREATE;
+  const showingSignIn = view === AUTH_VIEW_SIGN_IN;
+
+  authChoiceView.hidden = view !== AUTH_VIEW_CHOICE;
+  authFormView.hidden = view === AUTH_VIEW_CHOICE;
+  createAccountForm.hidden = !showingCreate;
+  signInForm.hidden = !showingSignIn;
+
+  if (showingCreate) {
+    authFormTitle.textContent = "Create Your Student Account";
+    authFormSubtitle.textContent = "Enter your legal name, email address, and password below.";
+    createLegalFirstName.focus();
+  } else if (showingSignIn) {
+    authFormTitle.textContent = "Sign In";
+    authFormSubtitle.textContent = "Use the email address and password associated with your student account.";
+    signInEmail.focus();
+  }
 }
 
 function resetExamMemory() {
@@ -1075,7 +1105,7 @@ async function loadQuestions(){
 }
 
 function updateStudentChrome() {
-  const label = currentStudent ? `${currentStudent.fullName} (${currentStudent.username})` : "";
+  const label = currentStudent ? currentStudent.fullName : "";
   studentChip.hidden = !currentStudent;
   studentChip.textContent = label;
 }
@@ -1085,7 +1115,7 @@ function updateStudentHome() {
   const savedSummary = getSavedSummaryForStudent();
 
   studentWelcome.textContent = `Welcome, ${currentStudent.fullName}`;
-  studentSubline.textContent = `Signed in as ${currentStudent.username}.`;
+  studentSubline.textContent = `Signed in as ${currentStudent.email}.`;
 
   if (savedState && !savedState.submitted) {
     const answered = questions.filter((_, i) => {
@@ -1123,7 +1153,8 @@ function updateStudentHome() {
 
 function showStudentHome() {
   clearAuthMessage();
-  authLayout.hidden = true;
+  authChoiceView.hidden = true;
+  authFormView.hidden = true;
   studentHome.hidden = false;
   authShell.hidden = false;
   examApp.hidden = true;
@@ -1140,12 +1171,12 @@ function signOutStudent() {
   resetExamMemory();
   updateStudentChrome();
   studentHome.hidden = true;
-  authLayout.hidden = false;
   authShell.hidden = false;
   examApp.hidden = true;
   signInForm.reset();
   createAccountForm.reset();
   clearAuthMessage();
+  setAuthView(AUTH_VIEW_CHOICE);
 }
 
 function startExamForCurrentStudent() {
@@ -1179,7 +1210,7 @@ async function handleSignIn(event) {
   }
   try {
     currentStudent = await window.examBridge.signInStudent({
-      username: signInUsername.value,
+      email: signInEmail.value,
       password: signInPassword.value,
     });
     signInForm.reset();
@@ -1198,8 +1229,9 @@ async function handleCreateAccount(event) {
   }
   try {
     currentStudent = await window.examBridge.createStudent({
-      fullName: createFullName.value,
-      username: createUsername.value,
+      legalFirstName: createLegalFirstName.value,
+      legalLastName: createLegalLastName.value,
+      email: createEmail.value,
       password: createPassword.value,
     });
     createAccountForm.reset();
@@ -1215,6 +1247,20 @@ async function handleCreateAccount(event) {
 window.addEventListener("load",()=>{ if(calculatorFrame)calculatorFrame.src="https://www.desmos.com/scientific"; });
 signInForm.addEventListener("submit", handleSignIn);
 createAccountForm.addEventListener("submit", handleCreateAccount);
+showCreateAccountButton.addEventListener("click", () => {
+  clearAuthMessage();
+  setAuthView(AUTH_VIEW_CREATE);
+});
+showSignInButton.addEventListener("click", () => {
+  clearAuthMessage();
+  setAuthView(AUTH_VIEW_SIGN_IN);
+});
+backToChoiceButton.addEventListener("click", () => {
+  clearAuthMessage();
+  signInForm.reset();
+  createAccountForm.reset();
+  setAuthView(AUTH_VIEW_CHOICE);
+});
 launchExamButton.addEventListener("click", startExamForCurrentStudent);
 signOutButton.addEventListener("click", signOutStudent);
 calculatorButton.addEventListener("click",()=>openModal("calculatorModal"));

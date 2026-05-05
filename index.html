@@ -26,20 +26,46 @@
     <div class="auth-panel">
       <div class="auth-brand">
         <div class="auth-kicker">Academic Standards Board</div>
-        <h1>Student Access</h1>
-        <p>Create a student account or sign in to start your practice exam on this device.</p>
+        <h1>Create Your Student Account</h1>
+        <p>Choose an option below to create a student account or sign in to an existing one.</p>
       </div>
 
-      <div class="auth-layout" id="authLayout">
-        <section class="auth-card">
+      <div class="auth-choice-view" id="authChoiceView">
+        <button class="auth-option-button" id="showCreateAccountButton" type="button">Student</button>
+        <button class="auth-option-button auth-option-button-muted" id="showSignInButton" type="button">Sign In</button>
+      </div>
+
+      <div class="auth-form-view" id="authFormView" hidden>
+        <section class="auth-card auth-card-active">
           <div class="auth-card-header">
-            <h2>Sign In</h2>
-            <p>Continue your own saved attempt.</p>
+            <h2 id="authFormTitle">Create Student Account</h2>
+            <p id="authFormSubtitle">Enter the student information below.</p>
           </div>
-          <form class="auth-form" id="signInForm">
+
+          <form class="auth-form" id="createAccountForm" hidden>
             <label class="auth-field">
-              <span>Username</span>
-              <input id="signInUsername" type="text" autocomplete="username" required />
+              <span>Legal First Name</span>
+              <input id="createLegalFirstName" type="text" autocomplete="given-name" required />
+            </label>
+            <label class="auth-field">
+              <span>Legal Last Name</span>
+              <input id="createLegalLastName" type="text" autocomplete="family-name" required />
+            </label>
+            <label class="auth-field">
+              <span>Email Address</span>
+              <input id="createEmail" type="email" autocomplete="email" required />
+            </label>
+            <label class="auth-field">
+              <span>Password</span>
+              <input id="createPassword" type="password" autocomplete="new-password" required />
+            </label>
+            <button class="primary-button auth-submit" type="submit">Create Account</button>
+          </form>
+
+          <form class="auth-form" id="signInForm" hidden>
+            <label class="auth-field">
+              <span>Email Address</span>
+              <input id="signInEmail" type="email" autocomplete="email" required />
             </label>
             <label class="auth-field">
               <span>Password</span>
@@ -47,28 +73,10 @@
             </label>
             <button class="primary-button auth-submit" type="submit">Sign In</button>
           </form>
-        </section>
 
-        <section class="auth-card auth-card-alt">
-          <div class="auth-card-header">
-            <h2>Create Account</h2>
-            <p>Set up a new student profile for this computer.</p>
+          <div class="auth-form-footer">
+            <button class="auth-link-button" id="backToChoiceButton" type="button">Back</button>
           </div>
-          <form class="auth-form" id="createAccountForm">
-            <label class="auth-field">
-              <span>Full Name</span>
-              <input id="createFullName" type="text" autocomplete="name" required />
-            </label>
-            <label class="auth-field">
-              <span>Username</span>
-              <input id="createUsername" type="text" autocomplete="username" required />
-            </label>
-            <label class="auth-field">
-              <span>Password</span>
-              <input id="createPassword" type="password" autocomplete="new-password" required />
-            </label>
-            <button class="secondary-button auth-submit" type="submit">Create Account</button>
-          </form>
         </section>
       </div>
 
