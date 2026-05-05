@@ -1,4 +1,5 @@
-const { app, BrowserWindow, globalShortcut, session, powerSaveBlocker, dialog, ipcMain } = require('electron');
+const { app, BrowserWindow, globalShortcut, session, powerSaveBlocker, dialog, ipcMain, clipboard } = require('electron');
+const { execFile } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
@@ -69,6 +70,40 @@ function log(event, detail) {
     fs.appendFileSync(LOG, line);
   } catch (_) {}
   console.log(line.trim());
+}
+
+function clearSystemClipboard() {
+  try {
+    clipboard.clear();
+    clipboard.writeText('');
+    log('CLIPBOARD_CLEARED');
+  } catch (error) {
+    log('CLIPBOARD_CLEAR_FAILED', error.message);
+  }
+}
+
+function minimizeOtherWindows() {
+  if (DEV || process.platform !== 'win32') {
+    return;
+  }
+
+  execFile(
+    'powershell.exe',
+    [
+      '-NoProfile',
+      '-NonInteractive',
+      '-WindowStyle', 'Hidden',
+      '-Command',
+      '(New-Object -ComObject Shell.Application).MinimizeAll()',
+    ],
+    error => {
+      if (error) {
+        log('OTHER_WINDOWS_MINIMIZE_FAILED', error.message);
+        return;
+      }
+      log('OTHER_WINDOWS_MINIMIZED');
+    }
+  );
 }
 
 function registerShortcuts() {
@@ -241,6 +276,8 @@ app.whenReady().then(() => {
   });
 
   registerShortcuts();
+  clearSystemClipboard();
+  minimizeOtherWindows();
   powerSaveBlocker.start('prevent-display-sleep');
   createWindow();
 });

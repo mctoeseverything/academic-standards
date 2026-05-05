@@ -14,6 +14,7 @@ let hotspotState       = {};
 let time      = DEFAULT_TIME;
 let timerId   = null;
 let submitted = false;
+let reviewingSubmitted = false;
 let eliminateMode  = false;
 let highlightMode  = false;
 let graphingCalculator = null;
@@ -51,6 +52,7 @@ const resultsCorrect      = document.getElementById("resultsCorrect");
 const resultsMarked       = document.getElementById("resultsMarked");
 const resultsTime         = document.getElementById("resultsTime");
 const resultsReview       = document.getElementById("resultsReview");
+const reviewResultsButton = document.getElementById("reviewResultsButton");
 const pauseButton         = document.querySelector(".pause-button");
 const qnavLabel           = document.getElementById("qnavLabel");
 
@@ -118,7 +120,7 @@ function restoreState() {
     hotspotState     = s.hotspotState     || {};
     time             = typeof s.time === "number" ? s.time : DEFAULT_TIME;
     submitted        = Boolean(s.submitted);
-  } catch { current=0; answers={}; markedQuestions=new Set(); time=DEFAULT_TIME; submitted=false; }
+  } catch { current=0; answers={}; markedQuestions=new Set(); time=DEFAULT_TIME; submitted=false; reviewingSubmitted=false; }
 }
 function loadNotes()  { notesField.value = localStorage.getItem(NOTES_KEY) || ""; }
 function saveNotes()  { localStorage.setItem(NOTES_KEY, notesField.value); }
@@ -132,12 +134,15 @@ function updateHeaderStats() {
 }
 function updateNavigationState() {
   const supportsElim = ["multiple_choice","select_multiple"].includes(questions[current]?.type);
+  const reviewing = submitted && reviewingSubmitted;
   if (!supportsElim) eliminateMode = false;
   const isLast = current === questions.length - 1;
-  prevButton.disabled = current === 0 || submitted;
-  nextButton.disabled = submitted;
+  prevButton.disabled = current === 0;
+  nextButton.disabled = false;
   nextButton.textContent = "";
-  if (isLast && !submitted) {
+  if (reviewing && isLast) {
+    nextButton.innerHTML = `Back to Score Report<svg class="tiny-icon" style="margin-left:4px;"><use href="#icon-chevron-right"/></svg>`;
+  } else if (isLast && !submitted) {
     nextButton.innerHTML = `Review &amp; Submit<svg class="tiny-icon" style="margin-left:4px;"><use href="#icon-chevron-right"/></svg>`;
   } else {
     nextButton.innerHTML = `Next<svg class="tiny-icon" style="margin-left:4px;"><use href="#icon-chevron-right"/></svg>`;
@@ -161,7 +166,7 @@ function renderGrid() {
     btn.className = `q-box${state ? " " + state : ""}`;
     btn.type = "button";
     btn.textContent = i + 1;
-    btn.disabled = submitted;
+    btn.disabled = submitted && !reviewingSubmitted;
     btn.title = `Q${i+1}: ${q.type.replace(/_/g," ")}`;
     btn.onclick = () => {
       current = i;
@@ -680,6 +685,7 @@ function renderQuestion() {
   if (eyebrow && q.sectionTitle) eyebrow.textContent = `§${q.section} · ${q.sectionTitle}`;
 
   renderQuestionInput(q);
+  if (submitted && reviewingSubmitted) renderSubmittedReviewPanel(q, current);
   typeset(questionText, choicesDiv);
   markToggle.classList.toggle("active", markedQuestions.has(current));
   markToggleLabel.textContent = markedQuestions.has(current) ? "Marked" : "Mark for Review";
@@ -687,6 +693,15 @@ function renderQuestion() {
 }
 
 function nextQuestion() {
+  if (submitted && reviewingSubmitted) {
+    if (current < questions.length - 1) {
+      current++;
+      renderQuestion();
+    } else {
+      exitSubmittedReview();
+    }
+    return;
+  }
   if (current < questions.length - 1) {
     current++; saveState(); renderQuestion();
   } else {
@@ -695,6 +710,13 @@ function nextQuestion() {
   }
 }
 function prevQuestion() {
+  if (submitted && reviewingSubmitted) {
+    if (current > 0) {
+      current--;
+      renderQuestion();
+    }
+    return;
+  }
   if (onReviewScreen) {
     hideReviewScreen();
     renderQuestion();
@@ -784,6 +806,33 @@ function showSubmitModal(auto=false) {
   openModal("submitModal");
 }
 
+function renderSubmittedReviewPanel(q, i) {
+  const panel = document.createElement("div");
+  panel.className = "submitted-review-panel";
+
+  const status = document.createElement("div");
+  status.className = isCorrect(i) ? "review-good" : "review-bad";
+  status.textContent = isCorrect(i) ? "Correct" : "Incorrect";
+  panel.appendChild(status);
+
+  const meta = document.createElement("div");
+  meta.className = "submitted-review-meta";
+  meta.innerHTML = `
+    <div class="submitted-review-line"><span>Your answer</span><strong>${escapeHtml(describeAnswer(i))}</strong></div>
+    <div class="submitted-review-line"><span>Correct answer</span><strong>${escapeHtml(describeCorrect(i))}</strong></div>
+  `;
+  panel.appendChild(meta);
+
+  if (q.explanation) {
+    const note = document.createElement("div");
+    note.className = "submitted-review-note";
+    note.innerHTML = q.explanation;
+    panel.appendChild(note);
+  }
+
+  choicesDiv.appendChild(panel);
+}
+
 // ── SCORING ───────────────────────────────────────────────
 function isCorrect(i) {
   const q=questions[i]; if(!hasAnswer(i))return false;
@@ -843,7 +892,7 @@ function describeCorrect(i){
 
 // ── RESULTS ───────────────────────────────────────────────
 function finalizeSubmission(){
-  submitted=true; saveState(); closeModal("submitModal");
+  submitted=true; reviewingSubmitted=false; saveState(); closeModal("submitModal");
   if(timerId)clearInterval(timerId);
   resetCalculator(); resetGraphingCalculator();
   renderQuestion(); renderResults(); openModal("resultsModal");
@@ -853,6 +902,8 @@ function renderResults(){
   questions.forEach((q,i)=>{
     if(isCorrect(i))correct++;
     const row=document.createElement("div");row.className="review-row";
+    row.role = "button";
+    row.tabIndex = 0;
     row.innerHTML=`
       <div class="review-row-top"><strong>Q${i+1} · ${q.sectionTitle||""}</strong>
         <span class="${isCorrect(i)?"review-good":"review-bad"}">${isCorrect(i)?"Correct":"Incorrect"}</span></div>
@@ -860,7 +911,15 @@ function renderResults(){
       <div class="review-meta">
         <span>Your answer: ${escapeHtml(describeAnswer(i))}</span>
         <span>Correct: ${escapeHtml(describeCorrect(i))}</span>
+        <span>Click to review this question</span>
       </div>`;
+    row.addEventListener("click", () => enterSubmittedReview(i));
+    row.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        enterSubmittedReview(i);
+      }
+    });
     resultsReview.appendChild(row);
   });
   const pct=Math.round(correct/questions.length*100);
@@ -874,11 +933,26 @@ function renderResults(){
 function restartTest(){
   current=0;answers={};markedQuestions=new Set();eliminatedChoices={};stemMarkup={};
   dragOrder={};matchState={};hotspotState={};
-  time=DEFAULT_TIME;submitted=false;eliminateMode=false;highlightMode=false;paused=false;keypadsVisible={};
+  time=DEFAULT_TIME;submitted=false;reviewingSubmitted=false;eliminateMode=false;highlightMode=false;paused=false;keypadsVisible={};
   closeModal("resultsModal");localStorage.removeItem(STORAGE_KEY);
   resetCalculator();resetGraphingCalculator();
   document.getElementById("pauseOverlay").style.display="none";
   startTimer();renderQuestion();
+}
+
+function enterSubmittedReview(startIndex = 0) {
+  reviewingSubmitted = true;
+  current = Math.max(0, Math.min(startIndex, questions.length - 1));
+  closeModal("resultsModal");
+  hideReviewScreen();
+  document.getElementById("qnavPopup")?.classList.remove("open");
+  renderQuestion();
+}
+
+function exitSubmittedReview() {
+  reviewingSubmitted = false;
+  renderResults();
+  openModal("resultsModal");
 }
 
 // ── TOOLS ─────────────────────────────────────────────────
@@ -912,6 +986,7 @@ markToggle.addEventListener("click",toggleMarked);
 submitButton.addEventListener("click",()=>showSubmitModal(false));
 confirmSubmitButton.addEventListener("click",finalizeSubmission);
 restartButton.addEventListener("click",restartTest);
+reviewResultsButton.addEventListener("click", () => enterSubmittedReview(0));
 eliminateModeButton.addEventListener("click",toggleEliminateMode);
 highlightModeButton.addEventListener("click",toggleHighlightMode);
 questionText.addEventListener("mouseup",applyHighlightFromSelection);

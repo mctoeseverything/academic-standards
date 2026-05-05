@@ -10,8 +10,10 @@ const {
   dialog,
   ipcMain,
   shell,
+  clipboard,
 } = require('electron');
 
+const { execFile } = require('child_process');
 const path = require('path');
 const fs   = require('fs');
 
@@ -35,6 +37,38 @@ function log(event, detail = '') {
   const line = `[${new Date().toISOString()}] ${event}${detail ? ' | ' + detail : ''}\n`;
   try { fs.appendFileSync(CONFIG.LOG_FILE, line); } catch (_) {}
   console.log(line.trim());
+}
+
+function clearSystemClipboard() {
+  try {
+    clipboard.clear();
+    clipboard.writeText('');
+    log('CLIPBOARD_CLEARED');
+  } catch (error) {
+    log('CLIPBOARD_CLEAR_FAILED', error.message);
+  }
+}
+
+function minimizeOtherWindows() {
+  if (!CONFIG.KIOSK || process.platform !== 'win32') return;
+
+  execFile(
+    'powershell.exe',
+    [
+      '-NoProfile',
+      '-NonInteractive',
+      '-WindowStyle', 'Hidden',
+      '-Command',
+      '(New-Object -ComObject Shell.Application).MinimizeAll()',
+    ],
+    (error) => {
+      if (error) {
+        log('OTHER_WINDOWS_MINIMIZE_FAILED', error.message);
+        return;
+      }
+      log('OTHER_WINDOWS_MINIMIZED');
+    }
+  );
 }
 
 // ── Block every shortcut that could expose the OS ────────
@@ -240,6 +274,8 @@ app.whenReady().then(() => {
 
   lockdownNetwork();
   registerShortcuts();
+  clearSystemClipboard();
+  minimizeOtherWindows();
 
   // Keep screen awake
   powerBlockerId = powerSaveBlocker.start('prevent-display-sleep');

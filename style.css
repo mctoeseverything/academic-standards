@@ -552,6 +552,7 @@ mjx-container[display="true"] { display: block; }
    ═══════════════════════════════════════════════════════════ */
 .results-grid { display: grid; grid-template-columns: 170px minmax(0,1fr); gap: 10px; margin-bottom: 10px; flex-shrink: 0; }
 .results-hero, .results-stats, .results-review { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-soft); }
+.results-header-actions { display: flex; align-items: center; gap: 8px; }
 .results-hero { padding: 14px; }
 .results-label { display: block; font-size: 0.72rem; font-weight: 600; color: var(--muted); }
 .results-score { margin-top: 4px; font-family: var(--font-body); font-size: 2rem; font-weight: 500; color: var(--text); }
@@ -566,9 +567,56 @@ mjx-container[display="true"] { display: block; }
 .review-row-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .review-row p { margin: 3px 0; color: var(--text); font-size: 0.76rem; }
 .review-meta { display: flex; gap: 10px; flex-wrap: wrap; font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+.review-row[role="button"] { cursor: pointer; transition: border-color 0.12s, background 0.12s; }
+.review-row[role="button"]:hover,
+.review-row[role="button"]:focus-visible { border-color: var(--accent); background: var(--accent-light); outline: none; }
 .review-good, .review-bad { display: inline-flex; align-items: center; min-height: 18px; padding: 0 10px; border-radius: var(--radius-pill); font-size: 0.7rem; font-weight: 600; }
 .review-good { background: var(--correct-bg); color: var(--correct-text); border: 1px solid var(--correct-border); }
 .review-bad  { background: var(--incorrect-bg); color: var(--incorrect-text); border: 1px solid var(--incorrect-border); }
+
+.submitted-review-panel {
+  margin-top: 16px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  max-width: 760px;
+}
+.submitted-review-meta {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+.submitted-review-line {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--surface);
+  font-size: 0.78rem;
+}
+.submitted-review-line span {
+  color: var(--muted);
+  font-weight: 600;
+}
+.submitted-review-line strong {
+  color: var(--text);
+  font-weight: 700;
+  text-align: right;
+}
+.submitted-review-note {
+  margin-top: 10px;
+  padding: 12px;
+  border-left: 3px solid var(--accent-mid);
+  border-radius: var(--radius-xs);
+  background: var(--surface);
+  color: var(--text-soft);
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
 
 .desmos-embed { width: 100%; height: 460px; }
 
