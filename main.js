@@ -14,6 +14,7 @@ const {
 } = require('electron');
 
 const { execFile } = require('child_process');
+const crypto = require('crypto');
 const path = require('path');
 const fs   = require('fs');
 
@@ -24,6 +25,7 @@ const CONFIG = {
   BLOCK_MULTI_SCREEN: true,   // refuse to launch if external display detected
   BLUR_AUTO_PAUSE:    true,   // auto-show overlay when window loses focus
   LOG_FILE:           path.join(app.getPath('userData'), 'exam-activity.log'),
+  STUDENTS_FILE:      path.join(app.getPath('userData'), 'students.json'),
   EXAM_URL:           `file://${path.join(__dirname, 'index.html')}`,
 };
 
@@ -47,6 +49,50 @@ function clearSystemClipboard() {
   } catch (error) {
     log('CLIPBOARD_CLEAR_FAILED', error.message);
   }
+}
+
+function ensureStudentsStore() {
+  if (!fs.existsSync(CONFIG.STUDENTS_FILE)) {
+    fs.writeFileSync(CONFIG.STUDENTS_FILE, JSON.stringify({ students: [] }, null, 2));
+  }
+}
+
+function readStudentsStore() {
+  ensureStudentsStore();
+  try {
+    return JSON.parse(fs.readFileSync(CONFIG.STUDENTS_FILE, 'utf8'));
+  } catch (_) {
+    return { students: [] };
+  }
+}
+
+function writeStudentsStore(store) {
+  ensureStudentsStore();
+  fs.writeFileSync(CONFIG.STUDENTS_FILE, JSON.stringify(store, null, 2));
+}
+
+function normalizeUsername(username) {
+  return String(username || '').trim().toLowerCase();
+}
+
+function sanitizeStudent(student) {
+  return {
+    id: student.id,
+    fullName: student.fullName,
+    username: student.username,
+    createdAt: student.createdAt,
+  };
+}
+
+function hashPassword(password, salt = crypto.randomBytes(16).toString('hex')) {
+  const hash = crypto.scryptSync(String(password), salt, 64).toString('hex');
+  return { salt, hash };
+}
+
+function verifyPassword(password, student) {
+  const computed = crypto.scryptSync(String(password), student.passwordSalt, 64);
+  const stored = Buffer.from(student.passwordHash, 'hex');
+  return stored.length === computed.length && crypto.timingSafeEqual(stored, computed);
 }
 
 function minimizeOtherWindows() {
@@ -320,4 +366,52 @@ app.on('window-all-closed', () => {
 // IPC from renderer (exam app can request unlock for legitimate exit)
 ipcMain.on('request-exit', () => {
   if (mainWindow) mainWindow.emit('close', { preventDefault: () => {} });
+});
+
+ipcMain.handle('students:create', async (_event, payload) => {
+  const fullName = String(payload?.fullName || '').trim();
+  const username = normalizeUsername(payload?.username);
+  const password = String(payload?.password || '');
+
+  if (!fullName || !username || !password) {
+    throw new Error('Full name, username, and password are required.');
+  }
+
+  const store = readStudentsStore();
+  if (store.students.some(student => student.username === username)) {
+    throw new Error('That username is already in use.');
+  }
+
+  const passwordParts = hashPassword(password);
+  const student = {
+    id: crypto.randomUUID(),
+    fullName,
+    username,
+    passwordSalt: passwordParts.salt,
+    passwordHash: passwordParts.hash,
+    createdAt: new Date().toISOString(),
+  };
+
+  store.students.push(student);
+  writeStudentsStore(store);
+  log('STUDENT_CREATED', username);
+  return sanitizeStudent(student);
+});
+
+ipcMain.handle('students:sign-in', async (_event, payload) => {
+  const username = normalizeUsername(payload?.username);
+  const password = String(payload?.password || '');
+
+  if (!username || !password) {
+    throw new Error('Username and password are required.');
+  }
+
+  const store = readStudentsStore();
+  const student = store.students.find(entry => entry.username === username);
+  if (!student || !verifyPassword(password, student)) {
+    throw new Error('Invalid username or password.');
+  }
+
+  log('STUDENT_SIGNED_IN', username);
+  return sanitizeStudent(student);
 });

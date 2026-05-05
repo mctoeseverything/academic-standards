@@ -52,9 +52,165 @@ body {
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
 }
+[hidden] { display: none !important; }
 button { font: inherit; appearance: none; border: none; background: none; cursor: pointer; }
 svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .icon-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+.auth-shell {
+  min-height: 100vh;
+  padding: 40px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at top left, rgba(59,75,200,0.16), transparent 34%),
+    linear-gradient(180deg, #f6f8fc 0%, #eef0f4 100%);
+}
+.auth-panel {
+  width: min(1080px, 100%);
+  padding: 36px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: rgba(255,255,255,0.92);
+  box-shadow: 0 18px 60px rgba(27,42,107,0.12);
+}
+.auth-brand {
+  margin-bottom: 28px;
+}
+.auth-kicker {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.auth-brand h1,
+.student-home-header h2 {
+  font-size: 2rem;
+  line-height: 1.05;
+  color: var(--text);
+  letter-spacing: -0.03em;
+  margin-bottom: 10px;
+}
+.auth-brand p,
+.student-home-header p,
+.auth-card-header p,
+.exam-launch-meta p {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+.auth-layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.auth-card,
+.exam-launch-card {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  padding: 22px;
+}
+.auth-card-alt {
+  background: linear-gradient(180deg, #ffffff 0%, #f8f9fd 100%);
+}
+.auth-card-header {
+  margin-bottom: 16px;
+}
+.auth-card-header h2,
+.exam-launch-meta h3 {
+  color: var(--text);
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+}
+.auth-form {
+  display: grid;
+  gap: 12px;
+}
+.auth-field {
+  display: grid;
+  gap: 6px;
+}
+.auth-field span {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-soft);
+  letter-spacing: 0.02em;
+}
+.auth-field input {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--text);
+}
+.auth-field input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59,75,200,0.12);
+}
+.auth-submit {
+  margin-top: 4px;
+  width: 100%;
+}
+.student-home {
+  display: grid;
+  gap: 18px;
+}
+.student-home-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.exam-launch-card {
+  display: grid;
+  gap: 16px;
+}
+.exam-launch-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.exam-launch-status,
+.auth-message {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+  font-size: 0.82rem;
+}
+.auth-message.is-error {
+  background: var(--incorrect-bg);
+  border-color: var(--incorrect-border);
+  color: var(--incorrect-text);
+}
+.auth-message.is-success {
+  background: var(--correct-bg);
+  border-color: var(--correct-border);
+  color: var(--correct-text);
+}
+.student-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: var(--header-text);
+  font-size: 0.68rem;
+  font-weight: 600;
+}
 
 /* ═══════════════════════════════════════════════════════════
    HEADER
@@ -625,6 +781,10 @@ mjx-container[display="true"] { display: block; }
    ═══════════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
   body { overflow: auto; }
+  .auth-shell { padding: 20px 14px; }
+  .auth-panel { padding: 22px; }
+  .auth-layout { grid-template-columns: 1fr; }
+  .student-home-header { flex-direction: column; }
   .page-shell { height: auto; }
   .question-body { padding: 18px 20px; }
   .action-bar { height: auto; padding: 8px 16px; }

@@ -1,5 +1,5 @@
-const STORAGE_KEY = "standards-institute-algebra-1-state-v3";
-const NOTES_KEY   = "standards-institute-algebra-1-notes";
+const APP_NAMESPACE = "standards-institute";
+const EXAM_ID = "algebra-1-practice";
 const DEFAULT_TIME = 5400;
 
 let questions = [];
@@ -19,8 +19,28 @@ let eliminateMode  = false;
 let highlightMode  = false;
 let graphingCalculator = null;
 let paused = false;
+let currentStudent = null;
+let examBooted = false;
 
 // ── DOM refs ──────────────────────────────────────────────
+const authShell           = document.getElementById("authShell");
+const authLayout          = document.getElementById("authLayout");
+const studentHome         = document.getElementById("studentHome");
+const authMessage         = document.getElementById("authMessage");
+const signInForm          = document.getElementById("signInForm");
+const createAccountForm   = document.getElementById("createAccountForm");
+const signInUsername      = document.getElementById("signInUsername");
+const signInPassword      = document.getElementById("signInPassword");
+const createFullName      = document.getElementById("createFullName");
+const createUsername      = document.getElementById("createUsername");
+const createPassword      = document.getElementById("createPassword");
+const studentWelcome      = document.getElementById("studentWelcome");
+const studentSubline      = document.getElementById("studentSubline");
+const examLaunchStatus    = document.getElementById("examLaunchStatus");
+const launchExamButton    = document.getElementById("launchExamButton");
+const signOutButton       = document.getElementById("signOutButton");
+const studentChip         = document.getElementById("studentChip");
+const examApp             = document.getElementById("examApp");
 const questionText        = document.getElementById("questionText");
 const choicesDiv          = document.getElementById("choices");
 const questionGrid        = document.getElementById("questionGrid");
@@ -98,15 +118,33 @@ function formatTime(s) {
   return [Math.floor(s/3600), Math.floor((s%3600)/60), s%60].map(n=>String(n).padStart(2,"0")).join(":");
 }
 
+function getStudentScope() {
+  return currentStudent?.username || "guest";
+}
+
+function getStateKey() {
+  return `${APP_NAMESPACE}:${EXAM_ID}:state:${getStudentScope()}`;
+}
+
+function getNotesKey() {
+  return `${APP_NAMESPACE}:${EXAM_ID}:notes:${getStudentScope()}`;
+}
+
+function getSummaryKey() {
+  return `${APP_NAMESPACE}:${EXAM_ID}:summary:${getStudentScope()}`;
+}
+
 // ── PERSIST ───────────────────────────────────────────────
 function saveState() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+  if (!currentStudent) return;
+  localStorage.setItem(getStateKey(), JSON.stringify({
     current, answers, markedQuestions:[...markedQuestions],
     eliminatedChoices, stemMarkup, dragOrder, matchState, hotspotState, time, submitted
   }));
 }
 function restoreState() {
-  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!currentStudent) return;
+  const raw = localStorage.getItem(getStateKey());
   if (!raw) return;
   try {
     const s = JSON.parse(raw);
@@ -122,8 +160,65 @@ function restoreState() {
     submitted        = Boolean(s.submitted);
   } catch { current=0; answers={}; markedQuestions=new Set(); time=DEFAULT_TIME; submitted=false; reviewingSubmitted=false; }
 }
-function loadNotes()  { notesField.value = localStorage.getItem(NOTES_KEY) || ""; }
-function saveNotes()  { localStorage.setItem(NOTES_KEY, notesField.value); }
+function loadNotes()  { notesField.value = currentStudent ? (localStorage.getItem(getNotesKey()) || "") : ""; }
+function saveNotes()  { if (currentStudent) localStorage.setItem(getNotesKey(), notesField.value); }
+
+function getSavedExamStateForStudent() {
+  if (!currentStudent) return null;
+  const raw = localStorage.getItem(getStateKey());
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function getSavedSummaryForStudent() {
+  if (!currentStudent) return null;
+  const raw = localStorage.getItem(getSummaryKey());
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function showAuthMessage(message, type = "error") {
+  authMessage.hidden = false;
+  authMessage.textContent = message;
+  authMessage.className = `auth-message is-${type}`;
+}
+
+function clearAuthMessage() {
+  authMessage.hidden = true;
+  authMessage.textContent = "";
+  authMessage.className = "auth-message";
+}
+
+function resetExamMemory() {
+  current = 0;
+  answers = {};
+  markedQuestions = new Set();
+  eliminatedChoices = {};
+  stemMarkup = {};
+  dragOrder = {};
+  matchState = {};
+  hotspotState = {};
+  time = DEFAULT_TIME;
+  submitted = false;
+  reviewingSubmitted = false;
+  eliminateMode = false;
+  highlightMode = false;
+  paused = false;
+  keypadsVisible = {};
+  closeModal("resultsModal");
+  closeModal("submitModal");
+  closeModal("submitWarningModal");
+  closeModal("pauseConfirmModal");
+  document.getElementById("pauseOverlay").style.display = "none";
+}
 
 // ── HEADER STATS ──────────────────────────────────────────
 function updateHeaderStats() {
@@ -894,6 +989,12 @@ function describeCorrect(i){
 function finalizeSubmission(){
   submitted=true; reviewingSubmitted=false; saveState(); closeModal("submitModal");
   if(timerId)clearInterval(timerId);
+  localStorage.setItem(getSummaryKey(), JSON.stringify({
+    completedAt: new Date().toISOString(),
+    answered: getAnsweredCount(),
+    correct: questions.filter((_, i) => isCorrect(i)).length,
+    total: questions.length,
+  }));
   resetCalculator(); resetGraphingCalculator();
   renderQuestion(); renderResults(); openModal("resultsModal");
 }
@@ -931,12 +1032,9 @@ function renderResults(){
   resultsTime.textContent=formatTime(time);
 }
 function restartTest(){
-  current=0;answers={};markedQuestions=new Set();eliminatedChoices={};stemMarkup={};
-  dragOrder={};matchState={};hotspotState={};
-  time=DEFAULT_TIME;submitted=false;reviewingSubmitted=false;eliminateMode=false;highlightMode=false;paused=false;keypadsVisible={};
-  closeModal("resultsModal");localStorage.removeItem(STORAGE_KEY);
+  resetExamMemory();
+  localStorage.removeItem(getStateKey());
   resetCalculator();resetGraphingCalculator();
-  document.getElementById("pauseOverlay").style.display="none";
   startTimer();renderQuestion();
 }
 
@@ -976,8 +1074,149 @@ async function loadQuestions(){
   catch{ const fb=document.getElementById("questionsFallback"); questions=JSON.parse(fb.textContent); }
 }
 
+function updateStudentChrome() {
+  const label = currentStudent ? `${currentStudent.fullName} (${currentStudent.username})` : "";
+  studentChip.hidden = !currentStudent;
+  studentChip.textContent = label;
+}
+
+function updateStudentHome() {
+  const savedState = getSavedExamStateForStudent();
+  const savedSummary = getSavedSummaryForStudent();
+
+  studentWelcome.textContent = `Welcome, ${currentStudent.fullName}`;
+  studentSubline.textContent = `Signed in as ${currentStudent.username}.`;
+
+  if (savedState && !savedState.submitted) {
+    const answered = questions.filter((_, i) => {
+      const q = questions[i];
+      const a = savedState.answers?.[i];
+      switch (q.type) {
+        case "select_multiple": return Array.isArray(a) && a.length > 0;
+        case "numeric":
+        case "short_response": return typeof a === "string" && a.trim().length > 0;
+        case "fill_blank": return a && typeof a === "object" && Object.values(a).some(v => String(v).trim().length > 0);
+        case "ordering": return Array.isArray(savedState.dragOrder?.[i]) && savedState.dragOrder[i].length === q.items.length;
+        case "matching": return savedState.matchState?.[i] && Object.values(savedState.matchState[i]).every(v => v !== null);
+        case "graph_point":
+        case "graph_line": return typeof a === "string" && a.length > 0;
+        case "hotspot": return savedState.hotspotState?.[i] != null;
+        default: return Number.isInteger(a);
+      }
+    }).length;
+
+    examLaunchStatus.textContent = `Saved attempt in progress. ${answered} of ${questions.length} questions answered with ${formatTime(savedState.time ?? DEFAULT_TIME)} remaining.`;
+    launchExamButton.textContent = "Resume Practice Exam";
+    return;
+  }
+
+  if (savedSummary) {
+    const percent = Math.round((savedSummary.correct / savedSummary.total) * 100);
+    examLaunchStatus.textContent = `Last completed attempt: ${percent}% (${savedSummary.correct}/${savedSummary.total}) on ${new Date(savedSummary.completedAt).toLocaleString()}.`;
+    launchExamButton.textContent = "Start New Practice Exam";
+    return;
+  }
+
+  examLaunchStatus.textContent = "No saved attempt yet.";
+  launchExamButton.textContent = "Start Practice Exam";
+}
+
+function showStudentHome() {
+  clearAuthMessage();
+  authLayout.hidden = true;
+  studentHome.hidden = false;
+  authShell.hidden = false;
+  examApp.hidden = true;
+  updateStudentChrome();
+  updateStudentHome();
+}
+
+function signOutStudent() {
+  currentStudent = null;
+  if (timerId) {
+    clearInterval(timerId);
+    timerId = null;
+  }
+  resetExamMemory();
+  updateStudentChrome();
+  studentHome.hidden = true;
+  authLayout.hidden = false;
+  authShell.hidden = false;
+  examApp.hidden = true;
+  signInForm.reset();
+  createAccountForm.reset();
+  clearAuthMessage();
+}
+
+function startExamForCurrentStudent() {
+  if (!currentStudent) return;
+  clearAuthMessage();
+  resetExamMemory();
+  restoreState();
+  loadNotes();
+  if (current > questions.length - 1) current = 0;
+  authShell.hidden = true;
+  examApp.hidden = false;
+  updateStudentChrome();
+  if (submitted) {
+    document.getElementById("time").textContent = formatTime(time);
+    renderQuestion();
+    renderResults();
+    openModal("resultsModal");
+  } else {
+    startTimer();
+    renderQuestion();
+  }
+  examBooted = true;
+}
+
+async function handleSignIn(event) {
+  event.preventDefault();
+  clearAuthMessage();
+  if (!window.examBridge?.signInStudent) {
+    showAuthMessage("Student sign-in is only available inside the Electron app.");
+    return;
+  }
+  try {
+    currentStudent = await window.examBridge.signInStudent({
+      username: signInUsername.value,
+      password: signInPassword.value,
+    });
+    signInForm.reset();
+    showStudentHome();
+  } catch (error) {
+    showAuthMessage(error.message || "Unable to sign in.");
+  }
+}
+
+async function handleCreateAccount(event) {
+  event.preventDefault();
+  clearAuthMessage();
+  if (!window.examBridge?.createStudent) {
+    showAuthMessage("Account creation is only available inside the Electron app.");
+    return;
+  }
+  try {
+    currentStudent = await window.examBridge.createStudent({
+      fullName: createFullName.value,
+      username: createUsername.value,
+      password: createPassword.value,
+    });
+    createAccountForm.reset();
+    signInForm.reset();
+    showStudentHome();
+    showAuthMessage("Account created. You can start the practice exam now.", "success");
+  } catch (error) {
+    showAuthMessage(error.message || "Unable to create account.");
+  }
+}
+
 // ── EVENT LISTENERS ───────────────────────────────────────
 window.addEventListener("load",()=>{ if(calculatorFrame)calculatorFrame.src="https://www.desmos.com/scientific"; });
+signInForm.addEventListener("submit", handleSignIn);
+createAccountForm.addEventListener("submit", handleCreateAccount);
+launchExamButton.addEventListener("click", startExamForCurrentStudent);
+signOutButton.addEventListener("click", signOutStudent);
 calculatorButton.addEventListener("click",()=>openModal("calculatorModal"));
 graphingButton.addEventListener("click",()=>{ initGraphingCalculator(); openModal("graphingModal"); });
 notesButton.addEventListener("click",()=>openModal("notesModal"));
@@ -1248,12 +1487,10 @@ function hideFocusLostOverlay() {
 }
 
 async function init(){
-  loadNotes(); restoreState(); await loadQuestions(); setupDraggableWindows();
-  if(current>questions.length-1)current=0;
-  startTimer();
+  await loadQuestions();
+  setupDraggableWindows();
   if(window.MathJax?.startup?.promise){ await MathJax.startup.promise; }
   else { await new Promise(res=>{ const t=setInterval(()=>{ if(window.MathJax?.typesetPromise){clearInterval(t);res();} },50); setTimeout(()=>{clearInterval(t);res();},4000); }); }
-  renderQuestion();
-  if(submitted){ if(timerId)clearInterval(timerId); renderResults(); openModal("resultsModal"); }
+  signOutStudent();
 }
 init().catch(()=>{ questionText.textContent="There was a problem loading the question set."; });

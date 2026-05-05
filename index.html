@@ -22,6 +22,82 @@
   <script src="https://www.desmos.com/api/v1.3/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
 </head>
 <body>
+  <div class="auth-shell" id="authShell">
+    <div class="auth-panel">
+      <div class="auth-brand">
+        <div class="auth-kicker">Academic Standards Board</div>
+        <h1>Student Access</h1>
+        <p>Create a student account or sign in to start your practice exam on this device.</p>
+      </div>
+
+      <div class="auth-layout" id="authLayout">
+        <section class="auth-card">
+          <div class="auth-card-header">
+            <h2>Sign In</h2>
+            <p>Continue your own saved attempt.</p>
+          </div>
+          <form class="auth-form" id="signInForm">
+            <label class="auth-field">
+              <span>Username</span>
+              <input id="signInUsername" type="text" autocomplete="username" required />
+            </label>
+            <label class="auth-field">
+              <span>Password</span>
+              <input id="signInPassword" type="password" autocomplete="current-password" required />
+            </label>
+            <button class="primary-button auth-submit" type="submit">Sign In</button>
+          </form>
+        </section>
+
+        <section class="auth-card auth-card-alt">
+          <div class="auth-card-header">
+            <h2>Create Account</h2>
+            <p>Set up a new student profile for this computer.</p>
+          </div>
+          <form class="auth-form" id="createAccountForm">
+            <label class="auth-field">
+              <span>Full Name</span>
+              <input id="createFullName" type="text" autocomplete="name" required />
+            </label>
+            <label class="auth-field">
+              <span>Username</span>
+              <input id="createUsername" type="text" autocomplete="username" required />
+            </label>
+            <label class="auth-field">
+              <span>Password</span>
+              <input id="createPassword" type="password" autocomplete="new-password" required />
+            </label>
+            <button class="secondary-button auth-submit" type="submit">Create Account</button>
+          </form>
+        </section>
+      </div>
+
+      <section class="student-home" id="studentHome" hidden>
+        <div class="student-home-header">
+          <div>
+            <div class="auth-kicker">Student Dashboard</div>
+            <h2 id="studentWelcome">Welcome</h2>
+            <p id="studentSubline">Your practice exam is ready.</p>
+          </div>
+          <button class="secondary-button" id="signOutButton" type="button">Sign Out</button>
+        </div>
+
+        <div class="exam-launch-card">
+          <div class="exam-launch-meta">
+            <div class="exam-launch-eyebrow">Practice Exam</div>
+            <h3>Algebra I Mock Exam</h3>
+            <p>Resume saved work or start a fresh attempt under your student account.</p>
+          </div>
+          <div class="exam-launch-status" id="examLaunchStatus">No saved attempt yet.</div>
+          <button class="primary-button" id="launchExamButton" type="button">Start Practice Exam</button>
+        </div>
+      </section>
+
+      <div class="auth-message" id="authMessage" hidden></div>
+    </div>
+  </div>
+
+  <div id="examApp" hidden>
 
   <!-- ── SVG icon sprite ─────────────────────────────────── -->
   <svg class="icon-sprite" aria-hidden="true" focusable="false">
@@ -87,6 +163,7 @@
     </div>
 
     <div class="header-right">
+      <div class="student-chip" id="studentChip" hidden></div>
       <button class="pause-button" type="button" onclick="togglePause()">
         <svg class="pause-icon"><use href="#icon-pause"/></svg>Pause
       </button>
@@ -381,6 +458,8 @@
   <script id="questionsFallback" type="application/json">
 [{"type":"multiple_choice","prompt":"Which expression is equivalent to $3(2x - 5) + 4x$?","choices":["$10x - 15$","$10x - 5$","$6x - 15$","$6x - 5$"],"correct":0}]
   </script>
+
+  </div>
 
   <script src="./script.js"></script>
 
